@@ -42,7 +42,7 @@ task prepareNpmPackage {
 
 task execConfig {
     doLast {
-        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "install"
+        yarnInstall.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").setup.yarnPath, "ynstall"
         npmPack.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "pack"
         nodeEnv.commandLine project(":node-distrib").config.nodePath, file("env.js"), "${project.buildDir}/env.json"
 
@@ -62,11 +62,12 @@ task execConfig {
 task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
     workingDir DISTRIB_PATH
     errorOutput = new ByteArrayOutputStream()
+    ignoreExitValue true
 
     doLast {
-        println("=====================")
-        println errorOutput.toString()
-        println("=====================")
+        if (execResult.exitValue > 0) {
+            throw new GradleException(errorOutput.toString())
+        }
     }
 }
 
