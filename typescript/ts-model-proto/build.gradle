@@ -24,7 +24,7 @@ task execConfig {
     }
 }
 
-task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:config"], type: Exec) {
     workingDir nodeModulesPath
 }
 

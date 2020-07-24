@@ -71,20 +71,3 @@ task config(dependsOn: unpackNodeDistrib) {
                 file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/node_modules/npm/bin/npm-cli.js").absolutePath :
                 file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js").absolutePath
 }
-
-task prepareNpmPackage(type: Copy) {
-    from "package.template.json"
-    into config.packageDir
-    rename { String fileName -> fileName.replace(".template", "") }
-}
-
-task execConfig() {
-    doLast {
-        setup.commandLine config.nodePath, config.npmPath, "install", "--verbose"
-    }
-}
-
-task setup(dependsOn: [prepareNpmPackage, config, execConfig], type: Exec) {
-    workingDir config.packageDir
-    ext.yarnPath = file("${config.packageDir}/node_modules/yarn/lib/cli.js").absolutePath
-}

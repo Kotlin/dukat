@@ -59,7 +59,7 @@ task execConfig {
     }
 }
 
-task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:config"], type: Exec) {
     workingDir DISTRIB_PATH
     errorOutput = new ByteArrayOutputStream()
     ignoreExitValue true
@@ -104,7 +104,7 @@ task buildDistrib {
 }
 
 
-task nodeEnv(type: Exec, dependsOn: [execConfig, ":node-distrib:setup"]) {
+task nodeEnv(type: Exec, dependsOn: [execConfig, ":node-distrib:config"]) {
     doFirst {
         mkdir project.buildDir
     }
