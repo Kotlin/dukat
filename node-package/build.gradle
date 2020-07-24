@@ -1,6 +1,5 @@
 plugins {
     id("base")
-    id("com.github.node-gradle.node")
 }
 
 def PROPERTY_REGISTRY = "dukat.npm.registry"
@@ -11,18 +10,6 @@ def TYPESCRIPT_VERSION = hasProperty("tsVersion") ? tsVersion : gradle.defaultTs
 def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE)
                                                         .replace("__DEFAULT__", gradle.defaultNpmPackageVersion)
                                                         .replace("__TIMESTAMP__", new Date().format("yyyyMMdd")) : gradle.defaultNpmPackageVersion
-
-node {
-    workDir = gradle.nodeWorkingDir
-
-    version = gradle.nodeVersion
-    npmVersion = gradle.npmVersion
-    yarnVersion = gradle.yarnVersion
-
-    nodeModulesDir = file(DISTRIB_PATH)
-    download = true
-}
-
 configurations {
     cliBinary
 }
@@ -55,17 +42,29 @@ task prepareNpmPackage {
 
 task execConfig {
     doLast {
-        jarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
+        yarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
         npmPack.commandLine  project(":node-distrib").config.npmPath, "pack"
+        nodeEnv.commandLine project(":node-distrib").config.nodePath, file("env.js"), "${project.buildDir}/env.json"
+
+        def distribPath = "dukat-${PACKAGE_VERSION}.tgz"
+
+        def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
+        def npmArgs = [project(":node-distrib").config.npmPath, "publish",  distribPath,  "--registry", "http://${registry}"]
+
+        if (project.hasProperty("dukat.npm.tag")) {
+            npmArgs += ["--tag", project.getProperty("dukat.npm.tag") as String]
+        }
+
+        npmPublish.commandLine npmArgs
     }
 }
 
-task jarnInstall(dependsOn: [prepareNpmPackage, execConfig], type: Exec) {
+task yarnInstall(dependsOn: [prepareNpmPackage, execConfig], type: Exec) {
     workingDir DISTRIB_PATH
 }
 
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack", jarnInstall, ":command-line:build"]
+    dependsOn = [":ts-converter:webpack", yarnInstall, ":command-line:build"]
 
     doLast {
         copy {
@@ -97,12 +96,11 @@ task buildDistrib {
 }
 
 
-task nodeEnv(type: NodeTask) {
+task nodeEnv(type: Exec, dependsOn: [execConfig]) {
     doFirst {
         mkdir project.buildDir
     }
-    script = file("env.js")
-    args = ["${project.buildDir}/env.json"]
+    workingDir DISTRIB_PATH
 }
 
 
@@ -124,18 +122,7 @@ task npmrc() {
 }
 
 
-
-task npmPublish(type: NpmTask) {
+task npmPublish(type: Exec) {
     dependsOn = [npmrc, npmPack]
-
-    def distribPath = "dukat-${PACKAGE_VERSION}.tgz"
-
-    def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
-    def npmArgs = ["publish",  distribPath,  "--registry", "http://${registry}"]
-
-    if (project.hasProperty("dukat.npm.tag")) {
-        npmArgs += ["--tag", project.getProperty("dukat.npm.tag") as String]
-    }
-
-    args = npmArgs
+    workingDir DISTRIB_PATH
 }
