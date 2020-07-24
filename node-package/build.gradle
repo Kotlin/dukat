@@ -96,7 +96,7 @@ task buildDistrib {
 }
 
 
-task nodeEnv(type: Exec, dependsOn: [execConfig]) {
+task nodeEnv(type: Exec, dependsOn: [execConfig, project(":node-distrib").setup]) {
     doFirst {
         mkdir project.buildDir
     }
