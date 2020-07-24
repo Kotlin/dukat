@@ -26,6 +26,14 @@ task execConfig {
 
 task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:config"], type: Exec) {
   workingDir packagePath
+  errorOutput = new ByteArrayOutputStream()
+  ignoreExitValue true
+
+  doLast {
+    if (execResult.exitValue > 0) {
+      throw new GradleException(errorOutput.toString())
+    }
+  }
 }
 
 task copyTypescriptDeclarations(type: Copy) {
