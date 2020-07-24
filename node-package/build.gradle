@@ -53,10 +53,18 @@ task prepareNpmPackage {
     }
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+task execConfig {
+    doLast {
+        jarnInstall.commandLine  project(":node-distrib").setup.yarnPath, "install"
+    }
+}
+
+task jarnInstall(dependsOn: [prepareNpmPackage, execConfig], type: Exec) {
+    workingDir DISTRIB_PATH
+}
 
 task buildDistrib {
-    dependsOn = [":ts-converter:webpack", yarn, ":command-line:build"]
+    dependsOn = [":ts-converter:webpack", jarnInstall, ":command-line:build"]
 
     doLast {
         copy {
