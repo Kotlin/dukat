@@ -60,10 +60,16 @@ task unpackNodeDistrib(dependsOn: [downloadNodeDistrib], type: Copy) {
 }
 
 task config(dependsOn: unpackNodeDistrib) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+
     ext.packageDir = "${project.buildDir}"
-    ext.distribPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}"
-    ext.nodePath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/bin/node"
-    ext.npmPath = "${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js"
+    ext.distribPath = file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}").absolutePath
+    ext.nodePath = os.windows ?
+                    file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/node.exe").absolutePath :
+                    file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/bin/node").absolutePath
+    ext.npmPath = os.windows ?
+                    file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/node_modules/npm/bin/npm-cli.js").absolutePath :
+                    file("${gradle.nodeDistribUnpackDir}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js").absolutePath
 }
 
 task prepareNpmPackage(type: Copy) {
@@ -79,12 +85,6 @@ task execConfig() {
 }
 
 task setup(dependsOn: [prepareNpmPackage, config, execConfig], type: Exec) {
-    doFirst {
-        println("START SETUP")
-    }
     workingDir config.packageDir
-    ext.yarnPath = "${config.packageDir}/node_modules/yarn/lib/cli.js"
-    doLast {
-        println("END SETUP")
-    }
+    ext.yarnPath = file("${config.packageDir}/node_modules/yarn/lib/cli.js").absolutePath
 }
