@@ -27,7 +27,7 @@ task execConfig {
   }
 }
 
-task yarnInstall(dependsOn: [prepareNpmPackage, execConfig], type: Exec) {
+task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
   workingDir packagePath
 }
 
@@ -60,7 +60,6 @@ task webpack(type: Exec) {
   inputs.dir("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js")
   inputs.dir("${project.buildDir}/ts")
   inputs.dir("${project.buildDir}/package/node_modules")
-
   outputs.file("${project.buildDir}/bundle/converter.js")
 }
 
