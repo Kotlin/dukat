@@ -61,6 +61,13 @@ task execConfig {
 
 task yarnInstall(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:setup"], type: Exec) {
     workingDir DISTRIB_PATH
+    errorOutput = new ByteArrayOutputStream()
+
+    doLast {
+        println("=====================")
+        println errorOutput.toString()
+        println("=====================")
+    }
 }
 
 task buildDistrib {
