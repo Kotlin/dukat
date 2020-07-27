@@ -22,7 +22,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getElement(): HTMLElement
     override fun <T : Shape> transform(shape: T): T
     override fun getSortOfEventTarget(): SortOfElement
-    override var prop: String
+    override val prop: String
 }
 
 external interface NumberEvent : BaseEvent {
@@ -65,5 +65,5 @@ external interface BaseEvent {
     fun getElement(): Element
     fun <T : Shape> transform(shape: T = definedExternally): T
     fun getSortOfEventTarget(): SortOfEventTarget
-    var prop: Any
+    val prop: Any
 }

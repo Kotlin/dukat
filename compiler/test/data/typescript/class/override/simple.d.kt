@@ -19,12 +19,12 @@ import org.w3c.xhr.*
 external open class Foo {
     open fun bar()
     open fun bar(a: Number)
-    open var baz: Any
+    open val baz: Any
 }
 
 external open class Boo : Foo {
     override fun bar()
     override fun bar(a: Number)
     open fun bar(a: String)
-    override var baz: Number
+    override val baz: Number
 }
