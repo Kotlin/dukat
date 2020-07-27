@@ -20,6 +20,7 @@ import org.jetbrains.dukat.model.commonLowerings.OverrideTypeChecker
 import org.jetbrains.dukat.model.commonLowerings.allParentMembers
 import org.jetbrains.dukat.model.commonLowerings.buildInheritanceGraph
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 
 private fun PropertyModel.toVal(): PropertyModel {
     return copy(
@@ -53,6 +54,23 @@ private class VarOverrideResolver(
         }
     }
 
+    private fun findVarPropertiesWithSpecifiedType(
+        member: PropertyModel,
+        parentMembers: Map<NameEntity?, List<MemberData>>,
+        typeChecker: OverrideTypeChecker
+    ): MemberData? {
+        val parentProperty = parentMembers[member.name]?.firstOrNull { it.memberModel is PropertyModel }
+        if (parentProperty != null) {
+            if (with (typeChecker) {
+                    val parentType = (parentProperty.memberModel as PropertyModel).type
+                    member.type.isOverridingReturnType(parentType) && !member.type.isEquivalent(parentType)
+                }) {
+                return parentProperty
+            }
+        }
+        return null
+    }
+
     private fun findSuperType(types: List<TypeModel>, typeChecker: OverrideTypeChecker): TypeModel? {
         var superType: TypeModel? = types[0]
         types.forEach { type ->
@@ -83,15 +101,29 @@ private class VarOverrideResolver(
         }
     }
 
-    private fun generateNewMembers(allConflictingProperties: List<List<MemberData>>, classLike: ClassLikeModel): List<MemberModel> {
+    private fun generateNewMembers(
+        allConflictingProperties: List<List<MemberData>>,
+        varPropertiesWithSpecifiedType: List<MemberData>,
+        classLike: ClassLikeModel
+    ): List<MemberModel> {
 
         val propertiesToAdd = allConflictingProperties.mapNotNull { createPropertyToAdd(it, classLike) }
 
-        return classLike.members.map { member ->
-            if (member is PropertyModel && allConflictingProperties.any { properties ->
-                    (properties[0].memberModel as PropertyModel).name == member.name
-                }) {
-                member.toVal()
+        return classLike.members.mapNotNull { member ->
+            if (member is PropertyModel) {
+                when {
+                    allConflictingProperties.any { properties ->
+                        (properties[0].memberModel as PropertyModel).name == member.name
+                    } -> {
+                        member.toVal()
+                    }
+                    varPropertiesWithSpecifiedType.any { (it.memberModel as PropertyModel).name == member.name } -> {
+                        member.toVal()
+                    }
+                    else -> {
+                        member
+                    }
+                }
             } else {
                 member
             }
@@ -102,7 +134,7 @@ private class VarOverrideResolver(
         ownerContext: NodeOwner<ClassLikeModel>,
         parentModule: ModuleModel
     ): ClassLikeModel? {
-        val classLike = ownerContext.node
+        val classLike = super.lowerClassLikeModel(ownerContext, parentModule) ?: return null
 
         val parentMembers = classLike.allParentMembers(modelContext)
 
@@ -111,9 +143,18 @@ private class VarOverrideResolver(
             OverrideTypeChecker(modelContext, inheritanceContext, classLike, null)
         )
 
-        allConflictingProperties.forEach { propertiesToChangeToVal += it }
+        val varPropertiesWithSpecifiedType = classLike.members.filterIsInstance<PropertyModel>().mapNotNull {
+            findVarPropertiesWithSpecifiedType(
+                it,
+                parentMembers,
+                OverrideTypeChecker(modelContext, inheritanceContext, classLike, null)
+            )
+        }
 
-        val newMembers = generateNewMembers(allConflictingProperties, classLike)
+        allConflictingProperties.forEach { propertiesToChangeToVal += it }
+        varPropertiesWithSpecifiedType.forEach { propertiesToChangeToVal += it }
+
+        val newMembers = generateNewMembers(allConflictingProperties, varPropertiesWithSpecifiedType, classLike)
 
         return when (classLike) {
             is InterfaceModel -> classLike.copy(members = newMembers)
@@ -166,7 +207,8 @@ class VarConflictResolveLowering : ModelLowering {
                 it.copy(root = varOverrideResolver.lowerRoot(it.root, NodeOwner(it.root, null)))
             }
         )
-        val varToValResolver = VarToValResolver(varOverrideResolver.propertiesToChangeToVal)
+        val varToValResolver =
+            VarToValResolver(varOverrideResolver.propertiesToChangeToVal)
         return newSourceSet.copy(
             sources = newSourceSet.sources.map {
                 it.copy(root = varToValResolver.lowerRoot(it.root, NodeOwner(it.root, null)))

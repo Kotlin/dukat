@@ -19,12 +19,12 @@ import org.w3c.xhr.*
 external interface Foo {
     fun bar()
     fun bar(a: Number)
-    var baz: Any
+    val baz: Any
 }
 
 external interface Boo : Foo {
     override fun bar()
     override fun bar(b: Number)
     fun bar(c: String)
-    override var baz: Number
+    override val baz: Number
 }

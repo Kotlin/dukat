@@ -29,7 +29,7 @@ external interface BaseEvent {
     fun getDelegateTarget(): Shape
     fun getElement(): Element
     fun <T : Shape> transform(shape: T = definedExternally): T
-    var prop: Any
+    val prop: Any
     fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<Any>
     var thisIsNullable: String?
 }
@@ -39,7 +39,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getDelegateTarget(): Box
     override fun getElement(): HTMLElement
     override fun <T : Shape> transform(shape: T): T
-    override var prop: String
+    override val prop: String
     open fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<String>
 }
 
@@ -49,12 +49,12 @@ external interface NumberEvent : BaseEvent {
 }
 
 external open class ParentClass {
-    open var prop: Any
+    open val prop: Any
     open fun ping(message: String)
 }
 
 external open class ChildClass : ParentClass {
-    override var prop: String
+    override val prop: String
     override fun ping(message: String /* "message" */)
 }
 
