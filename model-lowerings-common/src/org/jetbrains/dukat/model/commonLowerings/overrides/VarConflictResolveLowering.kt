@@ -34,7 +34,7 @@ private class VarOverrideResolver(
     private val inheritanceContext: InheritanceContext
 ) : ModelWithOwnerTypeLowering {
 
-    val propertiesToChangeToVal: MutableList<MemberData> = mutableListOf()
+    val propertiesToChangeToVal: MutableSet<NameEntity> = mutableSetOf()
 
     private fun findConflictingProperties(
         parentMembers: Map<NameEntity?, List<MemberData>>,
@@ -151,8 +151,11 @@ private class VarOverrideResolver(
             )
         }
 
-        allConflictingProperties.forEach { propertiesToChangeToVal += it }
-        varPropertiesWithSpecifiedType.forEach { propertiesToChangeToVal += it }
+        (allConflictingProperties + listOf(varPropertiesWithSpecifiedType)).forEach { propertiesToChangeToVal += it.mapNotNull { memberData ->
+            (memberData.memberModel as? PropertyModel)?.let { property ->
+                memberData.fqName?.appendLeft(property.name)
+            }
+        } }
 
         val newMembers = generateNewMembers(allConflictingProperties, varPropertiesWithSpecifiedType, classLike)
 
@@ -164,16 +167,14 @@ private class VarOverrideResolver(
     }
 }
 
-private class VarToValResolver(private val propertiesToChangeToVal: List<MemberData>) : ModelWithOwnerTypeLowering {
+private class VarToValResolver(private val propertiesToChangeToVal: Set<NameEntity>) : ModelWithOwnerTypeLowering {
 
     private var currentFqName: NameEntity = IdentifierEntity("")
 
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
         val property = ownerContext.node
 
-        return if (propertiesToChangeToVal.any {
-                (it.memberModel is PropertyModel) && (it.memberModel.name == property.name) && (it.fqName == currentFqName)
-            }) {
+        return if (propertiesToChangeToVal.contains(currentFqName.appendLeft(property.name))) {
             property.toVal()
         } else {
             property
