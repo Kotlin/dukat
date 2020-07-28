@@ -1,62 +1,63 @@
 plugins {
   id "java"
-  id "com.github.node-gradle.node"
 }
 
 def packagePath = "${project.buildDir}/package"
 def typescriptVersion = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 def tsDeclarationsPath = ".tsdeclarations"
 
-node {
-  workDir = gradle.nodeWorkingDir
-
-  // https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
-  version = gradle.nodeVersion
-  yarnVersion = gradle.yarnVersion
-
-  download = true
-
-  nodeModulesDir = file(packagePath)
-}
-
 task prepareNpmPackage(type: Copy) {
   from "package.template.json"
   into packagePath
   filter{ String line ->
     line.replaceAll("__TS_VERSION__", typescriptVersion)
-        .replaceAll("__PROTOBUF_VERSION__", gradle.protobufImplementationVersion)
+            .replaceAll("__PROTOBUF_VERSION__", gradle.protobufImplementationVersion)
   }
   rename { String fileName -> fileName.replace(".template", "") }
-
-  from "yarn.lock"
-  into packagePath
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+task execConfig {
+  doLast {
+    installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
+    webpack.commandLine project(":node-distrib").config.nodePath, "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
+    compileTs.commandLine project(":node-distrib").config.nodePath, file("${packagePath}/node_modules/typescript/bin/tsc"), "-p", file("./tsconfig.json").path
+  }
+}
+
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:config"], type: Exec) {
+  workingDir packagePath
+  errorOutput = new ByteArrayOutputStream()
+  ignoreExitValue true
+
+  doLast {
+    if (execResult.exitValue > 0) {
+      throw new GradleException(errorOutput.toString())
+    }
+  }
+}
 
 task copyTypescriptDeclarations(type: Copy) {
-  dependsOn = ["yarn"]
+  dependsOn = [installNpmDependencies]
 
   from "${packagePath}/node_modules/typescript/lib"
   into tsDeclarationsPath
   include "*.d.ts"
 }
 
-task compileTs(type: NodeTask) {
-  dependsOn = [yarn, copyTypescriptDeclarations, ":ts-model-proto:build"]
+task compileTs(type: Exec) {
+  dependsOn = [execConfig, installNpmDependencies, copyTypescriptDeclarations, ":ts-model-proto:build"]
+  workingDir project.projectDir
 
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   inputs.dir(packagePath)
   outputs.dir("./build/ts")
-
-  script = file("${packagePath}/node_modules/typescript/bin/tsc")
-
-  args = ["-p", file("./tsconfig.json").path]
 }
 
-task webpack(type: NodeTask) {
-  dependsOn = ["compileTs", ":ts-model-proto:build"]
+task webpack(type: Exec) {
+  dependsOn = [compileTs, ":ts-model-proto:build", execConfig]
+
+  workingDir project.projectDir
   def scriptName = "${project.buildDir}/package/node_modules/webpack/bin/webpack.js"
 
   inputs.file(scriptName)
@@ -64,10 +65,7 @@ task webpack(type: NodeTask) {
   inputs.dir("${project(":ts-model-proto").buildDir}/generated/source/proto/main/js")
   inputs.dir("${project.buildDir}/ts")
   inputs.dir("${project.buildDir}/package/node_modules")
-
   outputs.file("${project.buildDir}/bundle/converter.js")
-
-  script = file(scriptName)
 }
 
 task createJar(type: Zip) {

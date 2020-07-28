@@ -1,0 +1,14 @@
+{
+  "name": "node-distrib",
+  "private": true,
+  "version": "0.0.0",
+  "description": "This is non-public package the only purpose of which is to install packages we use for building the project further",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "yarn": "1.22.4"
+  },
+  "license": "UNLICENSED"
+}

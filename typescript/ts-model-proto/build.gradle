@@ -1,37 +1,40 @@
-import org.gradle.internal.os.OperatingSystem;
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id "java"
     id "com.google.protobuf"
-    id "com.github.node-gradle.node"
 }
 
 def targetMainDir = "${project.buildDir}/generated/source/proto/main"
 
 def nodeModulesPath = "${project.buildDir}/ts-model-proto-npm"
 
-node {
-    workDir = gradle.nodeWorkingDir
-
-    version = gradle.nodeVersion
-    npmVersion = gradle.npmVersion
-    yarnVersion = gradle.yarnVersion
-
-    nodeModulesDir = file(nodeModulesPath)
-    download = true
-}
-
-
 task prepareNpmPackage(type: Copy) {
     from "package.template.json"
     into nodeModulesPath
     rename { String fileName -> fileName.replace(".template", "") }
 
-    from "yarn.lock"
+    from "package-lock.json"
     into nodeModulesPath
 }
 
-yarn.dependsOn = [yarnSetup, prepareNpmPackage]
+task execConfig {
+    doLast {
+        installNpmDependencies.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
+    }
+}
+
+task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-distrib:config"], type: Exec) {
+    workingDir nodeModulesPath
+    errorOutput = new ByteArrayOutputStream()
+    ignoreExitValue true
+
+    doLast {
+        if (execResult.exitValue > 0) {
+            throw new GradleException(errorOutput.toString())
+        }
+    }
+}
 
 task copyGeneratedTs(type: Copy) {
     from "$targetMainDir/ts"
@@ -72,7 +75,7 @@ protobuf {
     generateProtoTasks {
         all().each { task ->
             if(task.name == 'generateProto') {
-                task.dependsOn = [yarn]
+                task.dependsOn = [installNpmDependencies]
                 task.finalizedBy(copyGeneratedTs)
             }
 

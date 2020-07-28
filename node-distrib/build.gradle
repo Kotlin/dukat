@@ -1,0 +1,75 @@
+import de.undercouch.gradle.tasks.download.Download
+import  org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+def NODE_DISTRIB_DIR = new File(gradle.gradleUserHomeDir, "node-distrib/unpacked").absolutePath
+
+def getDistribName(version) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+    Architecture architecture = DefaultNativePlatform.currentArchitecture
+
+    if (!architecture.amd64) {
+        throw new GradleException("unkown architecture ${architecture.displayName}")
+    }
+
+    String distribName = null
+
+    if (os.macOsX) {
+        distribName = "node-v${version}-darwin-x64"
+    }
+
+    if (os.linux) {
+        distribName = "node-v${version}-linux-x64"
+    }
+
+    if (os.windows) {
+        distribName = "node-v${version}-win-x64"
+    }
+
+    if (distribName == null) {
+        throw new GradleException("unkown architecture and/or operating system ${architecture.displayName} : ${os.displayName}")
+    }
+
+    return distribName
+}
+
+def existsOnlyAsZip() {
+    return DefaultNativePlatform.currentOperatingSystem.windows
+}
+
+def archiveExtension() {
+    return existsOnlyAsZip() ? ".zip" : ".tar.gz"
+}
+
+def distribUrl(version) {
+    def NODE_DISTRIB_REPO = "https://nodejs.org/dist"
+    def url = "$NODE_DISTRIB_REPO/v${version}"
+    def ext = existsOnlyAsZip() ? ".zip" : ".tar.gz"
+    return "${url}/${getDistribName(version)}${archiveExtension()}"
+}
+
+task downloadNodeDistrib(type: Download) {
+    onlyIfModified true
+    overwrite false
+    src distribUrl(gradle.nodeVersion)
+    dest new File(rootProject.gradle.gradleUserHomeDir, "node-distrib/v${gradle.nodeVersion}/node${archiveExtension()}")
+}
+
+task unpackNodeDistrib(dependsOn: [downloadNodeDistrib], type: Copy) {
+    from existsOnlyAsZip() ?
+            zipTree(downloadNodeDistrib.dest) :
+            tarTree(resources.gzip(downloadNodeDistrib.dest))
+    into NODE_DISTRIB_DIR
+}
+
+task config(dependsOn: unpackNodeDistrib) {
+    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+
+        ext.packageDir = "${project.buildDir}"
+        ext.distribPath = file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}").absolutePath
+        ext.nodePath = os.windows ?
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/node.exe").absolutePath :
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/bin/node").absolutePath
+        ext.npmPath = os.windows ?
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/node_modules/npm/bin/npm-cli.js").absolutePath :
+                file("${NODE_DISTRIB_DIR}/${getDistribName(gradle.nodeVersion)}/lib/node_modules/npm/bin/npm-cli.js").absolutePath
+}

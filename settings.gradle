@@ -43,7 +43,6 @@ gradle.ext {
   nodeWorkingDir = file("${gradle.gradleUserHomeDir}/nodejs")
   nodeVersion = "13.11.0"
   npmVersion = "6.13.4"
-  yarnVersion = "1.17.3"
   defaultTsVersion = "3.9.5"
   defaultNpmPackageVersion = "0.5.7"
   kotlinSerializationRuntimeVersion = "0.20.0"
@@ -74,6 +73,7 @@ include 'js-type-analysis'
 include 'logging'
 include 'model-lowerings'
 include 'module-name-resolver'
+include 'node-distrib'
 include 'node-package'
 include 'ownerContext'
 include 'panic'
