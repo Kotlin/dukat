@@ -256,7 +256,7 @@ private class LowerDeclarationsToNodes(
         return declaration
     }
 
-    private fun InterfaceDeclaration.convert(): TopLevelNode {
+    private fun InterfaceDeclaration.convert(inDeclaredModule: Boolean): TopLevelNode {
         return InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, true) },
@@ -264,7 +264,7 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
                 false,
                 uid,
-                true
+                inDeclaredModule || hasDeclareModifier()
         )
     }
 
@@ -430,7 +430,7 @@ private class LowerDeclarationsToNodes(
             is VariableDeclaration -> lowerVariableDeclaration(declaration, inDeclaredModule)
             is FunctionDeclaration -> declaration.convert(inDeclaredModule)
             is ClassDeclaration -> declaration.convert(inDeclaredModule)
-            is InterfaceDeclaration -> declaration.convert()
+            is InterfaceDeclaration -> declaration.convert(inDeclaredModule)
             is GeneratedInterfaceDeclaration -> declaration.convert()
             is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule)
             is EnumDeclaration -> declaration.convert()
