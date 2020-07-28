@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.model.commonLowerings.overrides
 
+import cartesian
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
@@ -20,7 +21,6 @@ import org.jetbrains.dukat.model.commonLowerings.OverrideTypeChecker
 import org.jetbrains.dukat.model.commonLowerings.allParentMembers
 import org.jetbrains.dukat.model.commonLowerings.buildInheritanceGraph
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.ownerContext.wrap
 
 private fun PropertyModel.toVal(): PropertyModel {
     return copy(
@@ -42,10 +42,10 @@ private class VarOverrideResolver(
     ): List<List<MemberData>> {
         return parentMembers.keys.mapNotNull { name ->
             val properties = parentMembers[name].orEmpty().filter { it.memberModel is PropertyModel }
-            if (properties.isEmpty() || properties.all {
+            if (properties.isEmpty() || cartesian(properties, properties).all { (first, second) ->
                     with(typeChecker) {
-                        (it.memberModel as PropertyModel).type.isEquivalent((properties[0].memberModel as PropertyModel).type)
-                    }
+                        (first.memberModel as PropertyModel).type.isEquivalent((second.memberModel as PropertyModel).type)
+                    } || inheritanceContext.areRelated(first.ownerModel, second.ownerModel)
                 }) {
                 null
             } else {
