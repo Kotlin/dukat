@@ -87,7 +87,7 @@ class DescriptorTests {
                 "qualifiedNames/extendingEntityFromParentModule",
                 "stdlib/convertTsStdlib",
                 "typePredicate/simple"
-        )
+        ).map { it.replace("/", System.getProperty("file.separator")) }
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
