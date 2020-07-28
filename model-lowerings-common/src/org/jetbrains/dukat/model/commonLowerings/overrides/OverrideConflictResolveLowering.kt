@@ -29,12 +29,13 @@ private fun PropertyModel.toVal(): PropertyModel {
     )
 }
 
-private class VarOverrideResolver(
+private class OverrideConflictResolver(
     private val modelContext: ModelContext,
     private val inheritanceContext: InheritanceContext
 ) : ModelWithOwnerTypeLowering {
 
     val propertiesToChangeToVal: MutableSet<NameEntity> = mutableSetOf()
+    val propertiesToChangeType: MutableMap<NameEntity, TypeModel> = mutableMapOf()
 
     private fun findConflictingProperties(
         parentMembers: Map<NameEntity?, List<MemberData>>,
@@ -69,6 +70,25 @@ private class VarOverrideResolver(
             }
         }
         return null
+    }
+
+    private fun processParentPropertiesNeededToChangeType(
+        member: PropertyModel,
+        parentMembers: Map<NameEntity?, List<MemberData>>,
+        typeChecker: OverrideTypeChecker
+    ) {
+        val parentProperty = parentMembers[member.name]?.firstOrNull { it.memberModel is PropertyModel }
+        if (parentProperty != null) {
+            val parentType = (parentProperty.memberModel as PropertyModel).type
+            val childType = member.type
+            val newType = parentType
+                .changeVarianceToMatchChild(childType, typeChecker)
+                .changeNullabilityToMatchChild(childType)
+            val fqName = parentProperty.fqName?.appendLeft(member.name)
+            if (newType != parentType && fqName != null) {
+                propertiesToChangeType[fqName] = newType
+            }
+        }
     }
 
     private fun findSuperType(types: List<TypeModel>, typeChecker: OverrideTypeChecker): TypeModel? {
@@ -109,7 +129,7 @@ private class VarOverrideResolver(
 
         val propertiesToAdd = allConflictingProperties.mapNotNull { createPropertyToAdd(it, classLike) }
 
-        return classLike.members.mapNotNull { member ->
+        return classLike.members.map { member ->
             if (member is PropertyModel) {
                 when {
                     allConflictingProperties.any { properties ->
@@ -143,8 +163,18 @@ private class VarOverrideResolver(
             OverrideTypeChecker(modelContext, inheritanceContext, classLike, null)
         )
 
-        val varPropertiesWithSpecifiedType = classLike.members.filterIsInstance<PropertyModel>().mapNotNull {
+        val properties = classLike.members.filterIsInstance<PropertyModel>()
+
+        val varPropertiesWithSpecifiedType = properties.mapNotNull {
             findVarPropertiesWithSpecifiedType(
+                it,
+                parentMembers,
+                OverrideTypeChecker(modelContext, inheritanceContext, classLike, null)
+            )
+        }
+
+        properties.forEach {
+            processParentPropertiesNeededToChangeType(
                 it,
                 parentMembers,
                 OverrideTypeChecker(modelContext, inheritanceContext, classLike, null)
@@ -167,17 +197,24 @@ private class VarOverrideResolver(
     }
 }
 
-private class VarToValResolver(private val propertiesToChangeToVal: Set<NameEntity>) : ModelWithOwnerTypeLowering {
+private class ParentPropertyChanger(
+    private val propertiesToChangeToVal: Set<NameEntity>,
+    private val propertiesToChangeType: MutableMap<NameEntity, TypeModel>
+) : ModelWithOwnerTypeLowering {
 
     private var currentFqName: NameEntity = IdentifierEntity("")
 
     override fun lowerPropertyModel(ownerContext: NodeOwner<PropertyModel>): PropertyModel {
         val property = ownerContext.node
+        val propertyFqName = currentFqName.appendLeft(property.name)
 
-        return if (propertiesToChangeToVal.contains(currentFqName.appendLeft(property.name))) {
-            property.toVal()
+        val newType = propertiesToChangeType[propertyFqName] ?: property.type
+        val newProperty = property.copy(type = newType)
+
+        return if (propertiesToChangeToVal.contains(propertyFqName)) {
+            newProperty.toVal()
         } else {
-            property
+            newProperty
         }
     }
 
@@ -197,22 +234,24 @@ private class VarToValResolver(private val propertiesToChangeToVal: Set<NameEnti
     }
 }
 
-class VarConflictResolveLowering : ModelLowering {
+class OverrideConflictResolveLowering : ModelLowering {
 
     override fun lower(source: SourceSetModel): SourceSetModel {
         val modelContext = ModelContext(source)
         val inheritanceContext = InheritanceContext(modelContext.buildInheritanceGraph())
-        val varOverrideResolver = VarOverrideResolver(modelContext, inheritanceContext)
+        val overrideConflictResolver = OverrideConflictResolver(modelContext, inheritanceContext)
         val newSourceSet = source.copy(
             sources = source.sources.map {
-                it.copy(root = varOverrideResolver.lowerRoot(it.root, NodeOwner(it.root, null)))
+                it.copy(root = overrideConflictResolver.lowerRoot(it.root, NodeOwner(it.root, null)))
             }
         )
-        val varToValResolver =
-            VarToValResolver(varOverrideResolver.propertiesToChangeToVal)
+        val parentPropertyChanger = ParentPropertyChanger(
+            overrideConflictResolver.propertiesToChangeToVal,
+            overrideConflictResolver.propertiesToChangeType
+        )
         return newSourceSet.copy(
             sources = newSourceSet.sources.map {
-                it.copy(root = varToValResolver.lowerRoot(it.root, NodeOwner(it.root, null)))
+                it.copy(root = parentPropertyChanger.lowerRoot(it.root, NodeOwner(it.root, null)))
             }
         )
     }
