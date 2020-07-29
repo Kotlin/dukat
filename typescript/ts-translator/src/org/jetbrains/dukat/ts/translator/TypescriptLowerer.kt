@@ -42,6 +42,7 @@ import org.jetbrains.dukat.tsLowerings.MoveAliasesFromMergeableModules
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
 import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
 import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
+import org.jetbrains.dukat.tsLowerings.ProcessTypePredicates
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RemoveUnusedGeneratedEntities
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
@@ -88,6 +89,7 @@ open class TypescriptLowerer(
                         RemoveUnusedGeneratedEntities(),
                         ProcessForOfStatements(),
                         ProcessNullabilityChecks(),
+                        ProcessTypePredicates(),
                         EscapeLiterals(),
                         MoveAliasesFromMergeableModules()
                 )

@@ -148,8 +148,4 @@ interface DeclarationStatementLowering : ExpressionLowering {
         }
     }
 
-    fun lowerBlockStatement(block: BlockDeclaration): BlockDeclaration {
-        return BlockDeclaration(block.statements.map { lower(it) })
-    }
-
 }

@@ -63,3 +63,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface InterfaceA
+
+external interface InterfaceB {
+    fun ping(): InterfaceC
+}
+
+external interface InterfaceC

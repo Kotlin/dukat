@@ -77,7 +77,7 @@ import {
   TupleDeclarationProto,
   TypeAliasDeclarationProto,
   TypeParameterDeclarationProto,
-  TypeParamReferenceDeclarationProto,
+  TypeParamReferenceDeclarationProto, TypePredicateDeclarationProto,
   TypeReferenceDeclarationProto,
   UnionTypeDeclarationProto,
   VariableDeclarationProto,
@@ -673,6 +673,16 @@ export class AstFactory {
 
     let paramValueDeclaration = new ParameterValueDeclarationProto();
     paramValueDeclaration.setUniontype(unionTypeDeclaration);
+    return paramValueDeclaration;
+  }
+
+  createTypePredicate(parameter: string, type: ParameterValueDeclarationProto): TypeDeclaration {
+    let typePredicateDeclaration = new TypePredicateDeclarationProto();
+    typePredicateDeclaration.setParameter(parameter);
+    typePredicateDeclaration.setType(type);
+
+    let paramValueDeclaration = new ParameterValueDeclarationProto();
+    paramValueDeclaration.setTypepredicate(typePredicateDeclaration);
     return paramValueDeclaration;
   }
 

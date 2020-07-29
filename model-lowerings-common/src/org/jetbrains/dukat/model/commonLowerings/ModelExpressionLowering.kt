@@ -9,6 +9,7 @@ import org.jetbrains.dukat.astModel.expressions.ConditionalExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
+import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
@@ -64,6 +65,10 @@ interface ModelExpressionLowering {
                 right = lower(expression.right)
             )
             is AsExpressionModel -> expression.copy(
+                expression = lower(expression.expression),
+                type = lowerTypeModel(NodeOwner(expression.type, null))
+            )
+            is IsExpressionModel -> expression.copy(
                 expression = lower(expression.expression),
                 type = lowerTypeModel(NodeOwner(expression.type, null))
             )

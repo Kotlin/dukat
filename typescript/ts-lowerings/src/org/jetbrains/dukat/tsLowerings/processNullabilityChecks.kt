@@ -7,6 +7,7 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.StatementDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
@@ -15,11 +16,32 @@ import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ParenthesizedExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.UnknownExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
+import java.util.*
 
 private class ProcessNullabilityChecksLowering(private val typeContext: StatementTypeContext) : DeclarationLowering {
 
     private val booleanUnaryOperators = listOf("!")
     private val booleanBinaryOperators = listOf("&&", "||")
+
+    private var counter = 1;
+
+    private fun generateVariableName(): String {
+        return "_vn${counter++}"
+    }
+
+    private fun createReplacementVariable(expression: ExpressionDeclaration): VariableDeclaration {
+        return VariableDeclaration(
+            name = generateVariableName(),
+            type = TypeDeclaration(IdentifierEntity("Any"), emptyList()),
+            modifiers = setOf(),
+            initializer = expression,
+            definitionsInfo = listOf(),
+            uid = "",
+            explicitlyDeclaredType = false
+        )
+    }
 
     private fun ExpressionDeclaration.convertToNonNullCheck(): ExpressionDeclaration {
         return BinaryExpressionDeclaration(
@@ -39,6 +61,9 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
 
     private fun processConditionNonNull(condition: ExpressionDeclaration): ExpressionDeclaration {
         if (!typeContext.hasBooleanType(condition)) {
+            if (condition !is IdentifierExpressionDeclaration) {
+                typeContext.addExpressionToReplace(condition)
+            }
             return ParenthesizedExpressionDeclaration(condition.convertToNonNullCheck())
         }
         return condition
@@ -46,6 +71,9 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
 
     private fun processEqualsNull(condition: UnaryExpressionDeclaration): ExpressionDeclaration {
         if (!typeContext.hasBooleanType(condition.operand)) {
+            if (condition.operand !is IdentifierExpressionDeclaration) {
+                typeContext.addExpressionToReplace(condition.operand)
+            }
             return ParenthesizedExpressionDeclaration(condition.operand.convertToEqualsNullCheck())
         }
         return condition
@@ -91,11 +119,31 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
         )
     }
 
-    override fun lowerBlockStatement(block: BlockDeclaration): BlockDeclaration {
+    override fun lowerBlock(statement: BlockDeclaration): BlockDeclaration {
         typeContext.startScope()
-        val newBlock = super.lowerBlockStatement(block)
+        val newStatements = mutableListOf<StatementDeclaration>()
+        var statementsToProcess = ArrayDeque(statement.statements)
+        while (statementsToProcess.isNotEmpty()) {
+            val nextStatement = super.lower(statementsToProcess.removeFirst())
+            val expressionsToReplace = typeContext.getRelevantExpressionsToReplace()
+            if (expressionsToReplace.isNotEmpty()) {
+                val replacementVariables = expressionsToReplace.map { createReplacementVariable(it) }
+                val replacementLowering = ReplaceExpressionsLowering(
+                    replacementVariables.map { variable ->
+                        variable.initializer!! to IdentifierExpressionDeclaration(IdentifierEntity(variable.name))
+                    }.toMap()
+                )
+
+                statementsToProcess = ArrayDeque(statementsToProcess.map {
+                    replacementLowering.lower(it)
+                })
+                newStatements += replacementVariables + replacementLowering.lower(nextStatement)
+            } else {
+                newStatements += nextStatement
+            }
+        }
         typeContext.endScope()
-        return newBlock
+        return BlockDeclaration(newStatements)
     }
 
     override fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {

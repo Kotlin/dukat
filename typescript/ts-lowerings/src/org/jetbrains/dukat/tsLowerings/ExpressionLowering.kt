@@ -1,5 +1,8 @@
 package org.jetbrains.dukat.tsLowerings
 
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.Declaration
@@ -118,8 +121,8 @@ interface ExpressionLowering {
             is NumericLiteralExpressionDeclaration -> declaration
             is RegExLiteralExpressionDeclaration -> declaration
             is StringLiteralExpressionDeclaration -> lowerStringLiteralDeclaration(declaration)
-            is IdentifierExpressionDeclaration -> declaration
-            is QualifierExpressionDeclaration -> declaration
+            is IdentifierExpressionDeclaration -> lowerIdentifierExpression(declaration)
+            is QualifierExpressionDeclaration -> lowerQualifierExpression(declaration)
             else -> {
                 logger.debug("[${this}] skipping $declaration")
                 declaration
@@ -129,6 +132,35 @@ interface ExpressionLowering {
 
     fun lowerStringLiteralDeclaration(literal: StringLiteralExpressionDeclaration): StringLiteralExpressionDeclaration {
         return literal
+    }
+
+    fun lowerIdentifier(identifier: IdentifierEntity): IdentifierEntity {
+        return identifier
+    }
+
+    fun lowerQualifier(qualifier: QualifierEntity): NameEntity {
+        return qualifier.copy(
+            left = lowerNameEntity(qualifier.left),
+            right = lowerIdentifier(qualifier.right)
+        )
+    }
+
+    fun lowerNameEntity(nameEntity: NameEntity): NameEntity {
+        return when (nameEntity) {
+            is IdentifierEntity -> lowerIdentifier(nameEntity)
+            is QualifierEntity -> lowerQualifier(nameEntity)
+        }
+    }
+
+    fun lowerIdentifierExpression(expression: IdentifierExpressionDeclaration): ExpressionDeclaration {
+        return expression.copy(identifier = lowerIdentifier(expression.identifier))
+    }
+
+    fun lowerQualifierExpression(expression: QualifierExpressionDeclaration): ExpressionDeclaration {
+        return when (val newName = lowerQualifier(expression.qualifier)) {
+            is QualifierEntity -> expression.copy(qualifier = newName)
+            is IdentifierEntity -> IdentifierExpressionDeclaration(newName)
+        }
     }
 
     fun lowerTemplateToken(token: TemplateTokenDeclaration): TemplateTokenDeclaration {

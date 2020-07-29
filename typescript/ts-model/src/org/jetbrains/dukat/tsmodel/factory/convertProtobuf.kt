@@ -47,6 +47,7 @@ import org.jetbrains.dukat.tsmodel.ThrowStatementDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TypePredicateDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.VariableLikeDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
@@ -161,6 +162,7 @@ import org.jetbrains.dukat.tsmodelproto.TopLevelDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeAliasDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeOfExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeParameterDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.TypePredicateDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.TypeReferenceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
@@ -591,6 +593,12 @@ private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration 
             FunctionTypeDeclaration(
                     parametersList.map { it.convert() },
                     type.convert()
+            )
+        }
+        hasTypePredicate() -> {
+            TypePredicateDeclaration(
+                typePredicate.parameter,
+                typePredicate.type.convert()
             )
         }
         else -> throw Exception("unknown ParameterValueDeclarationProto ${this}")
