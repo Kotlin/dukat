@@ -22,9 +22,12 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun ParameterDeclaration.isIdenticalTo(parameterDeclaration: ParameterDeclaration): Boolean {
     return (type == parameterDeclaration.type) &&
@@ -172,15 +175,20 @@ private fun GeneratedInterfaceDeclaration.isIdenticalTo(someInterface: Generated
 }
 
 
-private fun ParameterValueDeclaration.findTypeParameterDeclaration(): TypeParameterDeclaration? {
+private fun ParameterValueDeclaration.findTypeParameterDeclaration(): List<TypeParamReferenceDeclaration> {
     return when (this) {
-        is TypeParamReferenceDeclaration -> TypeParameterDeclaration(value, emptyList(), null)
-        else -> null
+        is TypeParamReferenceDeclaration -> listOf(this)
+        is UnionTypeDeclaration -> params.flatMap { it.findTypeParameterDeclaration() }
+        is IntersectionTypeDeclaration -> params.flatMap { it.findTypeParameterDeclaration() }
+        is TypeDeclaration -> params.flatMap { it.findTypeParameterDeclaration() }
+        is FunctionTypeDeclaration -> parameters.flatMap { it.type.findTypeParameterDeclaration() } +
+                type.findTypeParameterDeclaration()
+        else -> listOf()
     }
 }
 
-private fun ParameterValueDeclaration.resolveTypeParams(generatedTypeParams: LinkedHashSet<TypeParameterDeclaration>) {
-    findTypeParameterDeclaration()?.let {
+private fun ParameterValueDeclaration.resolveTypeParams(generatedTypeParams: LinkedHashSet<TypeParamReferenceDeclaration>) {
+    findTypeParameterDeclaration().forEach {
         generatedTypeParams.add(it)
     }
 }
@@ -204,7 +212,7 @@ class GeneratedInterfacesContext {
     }
 
     internal fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, uid: String): GeneratedInterfaceReferenceDeclaration {
-        val typeParams = LinkedHashSet<TypeParameterDeclaration>()
+        val typeParams = LinkedHashSet<TypeParamReferenceDeclaration>()
 
         declaration.members.forEach { member ->
             when (member) {
@@ -220,6 +228,7 @@ class GeneratedInterfacesContext {
                     member.type.resolveTypeParams(typeParams)
                 }
                 is FunctionDeclaration -> {
+                    member.parameters.forEach { param -> param.type.resolveTypeParams(typeParams) }
                     member.type.resolveTypeParams(typeParams)
                 }
                 is MethodSignatureDeclaration -> {
@@ -241,7 +250,9 @@ class GeneratedInterfacesContext {
                 GeneratedInterfaceDeclaration(
                         name = name,
                         members = declaration.members,
-                        typeParameters = generatedTypeParameters,
+                        typeParameters = generatedTypeParameters.map {
+                            TypeParameterDeclaration(it.value, listOf(), null)
+                        },
                         parentEntities = emptyList(),
                         definitionsInfo = emptyList(),
                         uid = generatedUid
@@ -257,7 +268,7 @@ class GeneratedInterfacesContext {
 
             referenceNode
         } else {
-            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, identicalInterface.typeParameters, ReferenceDeclaration(identicalInterface.uid))
+            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, generatedTypeParameters, ReferenceDeclaration(identicalInterface.uid))
         }
     }
 

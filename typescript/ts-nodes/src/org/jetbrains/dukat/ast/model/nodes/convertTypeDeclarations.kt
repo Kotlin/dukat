@@ -97,7 +97,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
         )
         is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
                 name,
-                typeParameters,
+                typeParameters.map { it.convertToNode() },
                 reference,
                 nullable,
                 metaData ?: meta
