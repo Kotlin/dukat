@@ -6,16 +6,21 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
 private fun NameEntity.addPostfix(postfix: String): NameEntity {
     return when (this) {
@@ -45,6 +50,25 @@ private class SubstituteTypeLowering(private val generatedEntities: Map<String, 
 
 private class EntityWithDefaultTypeParamsGenerator(private val references: Map<String, ClassLikeDeclaration>, private val generatedEntities: MutableMap<String, MutableMap<Int, ClassLikeDeclaration>>) : DeclarationLowering {
 
+    private fun ParameterValueDeclaration.processType(defValuesMap: Map<NameEntity, ParameterValueDeclaration>): ParameterValueDeclaration {
+        return when (this) {
+            is TypeParamReferenceDeclaration -> defValuesMap[value] ?: this
+            is TypeDeclaration -> copy(params = params.map { it.processType(defValuesMap) })
+            is UnionTypeDeclaration -> copy(params = params.map { it.processType(defValuesMap) })
+            is IntersectionTypeDeclaration -> copy(params = params.map { it.processType(defValuesMap) })
+            is GeneratedInterfaceReferenceDeclaration -> copy(typeParameters = typeParameters.map { it.processType(defValuesMap) })
+            is FunctionTypeDeclaration -> copy(
+                parameters = parameters.map { it.copy(type = it.type.processType(defValuesMap)) },
+                type = type.processType(defValuesMap)
+            )
+            else -> this
+        }
+    }
+
+    private fun TypeParameterDeclaration.processTypeParameter(defValuesMap: Map<NameEntity, ParameterValueDeclaration>): TypeParameterDeclaration {
+        return copy(constraints = constraints.map { it.processType(defValuesMap) })
+    }
+
     private fun checkForDefaultTypeParams(declarationParams: List<ParameterValueDeclaration>, resolvedClassLike: ClassLikeDeclaration?) {
         if (resolvedClassLike != null) {
             val typeParameters = resolvedClassLike.typeParameters
@@ -57,31 +81,42 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                         .getOrPut(resolvedClassLike.uid) { mutableMapOf() }
                         .getOrPut(declarationParams.size) {
 
-                            val defValues = typeParameters.subList(declarationParams.size, typeParameters.size).mapNotNull {
-                                val defValue = it.defaultValue
+                            val defValuesChanges = typeParameters.subList(declarationParams.size, typeParameters.size).mapNotNull { param ->
+                                val defValue = param.defaultValue
                                 when (defValue) {
                                     is ObjectLiteralDeclaration -> {
                                          if (defValue.members.isEmpty()) {
                                             TypeDeclaration(IdentifierEntity("Any"), emptyList())
-                                             defValue
+                                             param.name to defValue
                                         } else {
-                                            defValue
+                                            param.name to defValue
                                         }
                                     }
-                                    else -> defValue
+                                    null -> null
+                                    else -> param.name to defValue
                                 }
                             }
+
+                            val defValues = defValuesChanges.map { it.second }
                             val headValues = typeParameters.subList(0, declarationParams.size)
+
+                            val defValuesMap = defValuesChanges.toMap()
 
                             when (resolvedClassLike) {
                                 is InterfaceDeclaration -> InterfaceDeclaration(
                                         name = resolvedClassLike.name.addPostfix(postfix),
                                         members = emptyList(),
                                         uid = uid,
-                                        typeParameters = headValues,
+                                        typeParameters = headValues.map {
+                                            it.processTypeParameter(defValuesMap)
+                                        },
                                         parentEntities = listOf(HeritageClauseDeclaration(
                                                 name = resolvedClassLike.name,
-                                                typeArguments = headValues.map { TypeParamReferenceDeclaration(it.name) } + defValues,
+                                                typeArguments = headValues.map {
+                                                    TypeParamReferenceDeclaration(it.name)
+                                                } + defValues.map {
+                                                    it.processType(defValuesMap)
+                                                },
                                                 extending = false,
                                                 reference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
@@ -92,10 +127,16 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                         name = resolvedClassLike.name.addPostfix(postfix),
                                         members = emptyList(),
                                         uid = uid,
-                                        typeParameters = headValues,
+                                        typeParameters = headValues.map {
+                                            it.processTypeParameter(defValuesMap)
+                                        },
                                         parentEntities = listOf(HeritageClauseDeclaration(
                                                 name = resolvedClassLike.name,
-                                                typeArguments = headValues.map { TypeParamReferenceDeclaration(it.name) } + defValues,
+                                                typeArguments = headValues.map {
+                                                    TypeParamReferenceDeclaration(it.name)
+                                                } + defValues.map {
+                                                    it.processType(defValuesMap)
+                                                },
                                                 extending = false,
                                                 reference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
