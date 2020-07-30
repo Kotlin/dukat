@@ -53,8 +53,16 @@ class TypeAliasContext {
         return when (declaration) {
             is TypeDeclaration ->
                 myTypeAliasMap[declaration.reference?.uid]?.let { aliasResolved ->
+                    val typeReferenceWithReplacedDefaultValues = if (aliasResolved.typeParameters.size > declaration.params.size) {
+                        val defaultTypeMap = aliasResolved.typeParameters.subList(fromIndex = declaration.params.size, toIndex = aliasResolved.typeParameters.size).mapNotNull { param ->
+                            param.defaultValue?.let { param.name to it }
+                        }.toMap()
+                        TypeSpecifierLowering(defaultTypeMap).lowerParameterValue(aliasResolved.typeReference, NodeOwner(declaration, null))
+                    } else {
+                        aliasResolved.typeReference
+                    }
                     val aliasParamsMap: Map<NameEntity, ParameterValueDeclaration> = aliasResolved.typeParameters.zip(declaration.params).associateBy({ it.first.name }, { it.second })
-                    TypeSpecifierLowering(aliasParamsMap).lowerParameterValue(aliasResolved.typeReference, NodeOwner(declaration, null))
+                    TypeSpecifierLowering(aliasParamsMap).lowerParameterValue(typeReferenceWithReplacedDefaultValues, NodeOwner(declaration, null))
                 } ?: declaration
             else -> declaration
         }
