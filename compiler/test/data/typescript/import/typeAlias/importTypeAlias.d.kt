@@ -17,6 +17,6 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface State {
-    var currentEnvironment: String /* 'production' | 'development' */
+    var currentEnvironment: String /* "production" | "development" */
     fun ping(port: Number /* 80 | 440 */)
 }

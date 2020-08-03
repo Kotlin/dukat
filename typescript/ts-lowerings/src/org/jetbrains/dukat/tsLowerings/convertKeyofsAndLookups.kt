@@ -28,7 +28,7 @@ private class KeyOfAndLookupLowering(private val context: KeyOfAndLookupContext)
             if (reference != null) {
                 val namedMembers = context.getNamedMembers(reference.uid)
                 return UnionTypeDeclaration(
-                    namedMembers.map { StringLiteralDeclaration("\"${it.name}\"") }
+                    namedMembers.map { StringLiteralDeclaration(it.name) }
                 )
             }
         }
@@ -38,7 +38,7 @@ private class KeyOfAndLookupLowering(private val context: KeyOfAndLookupContext)
     }
 
     private fun findPropertyTypeByString(properties: List<PropertyDeclaration>, value: String): ParameterValueDeclaration? {
-        return properties.find { "\"${it.name}\"" == value }?.type
+        return properties.find { it.name == value }?.type
     }
 
     override fun lowerIndexTypeDeclaration(

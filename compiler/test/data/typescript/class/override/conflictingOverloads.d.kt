@@ -17,7 +17,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external open class Message {
-    open fun once(event: String /* 'abort' | 'timeout' | 'close' | 'drain' | "cancel" | "submit" | "start" | 'end' | 'finish' | 'basta' */, listener: () -> Unit): Message /* this */
+    open fun once(event: String /* "abort" | "timeout" | "close" | "drain" | "cancel" | "submit" | "start" | "end" | "finish" | "basta" */, listener: () -> Unit): Message /* this */
     open fun once(event: Any, listener: () -> Unit): Message /* this */
 }
 
@@ -38,7 +38,7 @@ external interface `T$0` {
     var privateKey: String
 }
 
-external fun generate(options: Options<String /* 'pem' | 'der' | 'der' */, String /* 'pem' | 'der' | 'pem' | 'der' */>): dynamic /* Result */
+external fun generate(options: Options<String /* "pem" | "der" | "der" */, String /* "pem" | "der" | "pem" | "der" */>): dynamic /* Result */
 
 external interface `T$1` {
     var publicKey: String

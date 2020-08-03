@@ -515,6 +515,8 @@ export class AstConverter {
           return this.createTypeDeclaration("boolean");
         } else if (literal.kind == ts.SyntaxKind.FirstLiteralToken) {
           return this.astFactory.createNumericLiteralDeclaration(literal.getText())
+        } else if (ts.isStringLiteral(literal)) {
+          return this.astFactory.createStringLiteralDeclaration(literal.text);
         } else {
           return this.astFactory.createStringLiteralDeclaration(literal.getText());
         }
