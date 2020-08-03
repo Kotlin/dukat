@@ -60,15 +60,14 @@ private class VarOverrideResolver(
         typeChecker: OverrideTypeChecker
     ): MemberData? {
         val parentProperty = parentMembers[member.name]?.firstOrNull { it.memberModel is PropertyModel }
-        if (parentProperty != null) {
-            if (with (typeChecker) {
-                    val parentType = (parentProperty.memberModel as PropertyModel).type
-                    member.type.isOverridingReturnType(parentType) && !member.type.isEquivalent(parentType)
-                }) {
-                return parentProperty
-            }
+        return if (parentProperty != null && with(typeChecker) {
+                val parentType = (parentProperty.memberModel as PropertyModel).type
+                member.type.isOverridingReturnType(parentType) && !member.type.isEquivalent(parentType)
+            }) {
+            parentProperty
+        } else {
+            null
         }
-        return null
     }
 
     private fun findSuperType(types: List<TypeModel>, typeChecker: OverrideTypeChecker): TypeModel? {
@@ -133,8 +132,8 @@ private class VarOverrideResolver(
     override fun lowerClassLikeModel(
         ownerContext: NodeOwner<ClassLikeModel>,
         parentModule: ModuleModel
-    ): ClassLikeModel? {
-        val classLike = super.lowerClassLikeModel(ownerContext, parentModule) ?: return null
+    ): ClassLikeModel {
+        val classLike = super.lowerClassLikeModel(ownerContext, parentModule)
 
         val parentMembers = classLike.allParentMembers(modelContext)
 
@@ -184,7 +183,7 @@ private class VarToValResolver(private val propertiesToChangeToVal: Set<NameEnti
     override fun lowerClassLikeModel(
         ownerContext: NodeOwner<ClassLikeModel>,
         parentModule: ModuleModel
-    ): ClassLikeModel? {
+    ): ClassLikeModel {
         currentFqName = currentFqName.appendLeft(ownerContext.node.name)
         val newClassLike = super.lowerClassLikeModel(ownerContext, parentModule)
         currentFqName = currentFqName.shiftRight()!!

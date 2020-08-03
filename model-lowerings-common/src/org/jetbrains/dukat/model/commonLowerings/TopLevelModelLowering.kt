@@ -4,34 +4,27 @@ import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
-import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
-import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
-import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
-import org.jetbrains.dukat.astModel.TypeModel
-import org.jetbrains.dukat.astModel.TypeParameterModel
-import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 
 interface TopLevelModelLowering : ModelStatementLowering {
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel = ownerContext.node
     fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel = ownerContext.node
-    fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? = ownerContext.node
-    fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? = ownerContext.node
+    fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel = ownerContext.node
+    fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel = ownerContext.node
     fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel = ownerContext.node
 
     fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel = ownerContext.node
     fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>, parentModule: ModuleModel): EnumModel = ownerContext.node
 
 
-    fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>, parentModule: ModuleModel): ClassLikeModel? {
+    fun lowerClassLikeModel(ownerContext: NodeOwner<ClassLikeModel>, parentModule: ModuleModel): ClassLikeModel {
         return when (val declaration = ownerContext.node) {
             is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext), parentModule)
             is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext), parentModule)
