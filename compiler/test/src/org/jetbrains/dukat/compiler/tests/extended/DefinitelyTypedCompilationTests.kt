@@ -10,7 +10,7 @@ import java.io.File
 
 
 private fun File.isDefinitelyTypedDeclaration(): Boolean {
-    return isFile() && name == "index.d.ts"
+    return isFile && name == "index.d.ts"
 }
 
 private fun File.getTestDescriptorName(): String {
@@ -27,7 +27,7 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
             sourcePath: String,
             tsConfig: String
     ) {
-        assertContentCompiles(descriptor, sourcePath)
+        assertContentCompiles(descriptor, sourcePath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     companion object {
@@ -42,11 +42,13 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
 
             val files = File(DEFINITELY_TYPED_DIR).walk()
                     .filter(filterFunc)
-                    .map {
+                    .map { file ->
+                        val tsConfig = file.parentFile.resolve("tsconfig.json").absoluteFile
+
                         arrayOf(
-                                it.getTestDescriptorName(),
-                                it.absolutePath,
-                                ""
+                                file.getTestDescriptorName(),
+                                file.absolutePath,
+                                if (tsConfig.exists()) tsConfig.absolutePath else ""
                         )
                     }.toList().toTypedArray()
 
