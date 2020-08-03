@@ -109,7 +109,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
         }
         is StringLiteralDeclaration -> {
             LiteralUnionNode(
-                    params = listOf(token),
+                    params = listOf("\"$token\""),
                     kind = UnionLiteralKind.STRING,
                     nullable = nullable
             )
@@ -125,7 +125,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
             when {
                 canBeTranslatedAsStringLiteral() -> {
                     LiteralUnionNode(
-                            params = params.mapNotNull { (it as? StringLiteralDeclaration)?.token },
+                            params = params.mapNotNull { (it as? StringLiteralDeclaration)?.token }.map { "\"$it\"" },
                             kind = UnionLiteralKind.STRING,
                             nullable = nullable
                     )

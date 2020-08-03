@@ -48,9 +48,10 @@ import {
   ImportClauseDeclarationProto,
   ImportEqualsDeclarationProto,
   ImportSpecifierDeclarationProto,
-  IndexSignatureDeclarationProto,
+  IndexSignatureDeclarationProto, IndexTypeDeclarationProto,
   InterfaceDeclarationProto,
   IntersectionTypeDeclarationProto,
+  KeyOfTypeDeclarationProto,
   MemberDeclarationProto,
   MethodSignatureDeclarationProto,
   ModifierDeclarationProto,
@@ -429,6 +430,16 @@ export class AstFactory {
     return memberEntity;
   }
 
+  createIndexTypeDeclaration(objectType: TypeDeclaration, indexType: TypeDeclaration): TypeDeclaration {
+    let type = new IndexTypeDeclarationProto();
+    type.setObjecttype(objectType);
+    type.setIndextype(indexType);
+
+    let parameterValueDeclaration = new ParameterValueDeclarationProto();
+    parameterValueDeclaration.setIndextype(type);
+    return parameterValueDeclaration;
+  }
+
   createInterfaceDeclaration(name: NameEntity, members: Array<MemberDeclaration>, typeParams: Array<TypeParameter>, parentEntities: Array<HeritageClauseDeclaration>, modifiers: Array<ModifierDeclaration>, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string): Declaration {
     let interfaceDeclaration = new InterfaceDeclarationProto();
     interfaceDeclaration.setName(name);
@@ -451,6 +462,15 @@ export class AstFactory {
     let paramValueDeclaration = new ParameterValueDeclarationProto();
     paramValueDeclaration.setIntersectiontype(intersection);
     return paramValueDeclaration;
+  }
+
+  createKeyOfTypeDeclaration(type: TypeDeclaration): TypeDeclaration {
+    let keyOfType = new KeyOfTypeDeclarationProto();
+    keyOfType.setType(type);
+
+    let typeDeclaration = new ParameterValueDeclarationProto();
+    typeDeclaration.setKeyoftype(keyOfType);
+    return typeDeclaration;
   }
 
   createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {

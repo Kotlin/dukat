@@ -1,4 +1,4 @@
-// [test] importTypeAlias.kt
+// [test] differentTypes.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
@@ -16,7 +16,13 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface State {
-    var currentEnvironment: String /* "production" | "development" */
-    fun ping(port: Number /* 80 | 440 */)
+external interface MODULE_KINDMap {
+    var A: Number /* 0 */
+    var B: String /* "b" */
+    var C: Number /* 1 */
+    var D: String /* "d" */
 }
+
+external var x: Number /* 0 | 1 */
+
+external var y: String /* "b" | "d" */

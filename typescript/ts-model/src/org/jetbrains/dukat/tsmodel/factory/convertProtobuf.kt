@@ -25,7 +25,9 @@ import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexTypeDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.types.KeyOfTypeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -166,7 +168,6 @@ import org.jetbrains.dukat.tsmodelproto.UnaryExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.UnknownExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.VariableDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.VariableLikeDeclarationProto
-import org.jetbrains.dukat.tsmodelproto.VariableLikeDeclarationProtoOrBuilder
 import org.jetbrains.dukat.tsmodelproto.WhileStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.YieldExpressionDeclarationProto
 
@@ -593,6 +594,11 @@ private fun ParameterValueDeclarationProto.convert(): ParameterValueDeclaration 
                     type.convert()
             )
         }
+        hasKeyOfType() -> KeyOfTypeDeclaration(keyOfType.type.convert())
+        hasIndexType() -> IndexTypeDeclaration(
+            indexType.objectType.convert(),
+            indexType.indexType.convert()
+        )
         else -> throw Exception("unknown ParameterValueDeclarationProto ${this}")
     }
 }

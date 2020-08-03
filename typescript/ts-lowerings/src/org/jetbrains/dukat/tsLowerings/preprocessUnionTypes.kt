@@ -4,6 +4,8 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.KeyOfTypeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -31,6 +33,8 @@ private fun ParameterValueDeclaration.makeNullable(): ParameterValueDeclaration 
         is UnionTypeDeclaration -> copy(params = params.map { it.makeNullable() }, nullable = true)
         is GeneratedInterfaceReferenceDeclaration -> copy(nullable = true)
         is ObjectLiteralDeclaration -> copy(nullable = true)
+        is IndexTypeDeclaration -> this
+        is KeyOfTypeDeclaration -> this
         else -> raiseConcern("makeNullable does not recognize type ${this}") { this }
     }
 }

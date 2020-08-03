@@ -41,7 +41,18 @@ message ParameterValueDeclarationProto {
         FunctionTypeDeclarationProto functionTypeDeclaration = 8;
         TypeParamReferenceDeclarationProto typeParamReferenceDeclaration = 9;
         NumericLiteralDeclarationProto numericLiteral = 10;
+        KeyOfTypeDeclarationProto keyOfType = 11;
+        IndexTypeDeclarationProto indexType = 12;
     }
+}
+
+message KeyOfTypeDeclarationProto {
+    ParameterValueDeclarationProto type = 1;
+}
+
+message IndexTypeDeclarationProto {
+    ParameterValueDeclarationProto objectType = 1;
+    ParameterValueDeclarationProto indexType = 2;
 }
 
 message NumericLiteralDeclarationProto {
