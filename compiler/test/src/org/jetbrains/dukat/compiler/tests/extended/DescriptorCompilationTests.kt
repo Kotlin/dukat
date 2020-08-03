@@ -19,7 +19,7 @@ class DescriptorCompilationTests : CompilationTests() {
         println("file:///${targetDir.normalize().absolutePath}")
 
         targetDir.deleteRecursively()
-        getTranslator().translate(sourcePath, targetPath, withDescriptors = true)
+        getTranslator().translate(sourcePath, targetPath, withDescriptors = true, tsConfig = if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     companion object {
