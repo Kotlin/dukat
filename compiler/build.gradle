@@ -209,6 +209,14 @@ test {
     systemProperty("dukat.test.resources.definitelyTyped", DEF_TYPE_DIR)
     systemProperty("dukat.test.resources.topN", TOPN_TARGET_DIR)
 
+    def systemPropPrefix = "system."
+    project.properties.forEach { key, value ->
+        if (key.startsWith(systemPropPrefix)) {
+            println("setting system property ${key} => ${value}")
+            systemProperty(key - systemPropPrefix, value)
+        }
+    }
+
     /*
         execute top-level classes in sequentially but their methods in parallel
         see https://junit.org/junit5/docs/5.5.1/user-guide/index.html#writing-tests-parallel-execution
