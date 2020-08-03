@@ -213,7 +213,6 @@ test {
         execute top-level classes in sequentially but their methods in parallel
         see https://junit.org/junit5/docs/5.5.1/user-guide/index.html#writing-tests-parallel-execution
     */
-    systemProperty("junit.jupiter.execution.parallel.enabled", "false")
     systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
     systemProperty("junit.jupiter.execution.parallel.mode.classes.default", "concurrent")
 
