@@ -7,6 +7,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
@@ -31,11 +32,16 @@ interface ModelWithOwnerLowering : TopLevelModelLowering {
         return declaration.copy(params = declaration.params.map { param -> lowerTypeParameterModel(ownerContext.wrap(param)) })
     }
 
+    fun lowerTypeParameterReferenceModel(ownerContext: NodeOwner<TypeParameterReferenceModel>): TypeParameterReferenceModel {
+        return ownerContext.node
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
         return when (val declaration = ownerContext.node) {
             is FunctionTypeModel -> lowerFunctionTypeModel(ownerContext as NodeOwner<FunctionTypeModel>)
             is TypeValueModel -> lowerTypeValueModel(ownerContext as NodeOwner<TypeValueModel>)
+            is TypeParameterReferenceModel -> lowerTypeParameterReferenceModel(ownerContext as NodeOwner<TypeParameterReferenceModel>)
             else -> declaration
         }
     }
