@@ -28,7 +28,8 @@ private fun NodeOwner<*>.moduleOwner(): ModuleNode? {
 private class ExportAssignmentLowering(
         private val root: ModuleNode,
         private val exportQualifierMap: MutableMap<String?, ExportQualifier>,
-        private val moduleNameResolver: ModuleNameResolver
+        private val moduleNameResolver: ModuleNameResolver,
+        private val fileName: String
 ) : NodeWithOwnerTypeLowering {
     private val assignExports: Map<String, ExportQualifier> = buildExportAssignmentTable(root)
 
@@ -52,7 +53,6 @@ private class ExportAssignmentLowering(
 
         return assignExports
     }
-
 
     private fun ModuleNode.getModuleName(): NameEntity? {
         return if (packageName.isStringLiteral()) {
@@ -155,7 +155,7 @@ internal class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleN
     override fun lower(source: SourceSetNode): SourceSetNode {
         return source. copy(sources = source.sources.map { sourceFileNode ->
             val root = sourceFileNode.root
-            sourceFileNode.copy(root = ExportAssignmentLowering(root, exportQualifierMap, moduleNameResolver).lowerRoot(root, NodeOwner(root, null)))
+            sourceFileNode.copy(root = ExportAssignmentLowering(root, exportQualifierMap, moduleNameResolver, sourceFileNode.fileName).lowerRoot(root, NodeOwner(root, null)))
         })
     }
 }

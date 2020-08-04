@@ -14,7 +14,6 @@ data class ModuleNode(
         val jsQualifier: NameEntity?,
 
         override var uid: String,
-        override val external: Boolean,
-        val fileName: String
+        override val external: Boolean
 
 ) : TopLevelNode

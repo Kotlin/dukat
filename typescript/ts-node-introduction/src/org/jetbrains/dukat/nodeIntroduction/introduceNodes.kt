@@ -483,8 +483,7 @@ private class LowerDeclarationsToNodes(
                 jsModule = null,
                 jsQualifier = null,
                 uid = documentRoot.uid,
-                external = isDeclaration,
-                fileName = fileName
+                external = isDeclaration
         )
     }
 }
