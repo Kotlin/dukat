@@ -314,7 +314,9 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
-        return if (hasDefaultModifier() && hasExportModifier()) { JsDefault } else null
+        return if (hasDefaultModifier() && hasExportModifier()) {
+            JsDefault
+        } else null
     }
 
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {

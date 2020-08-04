@@ -89,7 +89,6 @@ import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
-import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.translatorString.translate
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
