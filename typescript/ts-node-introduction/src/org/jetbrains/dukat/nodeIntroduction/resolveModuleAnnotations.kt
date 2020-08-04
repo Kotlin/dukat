@@ -12,7 +12,7 @@ import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
 private class ResolveQualifierAnnotations(
-        private val exportQualifierMap: MutableMap<String, ExportQualifier>
+        private val exportQualifierMap: MutableMap<String?, ExportQualifier>
 ) : NodeWithOwnerTypeLowering {
 
     override fun lowerRoot(moduleNode: ModuleNode, owner: NodeOwner<ModuleNode>): ModuleNode {
