@@ -7,7 +7,7 @@ import org.jetbrains.dukat.astCommon.MetaData
 
 data class GeneratedInterfaceReferenceNode(
         val name: NameEntity,
-        val typeParameters: List<TypeParameterDeclaration>,
+        val typeParameters: List<TypeNode>,
         val reference: ReferenceEntity?,
 
         override val nullable: Boolean = false,

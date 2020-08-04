@@ -290,7 +290,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     }
                     else -> typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                type = TypeParameterReferenceModel(typeParam.name, null),
+                                type = typeParam.process(),
                                 constraints = emptyList()
                         )
                     }
