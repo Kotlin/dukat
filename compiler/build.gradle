@@ -157,7 +157,7 @@ task prepareTopNPackage(type: Copy) {
 
 task installTopNConfig {
     doLast {
-        installTopN.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "install"
+        installTopN.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "ci"
     }
 }
 task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec) {
