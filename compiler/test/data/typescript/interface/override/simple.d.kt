@@ -26,5 +26,5 @@ external interface Boo : Foo {
     override fun bar()
     override fun bar(b: Number)
     fun bar(c: String)
-    override val baz: Number
+    override var baz: Number
 }

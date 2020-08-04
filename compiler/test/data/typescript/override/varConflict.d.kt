@@ -26,5 +26,5 @@ external interface C {
 }
 
 external open class A : B, C {
-    override val x: Boolean
+    override var x: Boolean
 }

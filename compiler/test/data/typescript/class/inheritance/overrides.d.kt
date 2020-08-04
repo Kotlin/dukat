@@ -39,7 +39,7 @@ external open class BoxStringEvent : BaseEvent {
     override fun getDelegateTarget(): Box
     override fun getElement(): HTMLElement
     override fun <T : Shape> transform(shape: T): T
-    override val prop: String
+    override var prop: String
     open fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<String>
 }
 
@@ -54,7 +54,7 @@ external open class ParentClass {
 }
 
 external open class ChildClass : ParentClass {
-    override val prop: String
+    override var prop: String
     override fun ping(message: String /* "message" */)
 }
 

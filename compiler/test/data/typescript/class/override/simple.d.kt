@@ -26,5 +26,5 @@ external open class Boo : Foo {
     override fun bar()
     override fun bar(a: Number)
     open fun bar(a: String)
-    override val baz: Number
+    override var baz: Number
 }

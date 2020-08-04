@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.model.commonLowerings.overrides
 
-import cartesian
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
@@ -108,35 +107,6 @@ private class VarOverrideResolver(
         }
     }
 
-    private fun generateNewMembers(
-        allConflictingProperties: List<List<MemberData>>,
-        varPropertiesWithSpecifiedType: List<MemberData>,
-        classLike: ClassLikeModel
-    ): List<MemberModel> {
-
-        val propertiesToAdd = allConflictingProperties.mapNotNull { createPropertyToAdd(it, classLike) }
-
-        return classLike.members.mapNotNull { member ->
-            if (member is PropertyModel) {
-                when {
-                    allConflictingProperties.any { properties ->
-                        (properties[0].memberModel as PropertyModel).name == member.name
-                    } -> {
-                        member.toVal()
-                    }
-                    varPropertiesWithSpecifiedType.any { (it.memberModel as PropertyModel).name == member.name } -> {
-                        member.toVal()
-                    }
-                    else -> {
-                        member
-                    }
-                }
-            } else {
-                member
-            }
-        } + propertiesToAdd
-    }
-
     override fun lowerClassLikeModel(
         ownerContext: NodeOwner<ClassLikeModel>,
         parentModule: ModuleModel
@@ -164,7 +134,7 @@ private class VarOverrideResolver(
             }
         } }
 
-        val newMembers = generateNewMembers(allConflictingProperties, varPropertiesWithSpecifiedType, classLike)
+        val newMembers = classLike.members + allConflictingProperties.mapNotNull { createPropertyToAdd(it, classLike) }
 
         return when (classLike) {
             is InterfaceModel -> classLike.copy(members = newMembers)
