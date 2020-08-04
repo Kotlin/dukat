@@ -36,9 +36,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
-import org.jetbrains.dukat.astCommon.isStringLiteral
-import org.jetbrains.dukat.astCommon.process
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -95,8 +92,7 @@ private fun NameEntity.unquote(): NameEntity {
 
 
 private class LowerDeclarationsToNodes(
-        private val fileName: String,
-        private val moduleNameResolver: ModuleNameResolver
+        private val fileName: String
 ) {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
@@ -478,16 +474,7 @@ private class LowerDeclarationsToNodes(
             }
         }
 
-        val moduleNameIsStringLiteral = name.isStringLiteral()
-
-        val moduleName = if (moduleNameIsStringLiteral) {
-            name.process { it.unquote() }
-        } else {
-            moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
-        }
-
         return ModuleNode(
-                moduleName = moduleName,
                 export = documentRoot.export?.let { ExportAssignmentNode(it.uids, it.isExportEquals) },
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
@@ -496,15 +483,16 @@ private class LowerDeclarationsToNodes(
                 jsModule = null,
                 jsQualifier = null,
                 uid = documentRoot.uid,
-                external = isDeclaration
+                external = isDeclaration,
+                fileName = fileName
         )
     }
 }
 
 
-class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
+class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
 
-    private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName, moduleNameResolver).lowerPackageDeclaration(this, null, isInExternalDeclaration)
+    private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
     private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
         val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }

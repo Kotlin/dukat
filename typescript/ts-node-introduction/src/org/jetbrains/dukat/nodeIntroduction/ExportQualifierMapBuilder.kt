@@ -10,28 +10,15 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
+import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.process
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
-private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: MutableMap<String, ExportQualifier> = mutableMapOf()): Map<String, ExportQualifier> {
-    val exports = docRoot.export
-    if (exports?.isExportEquals == true) {
-        exports.uids.forEach { uid ->
-            docRoot.moduleName?.let { assignExports[uid] = JsModule(it) }
-        }
-    } else {
-        exports?.uids?.forEach { uid ->
-            docRoot.moduleName?.let { assignExports[uid] = JsDefault }
-        }
-    }
-
-    docRoot.declarations.forEach { declaration ->
-        if (declaration is ModuleNode) {
-            buildExportAssignmentTable(declaration, assignExports)
-        }
-    }
-
-    return assignExports
+private fun String.unquote(): String {
+    return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
 }
 
 private fun NodeOwner<*>.moduleOwner(): ModuleNode? {
@@ -40,9 +27,40 @@ private fun NodeOwner<*>.moduleOwner(): ModuleNode? {
 
 private class ExportAssignmentLowering(
         private val root: ModuleNode,
-        private val exportQualifierMap: MutableMap<String?, ExportQualifier>
+        private val exportQualifierMap: MutableMap<String?, ExportQualifier>,
+        private val moduleNameResolver: ModuleNameResolver
 ) : NodeWithOwnerTypeLowering {
     private val assignExports: Map<String, ExportQualifier> = buildExportAssignmentTable(root)
+
+    private fun buildExportAssignmentTable(docRoot: ModuleNode, assignExports: MutableMap<String, ExportQualifier> = mutableMapOf()): Map<String, ExportQualifier> {
+        val exports = docRoot.export
+        if (exports?.isExportEquals == true) {
+            exports.uids.forEach { uid ->
+                docRoot.getModuleName()?.let { assignExports[uid] = JsModule(it) }
+            }
+        } else {
+            exports?.uids?.forEach { uid ->
+                docRoot.getModuleName()?.let { assignExports[uid] = JsDefault }
+            }
+        }
+
+        docRoot.declarations.forEach { declaration ->
+            if (declaration is ModuleNode) {
+                buildExportAssignmentTable(declaration, assignExports)
+            }
+        }
+
+        return assignExports
+    }
+
+
+    private fun ModuleNode.getModuleName(): NameEntity? {
+        return if (packageName.isStringLiteral()) {
+            packageName.process { it.unquote() }
+        } else {
+            moduleNameResolver.resolveName(fileName)?.let { IdentifierEntity(it) }
+        }
+    }
 
     override fun lowerRoot(moduleNode: ModuleNode, owner: NodeOwner<ModuleNode>): ModuleNode {
         if (assignExports.contains(moduleNode.uid)) {
@@ -81,7 +99,7 @@ private class ExportAssignmentLowering(
                 exportQualifierMap[moduleNode?.uid] = JsModule(null)
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
             }
         }
 
@@ -100,7 +118,7 @@ private class ExportAssignmentLowering(
                 exportQualifierMap[moduleNode?.uid] = JsModule(null)
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
             }
         }
 
@@ -123,7 +141,7 @@ private class ExportAssignmentLowering(
                 }
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
             }
         }
 
@@ -131,13 +149,13 @@ private class ExportAssignmentLowering(
     }
 }
 
-internal class ExportQualifierMapBuilder : NodeLowering {
+internal class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver) : NodeLowering {
     val exportQualifierMap = mutableMapOf<String?, ExportQualifier>()
 
     override fun lower(source: SourceSetNode): SourceSetNode {
         return source. copy(sources = source.sources.map { sourceFileNode ->
             val root = sourceFileNode.root
-            sourceFileNode.copy(root = ExportAssignmentLowering(root, exportQualifierMap).lowerRoot(root, NodeOwner(root, null)))
+            sourceFileNode.copy(root = ExportAssignmentLowering(root, exportQualifierMap, moduleNameResolver).lowerRoot(root, NodeOwner(root, null)))
         })
     }
 }

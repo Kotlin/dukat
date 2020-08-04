@@ -8,6 +8,7 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
 import org.jetbrains.dukat.ast.model.nodes.export.JsModule
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
@@ -67,9 +68,9 @@ private class ResolveQualifierAnnotations(
     }
 }
 
-class ResolveModuleAnnotations : NodeLowering {
+class ResolveModuleAnnotations(private val moduleNameResolver: ModuleNameResolver) : NodeLowering {
     override fun lower(source: SourceSetNode): SourceSetNode {
-        val exportQualifierMapLowering = ExportQualifierMapBuilder()
+        val exportQualifierMapLowering = ExportQualifierMapBuilder(moduleNameResolver)
         val sourceSet = exportQualifierMapLowering.lower(source)
         return sourceSet.copy(sources = sourceSet.sources.map { sourceFileNode ->
             sourceFileNode.copy(root = ResolveQualifierAnnotations(exportQualifierMapLowering.exportQualifierMap).lowerRoot(sourceFileNode.root, NodeOwner(sourceFileNode.root, null)))
