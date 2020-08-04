@@ -20,7 +20,7 @@ private class ResolveQualifierAnnotations(
             when (exportQualifier) {
                 is JsModule -> moduleNode.copy(
                         jsModule = exportQualifier.name,
-                        jsQualifier = exportQualifier.qualifier
+                        jsQualifier = if (exportQualifier.qualifier) moduleNode.qualifiedPackageName else null
                 )
                 else -> null
             }

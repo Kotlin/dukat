@@ -49,20 +49,19 @@ private class ExportAssignmentLowering(
             (assignExports[moduleNode.uid] as? JsModule)?.let { jsModule ->
                 exportQualifierMap[moduleNode.uid] = JsModule(
                         name = jsModule.name,
-                        qualifier = null
+                        qualifier = false
                 )
             }
         } else {
             if (moduleNode.uid != root.uid) {
                 exportQualifierMap[moduleNode.uid] = if (moduleNode.packageName.isStringLiteral()) {
                     JsModule(
-                            name = moduleNode.packageName,
-                            qualifier = null
+                            name = moduleNode.packageName
                     )
                 } else {
                     JsModule(
                             name = null,
-                            qualifier = moduleNode.qualifiedPackageName
+                            qualifier = true
                     )
                 }
             }
@@ -78,11 +77,11 @@ private class ExportAssignmentLowering(
         val moduleNode = owner.moduleOwner()
         when (exportQualifier) {
             is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name, null)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null, null)
+                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
+                exportQualifierMap[moduleNode?.uid] = JsModule(null)
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName, null)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
             }
         }
 
@@ -97,11 +96,11 @@ private class ExportAssignmentLowering(
         val moduleNode = owner.moduleOwner()
         when (exportQualifier) {
             is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name, null)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null, null)
+                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
+                exportQualifierMap[moduleNode?.uid] = JsModule(null)
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName, null)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
             }
         }
 
@@ -116,15 +115,15 @@ private class ExportAssignmentLowering(
 
         when (exportQualifier) {
             is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name, null)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null, null)
+                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
+                exportQualifierMap[moduleNode?.uid] = JsModule(null)
 
                 if (moduleNode?.packageName?.isStringLiteral() == true) {
                     exportQualifier.name?.let { declaration.name = it }
                 }
             }
             is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName, null)
+                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.moduleName)
             }
         }
 
