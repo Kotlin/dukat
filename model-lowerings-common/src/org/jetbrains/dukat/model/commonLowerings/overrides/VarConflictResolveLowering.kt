@@ -47,13 +47,15 @@ private class VarOverrideResolver(
                     inheritanceContext.isDescendant(second.ownerModel, first.ownerModel)
                 }
             }
-            
-            // if all properties in immediate parents have equivalent type, then there is no conflict
-            if (propertiesInImmediateParents.isEmpty() || propertiesInImmediateParents.all { property ->
-                    with(typeChecker) {
-                        (property.memberModel as PropertyModel).type.isEquivalent((properties[0].memberModel as PropertyModel).type)
+
+            val allPropertiesInImmediateParentsHaveEquivalentType = propertiesInImmediateParents.isEmpty() ||
+                    propertiesInImmediateParents.all { property ->
+                        with(typeChecker) {
+                            (property.memberModel as PropertyModel).type.isEquivalent((properties[0].memberModel as PropertyModel).type)
+                        }
                     }
-                }) {
+            
+            if (allPropertiesInImmediateParentsHaveEquivalentType) {
                 null
             } else {
                 properties
