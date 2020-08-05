@@ -318,7 +318,6 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
                 null,
                 FunctionNodeContextIrrelevant(),
                 uid,
-                null,
                 body,
                 inDeclaredModule || hasDeclareModifier(),
                 isGenerator
@@ -374,7 +373,6 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
                         emptyList(),
                         null,
                         declaration.uid,
-                        null,
                         declaration.hasDeclareModifier(),
                         inDeclaredModule || declaration.explicitlyDeclaredType
                 )
@@ -406,7 +404,6 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
                     emptyList(),
                     null,
                     declaration.uid,
-                    null,
                     inDeclaredModule || declaration.hasDeclareModifier(),
                     inDeclaredModule || declaration.explicitlyDeclaredType
             )

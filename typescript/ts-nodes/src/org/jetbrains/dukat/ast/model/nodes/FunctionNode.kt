@@ -29,7 +29,6 @@ data class FunctionNode(
         val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
         override val uid: String,
-        val comment: CommentEntity?,
 
         val body: BlockDeclaration?,
         override val external: Boolean,

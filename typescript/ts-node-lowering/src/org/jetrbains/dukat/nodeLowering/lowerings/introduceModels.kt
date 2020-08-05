@@ -766,7 +766,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                             }
                         } ?: resolveBody(),
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
-                        comment = comment,
+                        comment = null,
                         external = external
                 )
             }
