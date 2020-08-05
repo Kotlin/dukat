@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.JsModule
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetrbains.dukat.nodeLowering.NodeWithOwnerTypeLowering
 import org.jetrbains.dukat.nodeLowering.lowerings.NodeLowering
 
@@ -31,38 +30,21 @@ private class ResolveQualifierAnnotations(
     }
 
     override fun lowerFunctionNode(owner: NodeOwner<FunctionNode>): FunctionNode {
-        val nodeResolved = exportQualifierMap[owner.node.uid]?.let { exportQualifier ->
-            when (exportQualifier) {
-                is JsModule -> owner.node.copy(exportQualifier = exportQualifier)
-                else -> null
-            }
-        } ?: owner.node
-
+        val nodeResolved = owner.node.copy(exportQualifier = exportQualifierMap[owner.node.uid])
         return super.lowerFunctionNode(owner.copy(node = nodeResolved))
     }
 
     override fun lowerClassNode(owner: NodeOwner<ClassNode>): ClassNode {
-        val nodeResolved = exportQualifierMap[owner.node.uid]?.let { exportQualifier ->
-            when (exportQualifier) {
-                is JsModule -> owner.node.copy(exportQualifier = exportQualifier)
-                else -> null
-            }
-        } ?: owner.node
-
-
+        val nodeResolved = owner.node.copy(exportQualifier = exportQualifierMap[owner.node.uid])
         return super.lowerClassNode(owner.copy(node = nodeResolved))
     }
 
     override fun lowerVariableNode(owner: NodeOwner<VariableNode>): VariableNode {
-        val nodeResolved = exportQualifierMap[owner.node.uid]?.let { exportQualifier ->
-            when (exportQualifier) {
-                is JsModule -> owner.node.copy(
-                        exportQualifier = exportQualifier,
-                        immutable = true
-                )
-                else -> null
-            }
-        } ?: owner.node
+        val exportQualifier = exportQualifierMap[owner.node.uid]
+        val nodeResolved = owner.node.copy(
+                exportQualifier = exportQualifier,
+                immutable = exportQualifier is JsModule
+        )
 
         return super.lowerVariableNode(owner.copy(node = nodeResolved))
     }

@@ -93,9 +93,7 @@ private fun NameEntity.unquote(): NameEntity {
 }
 
 
-private class LowerDeclarationsToNodes(
-        private val fileName: String
-) {
+private class LowerDeclarationsToNodes {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
@@ -238,7 +236,7 @@ private class LowerDeclarationsToNodes(
     }
 
     private fun ClassDeclaration.convert(inDeclaredModule: Boolean): ClassNode {
-        val declaration = ClassNode(
+        return ClassNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || hasDeclareModifier()) },
                 typeParameters.map { typeParameter ->
@@ -247,11 +245,9 @@ private class LowerDeclarationsToNodes(
                 convertToHeritageNodes(parentEntities),
 
                 uid,
-                resolveAsExportQualifier(),
+                null,
                 inDeclaredModule || hasDeclareModifier()
         )
-
-        return declaration
     }
 
     private fun InterfaceDeclaration.convert(inDeclaredModule: Boolean): TopLevelNode {
@@ -311,12 +307,6 @@ private class LowerDeclarationsToNodes(
         )
     }
 
-    private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
-        return if (hasDefaultModifier() && hasExportModifier()) {
-            JsDefault
-        } else null
-    }
-
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
 
         return FunctionNode(
@@ -324,7 +314,7 @@ private class LowerDeclarationsToNodes(
                 convertParameters(parameters),
                 type.convertToNode(),
                 convertTypeParameters(typeParameters),
-                resolveAsExportQualifier(),
+                null,
                 hasExportModifier(),
                 false,
                 false,
@@ -380,7 +370,7 @@ private class LowerDeclarationsToNodes(
                 VariableNode(
                         IdentifierEntity(declaration.name),
                         TypeValueNode(IdentifierEntity("Json"), emptyList()),
-                        declaration.resolveAsExportQualifier(),
+                        null,
                         false,
                         false,
                         emptyList(),
@@ -412,7 +402,7 @@ private class LowerDeclarationsToNodes(
             VariableNode(
                     IdentifierEntity(declaration.name),
                     type.convertToNode(),
-                    declaration.resolveAsExportQualifier(),
+                    null,
                     false,
                     false,
                     emptyList(),
@@ -493,14 +483,14 @@ private class LowerDeclarationsToNodes(
 
 class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
 
-    private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, null, isInExternalDeclaration)
+    private fun ModuleDeclaration.introduceNodes(isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes().lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
     private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
         val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
         return SourceFileNode(
                 fileName,
-                root.introduceNodes(fileName, root.kind == ModuleDeclarationKind.DECLARATION_FILE),
+                root.introduceNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE),
                 references,
                 null
         )

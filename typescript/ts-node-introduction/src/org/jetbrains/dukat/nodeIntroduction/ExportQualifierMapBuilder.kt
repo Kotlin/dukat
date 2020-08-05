@@ -17,9 +17,17 @@ import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
+import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 
 private fun String.unquote(): String {
     return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
+}
+
+private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
+    return if (hasDefaultModifier() && hasExportModifier()) {
+        JsDefault
+    } else null
 }
 
 private class ExportAssignmentLowering(
@@ -28,9 +36,11 @@ private class ExportAssignmentLowering(
         private val moduleNameResolver: ModuleNameResolver,
         private val fileName: String
 ) : DeclarationLowering {
-    private val assignExports: Map<String, ExportQualifier> = buildExportAssignmentTable(root)
+    init {
+        buildExportAssignmentTable(root, exportQualifierMap)
+    }
 
-    private fun buildExportAssignmentTable(docRoot: ModuleDeclaration, assignExports: MutableMap<String, ExportQualifier> = mutableMapOf()): Map<String, ExportQualifier> {
+    private fun buildExportAssignmentTable(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
         val exports = docRoot.export
         if (exports?.isExportEquals == true) {
             exports.uids.forEach { uid ->
@@ -45,6 +55,12 @@ private class ExportAssignmentLowering(
         docRoot.declarations.forEach { declaration ->
             if (declaration is ModuleDeclaration) {
                 buildExportAssignmentTable(declaration, assignExports)
+            } else if (declaration is WithModifiersDeclaration) {
+                if (declaration is WithUidDeclaration) {
+                    declaration.resolveAsExportQualifier()?.let {
+                        assignExports[declaration.uid] = it
+                    }
+                }
             }
         }
 
@@ -60,8 +76,8 @@ private class ExportAssignmentLowering(
     }
 
     override fun lowerModuleModel(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration? {
-        if (assignExports.contains(moduleDeclaration.uid)) {
-            (assignExports[moduleDeclaration.uid] as? JsModule).let { jsModule ->
+        if (exportQualifierMap.contains(moduleDeclaration.uid)) {
+            (exportQualifierMap[moduleDeclaration.uid] as? JsModule).let { jsModule ->
                 exportQualifierMap[moduleDeclaration.uid] = JsModule(
                         name = jsModule?.name,
                         qualifier = false
@@ -86,8 +102,8 @@ private class ExportAssignmentLowering(
     }
 
     override fun lowerSourceDeclaration(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration {
-        if (assignExports.contains(moduleDeclaration.uid)) {
-            (assignExports[moduleDeclaration.uid] as? JsModule).let { jsModule ->
+        if (exportQualifierMap.contains(moduleDeclaration.uid)) {
+            (exportQualifierMap[moduleDeclaration.uid] as? JsModule).let { jsModule ->
                 exportQualifierMap[moduleDeclaration.uid] = JsModule(
                         name = jsModule?.name,
                         qualifier = false
@@ -112,7 +128,7 @@ private class ExportAssignmentLowering(
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
-        val exportQualifier = assignExports[declaration.uid]
+        val exportQualifier = exportQualifierMap[declaration.uid]
 
         val moduleNode = owner?.node as? ModuleDeclaration
 
@@ -131,7 +147,7 @@ private class ExportAssignmentLowering(
     }
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
-        val exportQualifier = assignExports[declaration.uid]
+        val exportQualifier = exportQualifierMap[declaration.uid]
 
         val moduleNode = owner?.node
 
@@ -149,7 +165,7 @@ private class ExportAssignmentLowering(
     }
 
     override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration {
-        val exportQualifier = assignExports[declaration.uid]
+        val exportQualifier = exportQualifierMap[declaration.uid]
 
         val moduleNode = owner?.node
 
