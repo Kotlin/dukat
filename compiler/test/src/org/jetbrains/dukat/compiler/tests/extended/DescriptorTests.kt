@@ -79,7 +79,6 @@ class DescriptorTests {
                 "interface/inheritance/withQualifiedParent",
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
                 "misc/missedOverloads",
-                "stdlib/convertTsStdlib",
                 "typePredicate/simple"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 
