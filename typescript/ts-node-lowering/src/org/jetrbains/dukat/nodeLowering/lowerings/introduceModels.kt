@@ -93,7 +93,7 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
+import org.jetrbains.dukat.nodeLowering.TopLevelNodeLowering
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -844,7 +844,7 @@ private class NodeConverter(private val node: SourceSetNode, private val uidToNa
     }
 }
 
-private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : NodeTypeLowering {
+private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : TopLevelNodeLowering {
     override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
         return super.lowerClassLikeNode(declaration, owner)
