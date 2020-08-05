@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
-import org.jetbrains.dukat.ast.model.nodes.ExportAssignmentNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
@@ -470,7 +469,6 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
 
 
         return ModuleNode(
-                export = documentRoot.export?.let { ExportAssignmentNode(it.uids, it.isExportEquals) },
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
