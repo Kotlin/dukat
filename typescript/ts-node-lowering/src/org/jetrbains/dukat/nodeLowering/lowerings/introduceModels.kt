@@ -31,9 +31,9 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
-import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
-import org.jetbrains.dukat.ast.model.nodes.export.JsModule
+import org.jetbrains.dukat.tsmodel.ExportQualifier
+import org.jetbrains.dukat.tsmodel.JsDefault
+import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity

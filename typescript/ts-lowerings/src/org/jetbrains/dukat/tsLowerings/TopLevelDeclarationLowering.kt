@@ -1,4 +1,5 @@
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -33,7 +34,7 @@ interface TopLevelDeclarationLowering {
             is VariableDeclaration -> lowerVariableDeclaration(declaration, owner)
             is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner as NodeOwner<FunctionOwnerDeclaration>)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration, owner)
-            is ModuleDeclaration -> lowerModuleModel(declaration, owner)
+            is ModuleDeclaration -> lowerModuleModel(declaration, owner.wrap(declaration))
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration, owner)
             else -> declaration
         }

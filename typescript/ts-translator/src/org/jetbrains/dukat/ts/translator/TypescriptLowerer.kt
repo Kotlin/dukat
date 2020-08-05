@@ -95,11 +95,7 @@ open class TypescriptLowerer(
                 )
 
 
-        val nodes = IntroduceNodes()
-                .lower(declarations)
-                .lower(
-                        ResolveModuleAnnotations(moduleNameResolver)
-                )
+        val nodes = IntroduceNodes(moduleNameResolver).lower(declarations)
 
         val models = nodes
                 .introduceModels()

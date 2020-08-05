@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.nodes.export
+package org.jetbrains.dukat.tsmodel
 
 import org.jetbrains.dukat.astCommon.NameEntity
 

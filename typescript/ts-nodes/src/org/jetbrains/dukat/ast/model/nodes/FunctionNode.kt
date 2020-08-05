@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
+import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity

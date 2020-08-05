@@ -27,8 +27,8 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNodeNullable
-import org.jetbrains.dukat.ast.model.nodes.export.ExportQualifier
-import org.jetbrains.dukat.ast.model.nodes.export.JsDefault
+import org.jetbrains.dukat.tsmodel.ExportQualifier
+import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -36,6 +36,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -65,6 +66,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
+import org.jetrbains.dukat.nodeLowering.lowerings.lower
 
 
 //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
@@ -489,7 +491,7 @@ private class LowerDeclarationsToNodes(
 }
 
 
-class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
+class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
 
     private fun ModuleDeclaration.introduceNodes(fileName: String, isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes(fileName).lowerPackageDeclaration(this, null, isInExternalDeclaration)
 
@@ -505,8 +507,11 @@ class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
     }
 
     override fun lower(source: SourceSetDeclaration): SourceSetNode {
-        return SourceSetNode(sourceName = source.sourceName, sources = source.sources.map { sourceFile ->
+        val exportQualifierMapBuilder = ExportQualifierMapBuilderDeclaration(moduleNameResolver)
+        val sourceSet = exportQualifierMapBuilder.lower(source)
+
+        return SourceSetNode(sourceName = sourceSet.sourceName, sources = sourceSet.sources.map { sourceFile ->
             sourceFile.introduceNodes()
-        })
+        }).lower(ResolveModuleAnnotations(exportQualifierMapBuilder.exportQualifierMap))
     }
 }
