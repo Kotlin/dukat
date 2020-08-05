@@ -86,10 +86,13 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.NodeTypeLowering
 import java.io.File
 
@@ -862,12 +865,14 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : No
     }
 }
 
-fun SourceSetNode.introduceModels(): SourceSetModel {
-    val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
+fun SourceSetDeclaration.introduceModels(moduleNameResolver: ModuleNameResolver): SourceSetModel {
+    val nodes = IntroduceNodes(moduleNameResolver).lower(this)
 
+    val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
     ReferenceVisitor { uid, fqModel ->
         uidToFqNameMapper[uid] = fqModel
-    }.process(this)
+    }.process(nodes)
 
-    return NodeConverter(this, uidToFqNameMapper).convert()
+    return NodeConverter(nodes, uidToFqNameMapper).convert()
+
 }

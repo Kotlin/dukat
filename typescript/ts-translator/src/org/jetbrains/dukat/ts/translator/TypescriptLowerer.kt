@@ -24,7 +24,6 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
 import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
@@ -92,10 +91,8 @@ open class TypescriptLowerer(
                         MoveAliasesFromMergeableModules()
                 )
 
-        val nodes = IntroduceNodes(moduleNameResolver).lower(declarations)
-
-        val models = nodes
-                .introduceModels()
+        val models = declarations
+                .introduceModels(moduleNameResolver)
                 .lower(
                         RearrangeConstructors(),
                         RemoveRedundantTypeParams(),
