@@ -27,8 +27,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.ast.model.nodes.convertToNodeNullable
-import org.jetbrains.dukat.tsmodel.ExportQualifier
-import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -42,11 +40,13 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
+import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -59,14 +59,12 @@ import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
-import org.jetrbains.dukat.nodeLowering.lowerings.lower
 
 
 //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
@@ -93,7 +91,7 @@ private fun NameEntity.unquote(): NameEntity {
 }
 
 
-private class LowerDeclarationsToNodes {
+private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMap<String?, ExportQualifier>) {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
@@ -245,7 +243,7 @@ private class LowerDeclarationsToNodes {
                 convertToHeritageNodes(parentEntities),
 
                 uid,
-                null,
+                exportQualifierMap[uid],
                 inDeclaredModule || hasDeclareModifier()
         )
     }
@@ -314,7 +312,7 @@ private class LowerDeclarationsToNodes {
                 convertParameters(parameters),
                 type.convertToNode(),
                 convertTypeParameters(typeParameters),
-                null,
+                exportQualifierMap[uid],
                 hasExportModifier(),
                 false,
                 false,
@@ -364,14 +362,15 @@ private class LowerDeclarationsToNodes {
 
     fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelNode {
         val type = declaration.type
+        val exportQualifier = exportQualifierMap[declaration.uid]
         return if (type is ObjectLiteralDeclaration) {
 
             if (type.canBeJson()) {
                 VariableNode(
                         IdentifierEntity(declaration.name),
                         TypeValueNode(IdentifierEntity("Json"), emptyList()),
-                        null,
-                        false,
+                        exportQualifier,
+                        exportQualifier is JsModule,
                         false,
                         emptyList(),
                         null,
@@ -402,8 +401,8 @@ private class LowerDeclarationsToNodes {
             VariableNode(
                     IdentifierEntity(declaration.name),
                     type.convertToNode(),
-                    null,
-                    false,
+                    exportQualifier,
+                    exportQualifier is JsModule,
                     false,
                     emptyList(),
                     null,
@@ -466,14 +465,18 @@ private class LowerDeclarationsToNodes {
             }
         }
 
+        val exportQualifier = exportQualifierMap[documentRoot.uid]
+        val jsModuleQualifier = exportQualifier as? JsModule
+
+
         return ModuleNode(
                 export = documentRoot.export?.let { ExportAssignmentNode(it.uids, it.isExportEquals) },
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
                 declarations = nonImports,
                 imports = imports,
-                jsModule = null,
-                jsQualifier = null,
+                jsModule = jsModuleQualifier?.name,
+                jsQualifier = if (jsModuleQualifier?.qualifier == true) fullPackageName else null,
                 uid = documentRoot.uid,
                 external = isDeclaration
         )
@@ -483,14 +486,12 @@ private class LowerDeclarationsToNodes {
 
 class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lowering<SourceSetDeclaration, SourceSetNode> {
 
-    private fun ModuleDeclaration.introduceNodes(isInExternalDeclaration: Boolean) = LowerDeclarationsToNodes().lowerPackageDeclaration(this, null, isInExternalDeclaration)
-
-    private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
+    private fun SourceFileDeclaration.introduceNodes(exportQualifierMap: MutableMap<String?, ExportQualifier>): SourceFileNode {
         val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
 
         return SourceFileNode(
                 fileName,
-                root.introduceNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE),
+                LowerDeclarationsToNodes(exportQualifierMap).lowerPackageDeclaration(root, null, root.kind == ModuleDeclarationKind.DECLARATION_FILE),
                 references,
                 null
         )
@@ -501,7 +502,7 @@ class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lower
         val sourceSet = exportQualifierMapBuilder.lower(source)
 
         return SourceSetNode(sourceName = sourceSet.sourceName, sources = sourceSet.sources.map { sourceFile ->
-            sourceFile.introduceNodes()
-        }).lower(ResolveModuleAnnotations(exportQualifierMapBuilder.exportQualifierMap))
+            sourceFile.introduceNodes(exportQualifierMapBuilder.exportQualifierMap)
+        })
     }
 }

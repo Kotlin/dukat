@@ -25,7 +25,6 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
-import org.jetbrains.dukat.nodeIntroduction.ResolveModuleAnnotations
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
 import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
@@ -56,7 +55,6 @@ import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
-import org.jetrbains.dukat.nodeLowering.lowerings.lower
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
@@ -93,7 +91,6 @@ open class TypescriptLowerer(
                         EscapeLiterals(),
                         MoveAliasesFromMergeableModules()
                 )
-
 
         val nodes = IntroduceNodes(moduleNameResolver).lower(declarations)
 
