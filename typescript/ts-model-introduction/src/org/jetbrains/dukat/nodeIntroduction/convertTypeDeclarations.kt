@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
@@ -103,7 +102,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 nullable = nullable,
                 meta = metaData ?: meta
         )
-        is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceNode(
+        is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceDeclaration(
                 name,
                 typeParameters.map { it.convertToNode() },
                 reference,

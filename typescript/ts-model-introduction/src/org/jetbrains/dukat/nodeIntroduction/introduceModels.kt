@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
-import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
@@ -89,6 +88,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -284,7 +284,7 @@ internal class DocumentConverter(
                         nullable = nullable
                 )
             }
-            is GeneratedInterfaceReferenceNode -> {
+            is GeneratedInterfaceReferenceDeclaration -> {
                 val typeParams = when (context) {
                     is TranslationContext.PROPERTY -> typeParameters.map {
                         TypeParameterModel(
