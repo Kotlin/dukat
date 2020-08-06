@@ -23,9 +23,7 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
@@ -94,6 +92,7 @@ import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -248,7 +247,7 @@ internal class DocumentConverter(
                     convertMeta(),
                     null
             )
-            is TupleTypeNode -> TypeValueModel(
+            is TupleDeclaration -> TypeValueModel(
                     dynamicName,
                     emptyList(),
                     "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",

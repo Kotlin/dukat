@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.GeneratedInterfaceReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
-import org.jetbrains.dukat.ast.model.nodes.TupleTypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -156,7 +155,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                     )
                 }
             }
-        is TupleDeclaration -> TupleTypeNode(
+        is TupleDeclaration -> TupleDeclaration(
                 params = params.map { param -> param.convertToNode() },
                 nullable = nullable,
                 meta = metaData ?: meta
