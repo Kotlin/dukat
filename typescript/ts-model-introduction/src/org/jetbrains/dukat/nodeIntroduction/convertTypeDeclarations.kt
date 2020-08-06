@@ -73,7 +73,6 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
             initializer = if (initializer != null || optional) {
                 TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
             } else null,
-            meta = null,
             vararg = varargResolved,
             optional = optional
     )

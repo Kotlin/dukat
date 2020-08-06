@@ -7,7 +7,6 @@ data class ParameterNode(
         val name: String,
         val type: ParameterValueDeclaration,
         val initializer: TypeValueNode?,
-        val meta: String?,
 
         val vararg: Boolean,
         val optional: Boolean

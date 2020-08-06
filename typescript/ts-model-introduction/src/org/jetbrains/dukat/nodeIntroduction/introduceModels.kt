@@ -395,13 +395,13 @@ internal class DocumentConverter(
                             IdentifierExpressionModel(
                                     initializer!!.value
                             ),
-                            meta
+                            null
                     )
                     optional -> ExpressionStatementModel(
                             IdentifierExpressionModel(
                                     IdentifierEntity("definedExternally")
                             ),
-                            meta
+                            null
                     )
                     else -> null
                 },
@@ -747,7 +747,7 @@ internal class DocumentConverter(
                                             IdentifierExpressionModel(
                                                     IdentifierEntity("null")
                                             ),
-                                            param.meta
+                                            null
                                     )
                                 } else {
                                     null
