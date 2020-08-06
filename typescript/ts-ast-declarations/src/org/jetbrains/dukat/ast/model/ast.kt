@@ -10,7 +10,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.panic.raiseConcern
@@ -53,7 +52,6 @@ fun <T : Entity> Entity.duplicate(): T {
         is TypeAliasNode -> copy() as T
         is TypeParameterNode -> copy() as T
         is TypeValueNode -> copy() as T
-        is UnionTypeNode -> copy() as T
         is VariableNode -> copy() as T
         else -> raiseConcern("can not copy ${this}") { this as T }
     }

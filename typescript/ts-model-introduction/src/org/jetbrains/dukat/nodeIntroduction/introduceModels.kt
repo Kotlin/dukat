@@ -27,7 +27,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.JsDefault
@@ -93,6 +92,7 @@ import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
+import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -195,7 +195,7 @@ internal class DocumentConverter(
         return Members(ownNodes.flatMap { it.process() }, staticNodes.flatMap { it.process() })
     }
 
-    private fun UnionTypeNode.convertMeta(): String {
+    private fun UnionTypeDeclaration.convertMeta(): String {
         return params.joinToString(" | ") { unionMember ->
             unionMember.process().translate()
         }
@@ -241,7 +241,7 @@ internal class DocumentConverter(
                         context == TranslationContext.PROPERTY(true)
                 )
             }
-            is UnionTypeNode -> TypeValueModel(
+            is UnionTypeDeclaration -> TypeValueModel(
                     dynamicName,
                     emptyList(),
                     convertMeta(),
@@ -262,7 +262,7 @@ internal class DocumentConverter(
             }
             is TypeValueNode -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
-                if ((node is TypeAliasNode) && (node.typeReference is UnionTypeNode)) {
+                if ((node is TypeAliasNode) && (node.typeReference is UnionTypeDeclaration)) {
                     dynamicType("typealias ${node.name} = dynamic")
                 } else {
                     TypeValueModel(
@@ -809,7 +809,7 @@ internal class DocumentConverter(
                     external = external
             )
             is TypeAliasNode -> {
-                if (typeReference is UnionTypeNode) {
+                if (typeReference is UnionTypeDeclaration) {
                     null
                 } else {
                     TypeAliasModel(

@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
-import org.jetbrains.dukat.ast.model.nodes.UnionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
@@ -148,7 +147,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                     )
                 }
                 else -> {
-                    UnionTypeNode(
+                    UnionTypeDeclaration(
                             params = params.map { param -> param.convertToNode() },
                             nullable = nullable,
                             meta = metaData ?: meta
