@@ -20,7 +20,6 @@ import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
@@ -54,6 +53,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
@@ -113,9 +113,9 @@ private class LowerDeclarationsToNodes {
         return parameters.map { param -> param.convertToNode() }
     }
 
-    private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeValueNode> {
+    private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeDeclaration> {
         return typeParams.map { typeParam ->
-            TypeValueNode(
+            TypeDeclaration(
                     value = typeParam.name,
                     params = typeParam.constraints.map { it.convertToNode() }
             )
@@ -182,7 +182,7 @@ private class LowerDeclarationsToNodes {
                     "set",
                     convertParameters(declaration.parameters + listOf(ParameterDeclaration("value", returnType.convertToNodeNullable()
                             ?: returnType, null, false, false, true))),
-                    TypeValueNode(IdentifierEntity("Unit"), emptyList()),
+                    TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
                     emptyList(),
                     false,
                     true,
@@ -223,7 +223,7 @@ private class LowerDeclarationsToNodes {
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || hasDeclareModifier()) },
                 typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
+                    TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 convertToHeritageNodes(parentEntities),
 
@@ -282,7 +282,7 @@ private class LowerDeclarationsToNodes {
                 name = aliasName,
                 typeReference = typeReference.convertToNode(),
                 typeParameters = typeParameters.map { typeParameter ->
-                    TypeValueNode(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
+                    TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 uid = uid,
                 external = false
@@ -348,7 +348,7 @@ private class LowerDeclarationsToNodes {
             if (type.canBeJson()) {
                 VariableNode(
                         IdentifierEntity(declaration.name),
-                        TypeValueNode(IdentifierEntity("Json"), emptyList()),
+                        TypeDeclaration(IdentifierEntity("Json"), emptyList()),
                         false,
                         emptyList(),
                         null,

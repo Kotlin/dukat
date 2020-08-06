@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -68,7 +67,7 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
             name = name,
             type = parameterValueDeclaration.convertToNode(),
             initializer = if (initializer != null || optional) {
-                TypeValueNode(IdentifierEntity("definedExternally"), emptyList())
+                TypeDeclaration(IdentifierEntity("definedExternally"), emptyList())
             } else null,
             vararg = varargResolved,
             optional = optional
@@ -82,7 +81,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 nullable = nullable,
                 meta = metaData ?: meta
         )
-        is TypeDeclaration -> TypeValueNode(
+        is TypeDeclaration -> TypeDeclaration(
                 value = value,
                 params = params.map { param -> param.convertToNode() },
                 typeReference = typeReference,
@@ -158,7 +157,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
     }
 }
 
-private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
+private val TYPE_ANY = TypeDeclaration(IdentifierEntity("Any"), emptyList(), null, false)
 
 fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): ParameterValueDeclaration {
     return convertToNodeNullable(meta) ?: TYPE_ANY

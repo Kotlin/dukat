@@ -22,7 +22,6 @@ import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.tsmodel.ExportQualifier
@@ -91,6 +90,7 @@ import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import java.io.File
@@ -184,7 +184,7 @@ internal class DocumentConverter(
         return uidToNameMapper[uid]?.fqName
     }
 
-    private fun TypeValueNode.getFqName(): NameEntity? {
+    private fun TypeDeclaration.getFqName(): NameEntity? {
         return typeReference?.getFqName() ?: if (KotlinStdlibEntities.contains(value)) {
             KLIBROOT.appendLeft(value)
         } else null
@@ -260,7 +260,7 @@ internal class DocumentConverter(
                         nullable = nullable
                 )
             }
-            is TypeValueNode -> {
+            is TypeDeclaration -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
                 if ((node is TypeAliasNode) && (node.typeReference is UnionTypeDeclaration)) {
                     dynamicType("typealias ${node.name} = dynamic")
@@ -479,7 +479,7 @@ internal class DocumentConverter(
     }
 
     private fun ParameterValueDeclaration.isUnit(): Boolean {
-        return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
+        return (this is TypeDeclaration) && (value == IdentifierEntity("Unit"))
     }
 
     private fun BlockStatementModel.wrapBodyAsLazyIterator(): BlockStatementModel {
@@ -624,7 +624,7 @@ internal class DocumentConverter(
         return blockStatements?.let { BlockStatementModel(it) }
     }
 
-    private fun convertTypeParams(typeParameters: List<TypeValueNode>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
+    private fun convertTypeParams(typeParameters: List<TypeDeclaration>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
         return typeParameters.map { typeParam ->
             TypeParameterModel(
                     type = TypeValueModel(typeParam.value, listOf(), null, typeParam.getFqName()),
