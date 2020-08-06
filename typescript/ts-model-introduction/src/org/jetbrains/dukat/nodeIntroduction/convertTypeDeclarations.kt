@@ -3,7 +3,6 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
-import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
@@ -86,9 +85,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
         is TypeDeclaration -> TypeValueNode(
                 value = value,
                 params = params.map { param -> param.convertToNode() },
-                typeReference = typeReference?.let {
-                    ReferenceNode(it.uid)
-                },
+                typeReference = typeReference,
                 nullable = nullable,
                 meta = metaData ?: meta
         )

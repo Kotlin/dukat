@@ -16,7 +16,6 @@ import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
@@ -214,9 +213,7 @@ private class LowerDeclarationsToNodes {
             HeritageNode(
                     name = declaration.name.convert(),
                     typeArguments = declaration.typeArguments.map { it.convertToNode() },
-                    reference = declaration.typeReference?.let {
-                        ReferenceNode(it.uid, it.origin)
-                    }
+                    reference = declaration.typeReference
             )
         }
     }
