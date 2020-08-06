@@ -20,7 +20,6 @@ import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
-import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
@@ -88,6 +87,7 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -202,7 +202,7 @@ internal class DocumentConverter(
     }
 
     private fun HeritageNode.convertToModel(): HeritageModel {
-        val isNamedImport = reference?.origin == ReferenceOriginNode.NAMED_IMPORT
+        val isNamedImport = reference?.origin == ReferenceOriginDeclaration.NAMED_IMPORT
         if (isNamedImport) {
             reference?.getFqName()?.let { resolvedName ->
                 imports.add(ImportModel(resolvedName, name.rightMost()))
