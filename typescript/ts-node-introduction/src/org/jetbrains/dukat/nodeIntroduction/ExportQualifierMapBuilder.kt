@@ -1,55 +1,53 @@
 package org.jetbrains.dukat.nodeIntroduction
 
+import MergeableDeclaration
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.tsLowerings.DeclarationLowering
 import org.jetbrains.dukat.tsLowerings.TsLowering
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
-import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 
 private fun String.unquote(): String {
     return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
 }
 
-private fun WithModifiersDeclaration.resolveAsExportQualifier(): ExportQualifier? {
+private fun WithModifiersDeclaration.resolveAsJsDefaultQualifier(): ExportQualifier? {
     return if (hasDefaultModifier() && hasExportModifier()) {
         JsDefault
     } else null
 }
 
-private class ExportAssignmentLowering(
-        private val root: ModuleDeclaration,
-        private val exportQualifierMap: MutableMap<String?, ExportQualifier>,
-        private val moduleNameResolver: ModuleNameResolver,
-        private val fileName: String
-) : DeclarationLowering {
+private abstract class ExportQualifierBuilder(
+        root: ModuleDeclaration,
+        private val exportQualifierMap: MutableMap<String?, ExportQualifier>
+) {
     init {
-        buildExportAssignmentTable(root, exportQualifierMap)
+        scanModules(root, exportQualifierMap)
+        scanTopLevelNodes(root, exportQualifierMap)
     }
 
-    private fun buildExportAssignmentTable(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
+    private fun scanModules(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf(), nested: Boolean = false): Map<String?, ExportQualifier> {
         val exports = docRoot.export
+        val moduleName = docRoot.getModuleName()
+
         exports?.uids?.forEach { uid ->
-            assignExports[uid] = if (exports.isExportEquals) JsModule(docRoot.getModuleName()) else JsDefault
+            assignExports[uid] = if (exports.isExportEquals) {
+                JsModule(moduleName)
+            } else JsDefault
         }
 
-        if (docRoot != root) {
+        if (nested) {
             val jsModule = exportQualifierMap[docRoot.uid]
             if (jsModule == null) {
-                exportQualifierMap[docRoot.uid] = if (docRoot.name.isStringLiteral()) {
+                assignExports[docRoot.uid] = if (docRoot.name.isStringLiteral()) {
                     JsModule(name = docRoot.name)
                 } else {
                     JsModule(
@@ -60,13 +58,37 @@ private class ExportAssignmentLowering(
             }
         }
 
+        docRoot.declarations.filterIsInstance(ModuleDeclaration::class.java).forEach {
+            (it as? ModuleDeclaration)?.let { moduleDeclaration -> scanModules(moduleDeclaration, assignExports, true) }
+        }
+
+        return assignExports
+    }
+
+
+    private fun scanTopLevelNodes(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
+        val moduleName = docRoot.getModuleName()
+
         docRoot.declarations.forEach { declaration ->
             if (declaration is ModuleDeclaration) {
-                buildExportAssignmentTable(declaration, assignExports)
+                scanTopLevelNodes(declaration, assignExports)
             } else if (declaration is WithModifiersDeclaration) {
-                if (declaration is WithUidDeclaration) {
-                    declaration.resolveAsExportQualifier()?.let {
-                        assignExports[declaration.uid] = it
+                if ((declaration is MergeableDeclaration) && (declaration !is InterfaceDeclaration)) {
+                    declaration.resolveAsJsDefaultQualifier()?.let {
+                        assignExports.getOrPut(declaration.uid) { it }
+                    }
+
+                    val exportQualifier = assignExports[declaration.uid]
+
+                    if (exportQualifier != null) {
+                        when (exportQualifier) {
+                            is JsDefault -> {
+                                assignExports[docRoot.uid] = JsModule(moduleName)
+                            }
+                            is JsModule -> {
+                                assignExports.remove(docRoot.uid)
+                            }
+                        }
                     }
                 }
             }
@@ -75,81 +97,26 @@ private class ExportAssignmentLowering(
         return assignExports
     }
 
-    private fun ModuleDeclaration.getModuleName(): NameEntity? {
-        return if (name.isStringLiteral()) {
-            name.process { it.unquote() }
-        } else {
-            moduleNameResolver.resolveName(fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
-        }
-    }
-
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
-        val exportQualifier = exportQualifierMap[declaration.uid]
-
-        val moduleNode = owner?.node as? ModuleDeclaration
-
-        when (exportQualifier) {
-            is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null)
-            }
-            is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
-            }
-        }
-
-
-        return declaration
-    }
-
-    override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): ClassDeclaration {
-        val exportQualifier = exportQualifierMap[declaration.uid]
-
-        val moduleNode = owner?.node
-
-        when (exportQualifier) {
-            is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null)
-            }
-            is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
-            }
-        }
-
-        return declaration
-    }
-
-    override fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration {
-        val exportQualifier = exportQualifierMap[declaration.uid]
-
-        val moduleNode = owner?.node
-
-        when (exportQualifier) {
-            is JsModule -> {
-                exportQualifierMap[declaration.uid] = JsModule(exportQualifier.name)
-                exportQualifierMap[moduleNode?.uid] = JsModule(null)
-
-                if (moduleNode?.name?.isStringLiteral() == true) {
-                    exportQualifier.name.let { declaration.name = it.toString() }
-                }
-            }
-            is JsDefault -> {
-                exportQualifierMap[moduleNode?.uid] = JsModule(moduleNode?.getModuleName())
-            }
-        }
-
-        return declaration
-    }
+    abstract fun ModuleDeclaration.getModuleName(): NameEntity?
 }
 
-class ExportQualifierMapBuilderDeclaration(private val moduleNameResolver: ModuleNameResolver) : TsLowering {
+class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver) : TsLowering {
     val exportQualifierMap = mutableMapOf<String?, ExportQualifier>()
 
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.copy(sources = source.sources.map { sourceFileNode ->
-            val root = sourceFileNode.root
-            sourceFileNode.copy(root = ExportAssignmentLowering(root, exportQualifierMap, moduleNameResolver, sourceFileNode.fileName).lowerSourceDeclaration(root, NodeOwner(root, null)))
+
+            object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
+                override fun ModuleDeclaration.getModuleName(): NameEntity? {
+                    return if (name.isStringLiteral()) {
+                        name.process { it.unquote() }
+                    } else {
+                        moduleNameResolver.resolveName(sourceFileNode.fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
+                    }
+                }
+            }
+
+            sourceFileNode
         })
     }
 }

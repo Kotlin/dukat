@@ -33,6 +33,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
@@ -358,7 +359,7 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelNode {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration, packageName: NameEntity, inDeclaredModule: Boolean): TopLevelNode {
         val type = declaration.type
         val exportQualifier = exportQualifierMap[declaration.uid]
         return if (type is ObjectLiteralDeclaration) {
@@ -394,8 +395,13 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
                 })
             }
         } else {
+            val name = if (packageName.isStringLiteral()) {
+                (exportQualifier as? JsModule)?.name?.toString() ?: declaration.name
+            } else {
+                declaration.name
+            }
             VariableNode(
-                    IdentifierEntity(declaration.name),
+                    IdentifierEntity(name),
                     type.convertToNode(),
                     exportQualifier,
                     false,
@@ -408,9 +414,9 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
         }
     }
 
-    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelNode? {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, packageName: NameEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelNode? {
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(declaration, inDeclaredModule)
+            is VariableDeclaration -> lowerVariableDeclaration(declaration, packageName, inDeclaredModule)
             is FunctionDeclaration -> declaration.convert(inDeclaredModule)
             is ClassDeclaration -> declaration.convert(inDeclaredModule)
             is InterfaceDeclaration -> declaration.convert(inDeclaredModule)
@@ -455,7 +461,7 @@ private class LowerDeclarationsToNodes(private val exportQualifierMap: MutableMa
                         declaration.uid
                 )
             } else {
-                lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration)?.let { nonImports.add(it) }
+                lowerTopLevelDeclaration(declaration, name, fullPackageName, isDeclaration)?.let { nonImports.add(it) }
             }
         }
 
@@ -491,7 +497,7 @@ class IntroduceNodes(private val moduleNameResolver: ModuleNameResolver) : Lower
     }
 
     override fun lower(source: SourceSetDeclaration): SourceSetNode {
-        val exportQualifierMapBuilder = ExportQualifierMapBuilderDeclaration(moduleNameResolver)
+        val exportQualifierMapBuilder = ExportQualifierMapBuilder(moduleNameResolver)
         val sourceSet = exportQualifierMapBuilder.lower(source)
 
         return SourceSetNode(sourceName = sourceSet.sourceName, sources = sourceSet.sources.map { sourceFile ->
