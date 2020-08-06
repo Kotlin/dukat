@@ -93,7 +93,6 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.TopLevelNodeLowering
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -844,24 +843,32 @@ private class NodeConverter(private val node: SourceSetNode, private val uidToNa
     }
 }
 
-private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) : TopLevelNodeLowering {
-    override fun lowerClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode): ClassLikeNode {
+private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
+    fun visitClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
-        return super.lowerClassLikeNode(declaration, owner)
     }
 
-    override fun lowerTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode): TypeAliasNode {
+    fun visitTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
-        return super.lowerTypeAliasNode(declaration, owner)
     }
 
-    override fun lowerEnumNode(declaration: EnumNode, owner: ModuleNode): EnumNode {
+    fun visitEnumNode(declaration: EnumNode, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
-        return super.lowerEnumNode(declaration, owner)
+    }
+
+    fun visitModule(node: ModuleNode) {
+        node.declarations.forEach { topLevelNode ->
+            when (topLevelNode) {
+                is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
+                is TypeAliasNode -> visitTypeAliasNode(topLevelNode, node)
+                is EnumNode -> visitEnumNode(topLevelNode, node)
+                is ModuleNode -> visitModule(topLevelNode)
+            }
+        }
     }
 
     fun process(sourceSet: SourceSetNode) {
-        sourceSet.sources.forEach { source -> lowerModuleNode(source.root) }
+        sourceSet.sources.forEach { source -> visitModule(source.root) }
     }
 }
 
