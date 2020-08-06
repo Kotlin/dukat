@@ -10,7 +10,6 @@ data class VariableNode(
 
         override val exportQualifier: ExportQualifier?,
 
-        val immutable: Boolean,
         val inline: Boolean,
         val typeParameters: List<TypeValueNode>,
         val extend: ClassLikeReferenceNode?,

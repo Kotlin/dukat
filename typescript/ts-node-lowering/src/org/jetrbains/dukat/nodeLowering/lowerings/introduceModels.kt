@@ -773,7 +773,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                     name = name,
                     type = type.process(),
                     annotations = exportQualifier.toAnnotation(),
-                    immutable = immutable,
+                    immutable = exportQualifier is JsModule,
                     inline = inline,
                     external = true,
                     initializer = null,
