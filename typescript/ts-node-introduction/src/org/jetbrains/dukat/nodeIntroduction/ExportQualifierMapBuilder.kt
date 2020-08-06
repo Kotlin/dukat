@@ -42,13 +42,21 @@ private class ExportAssignmentLowering(
 
     private fun buildExportAssignmentTable(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
         val exports = docRoot.export
-        if (exports?.isExportEquals == true) {
-            exports.uids.forEach { uid ->
-                docRoot.getModuleName().let { assignExports[uid] = JsModule(it) }
-            }
-        } else {
-            exports?.uids?.forEach { uid ->
-                docRoot.getModuleName().let { assignExports[uid] = JsDefault }
+        exports?.uids?.forEach { uid ->
+            assignExports[uid] = if (exports.isExportEquals) JsModule(docRoot.getModuleName()) else JsDefault
+        }
+
+        if (docRoot != root) {
+            val jsModule = exportQualifierMap[docRoot.uid]
+            if (jsModule == null) {
+                exportQualifierMap[docRoot.uid] = if (docRoot.name.isStringLiteral()) {
+                    JsModule(name = docRoot.name)
+                } else {
+                    JsModule(
+                            name = null,
+                            qualifier = true
+                    )
+                }
             }
         }
 
@@ -73,58 +81,6 @@ private class ExportAssignmentLowering(
         } else {
             moduleNameResolver.resolveName(fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
         }
-    }
-
-    override fun lowerModuleModel(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration? {
-        if (exportQualifierMap.contains(moduleDeclaration.uid)) {
-            (exportQualifierMap[moduleDeclaration.uid] as? JsModule).let { jsModule ->
-                exportQualifierMap[moduleDeclaration.uid] = JsModule(
-                        name = jsModule?.name,
-                        qualifier = false
-                )
-            }
-        } else {
-            if (moduleDeclaration.uid != root.uid) {
-                exportQualifierMap[moduleDeclaration.uid] = if (moduleDeclaration.name.isStringLiteral()) {
-                    JsModule(
-                            name = moduleDeclaration.name
-                    )
-                } else {
-                    JsModule(
-                            name = null,
-                            qualifier = true
-                    )
-                }
-            }
-        }
-
-        return super.lowerModuleModel(moduleDeclaration, owner)
-    }
-
-    override fun lowerSourceDeclaration(moduleDeclaration: ModuleDeclaration, owner: NodeOwner<ModuleDeclaration>?): ModuleDeclaration {
-        if (exportQualifierMap.contains(moduleDeclaration.uid)) {
-            (exportQualifierMap[moduleDeclaration.uid] as? JsModule).let { jsModule ->
-                exportQualifierMap[moduleDeclaration.uid] = JsModule(
-                        name = jsModule?.name,
-                        qualifier = false
-                )
-            }
-        } else {
-            if (moduleDeclaration.uid != root.uid) {
-                exportQualifierMap[moduleDeclaration.uid] = if (moduleDeclaration.name.isStringLiteral()) {
-                    JsModule(
-                            name = moduleDeclaration.name
-                    )
-                } else {
-                    JsModule(
-                            name = null,
-                            qualifier = true
-                    )
-                }
-            }
-        }
-
-        return super.lowerSourceDeclaration(moduleDeclaration, owner)
     }
 
     override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
