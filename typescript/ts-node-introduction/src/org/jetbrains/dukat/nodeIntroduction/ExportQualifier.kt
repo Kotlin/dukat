@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.ast.model.nodes
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.astCommon.NameEntity
 
