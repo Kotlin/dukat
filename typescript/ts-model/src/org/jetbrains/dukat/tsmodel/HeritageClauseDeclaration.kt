@@ -9,5 +9,5 @@ data class HeritageClauseDeclaration(
         val name: NameEntity,
         val typeArguments: List<ParameterValueDeclaration>,
         val extending: Boolean,
-        override val reference: ReferenceDeclaration?
+        override val typeReference: ReferenceDeclaration?
 ) : Entity, ParameterOwnerDeclaration, WithReferenceDeclaration

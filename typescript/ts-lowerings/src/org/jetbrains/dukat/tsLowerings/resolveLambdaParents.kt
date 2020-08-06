@@ -25,7 +25,7 @@ private class ResolveLambdaParentsLowering(private val topDeclarationResolver: T
 
         val callSignaturesFromLambda = mutableListOf<CallSignatureDeclaration>()
         val regularParentEntities = declaration.parentEntities.filter {
-            val topDeclaration = topDeclarationResolver.resolve(it.reference)
+            val topDeclaration = topDeclarationResolver.resolve(it.typeReference)
             if ((topDeclaration is TypeAliasDeclaration) && (topDeclaration.typeReference is FunctionTypeDeclaration)) {
                 callSignaturesFromLambda.add((topDeclaration.typeReference as FunctionTypeDeclaration).convertToCallSignature(topDeclaration.typeParameters))
                 false

@@ -309,7 +309,7 @@ internal class DocumentConverter(
                         name,
                         typeParams,
                         meta?.processMeta(),
-                        reference?.getFqName(),
+                        typeReference?.getFqName(),
                         nullable
                 )
 

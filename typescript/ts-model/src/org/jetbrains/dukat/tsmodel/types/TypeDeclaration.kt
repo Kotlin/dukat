@@ -9,7 +9,7 @@ import org.jetbrains.dukat.tsmodel.WithReferenceDeclaration
 data class TypeDeclaration(
         val value: NameEntity,
         val params: List<ParameterValueDeclaration>,
-        override val reference: ReferenceDeclaration? = null,
+        override val typeReference: ReferenceDeclaration? = null,
         override var nullable: Boolean = false,
         override var meta: MetaData? = null
 ) : ParameterValueDeclaration, ParameterOwnerDeclaration, WithReferenceDeclaration

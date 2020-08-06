@@ -52,7 +52,7 @@ class TypeAliasContext {
     fun dereference(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return when (declaration) {
             is TypeDeclaration ->
-                myTypeAliasMap[declaration.reference?.uid]?.let { aliasResolved ->
+                myTypeAliasMap[declaration.typeReference?.uid]?.let { aliasResolved ->
                     val typeReferenceWithReplacedDefaultValues = if (aliasResolved.typeParameters.size > declaration.params.size) {
                         val defaultTypeMap = aliasResolved.typeParameters.subList(fromIndex = declaration.params.size, toIndex = aliasResolved.typeParameters.size).mapNotNull { param ->
                             param.defaultValue?.let { param.name to it }

@@ -7,7 +7,7 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 data class GeneratedInterfaceReferenceDeclaration(
         val name: NameEntity,
         val typeParameters: List<ParameterValueDeclaration>,
-        override val reference: ReferenceDeclaration?,
+        override val typeReference: ReferenceDeclaration?,
 
         override val nullable: Boolean = false,
         override var meta: MetaData? = null

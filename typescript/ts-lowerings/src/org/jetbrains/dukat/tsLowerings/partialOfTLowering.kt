@@ -50,7 +50,7 @@ private fun MethodSignatureDeclaration.convertToLambdaProperty(): PropertyDeclar
     )
 }
 
-private data class ClassLikeWithOwner(val classLike: ClassLikeDeclaration, val moduleOwner: ModuleDeclaration) {}
+private data class ClassLikeWithOwner(val classLike: ClassLikeDeclaration, val moduleOwner: ModuleDeclaration)
 
 private fun ModuleDeclaration.visitClassLike(visit: (classLike: ClassLikeDeclaration, moduleOwner: ModuleDeclaration) -> Unit) {
     declarations.forEach {
@@ -83,11 +83,11 @@ private fun ClassLikeDeclaration.generatePartialInterface(
         parentEntities.map { heritageClauseDeclaration ->
             val partialHeritageClause = heritageClauseDeclaration.copy(
                     name = heritageClauseDeclaration.name.partialName(),
-                    reference = heritageClauseDeclaration.reference?.copy(uid = heritageClauseDeclaration.reference!!.uid.withPartialSuffix())
+                    typeReference = heritageClauseDeclaration.typeReference?.copy(uid = heritageClauseDeclaration.typeReference!!.uid.withPartialSuffix())
             )
 
-            if (partialHeritageClause.reference != null) {
-                heritageClauses.add(partialHeritageClause.reference!!.uid)
+            if (partialHeritageClause.typeReference != null) {
+                heritageClauses.add(partialHeritageClause.typeReference!!.uid)
             }
 
             partialHeritageClause
@@ -114,13 +114,13 @@ private class TypeVisitor(
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         val singleTypeParam = declaration.params.singleOrNull()
         return if (declaration.value == IdentifierEntity("Partial") && (singleTypeParam is TypeDeclaration)) {
-            val uid = singleTypeParam.reference?.uid
+            val uid = singleTypeParam.typeReference?.uid
             val typeAny = TypeDeclaration(IdentifierEntity("Any"), emptyList())
             if (uid != null) {
                 classLikeReferences[uid]?.let { (classLike, _) ->
                     val generatePartialInterface = classLike.generatePartialInterface(heritageClauses)
                     partialReferences.putIfAbsent(uid, generatePartialInterface)
-                    singleTypeParam.copy(value = generatePartialInterface.name, reference = ReferenceDeclaration(generatePartialInterface.uid))
+                    singleTypeParam.copy(value = generatePartialInterface.name, typeReference = ReferenceDeclaration(generatePartialInterface.uid))
                 } ?: typeAny
             } else {
                 typeAny
@@ -180,7 +180,7 @@ private fun SourceFileDeclaration.lowerPartialOfT(): SourceFileDeclaration = cop
 
 private fun SourceSetDeclaration.lowerPartialOfT(): SourceSetDeclaration = copy(sources = sources.map(SourceFileDeclaration::lowerPartialOfT))
 
-class LowerPartialOf(): TsLowering {
+class LowerPartialOf : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.lowerPartialOfT()
     }

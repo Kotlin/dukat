@@ -32,16 +32,16 @@ private fun NameEntity.addPostfix(postfix: String): NameEntity {
 private class SubstituteTypeLowering(private val generatedEntities: Map<String, Map<Int, ClassLikeDeclaration>>) : DeclarationLowering {
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
-        val heritageClauseResolved = generatedEntities[heritageClause.reference?.uid]?.get(heritageClause.typeArguments.size)?.let { reference ->
-            heritageClause.copy(name = reference.name, reference = ReferenceDeclaration(reference.uid))
+        val heritageClauseResolved = generatedEntities[heritageClause.typeReference?.uid]?.get(heritageClause.typeArguments.size)?.let { reference ->
+            heritageClause.copy(name = reference.name, typeReference = ReferenceDeclaration(reference.uid))
         }
 
         return super.lowerHeritageClause(heritageClauseResolved ?: heritageClause, owner)
     }
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
-        val declarationResolved = generatedEntities[declaration.reference?.uid]?.get(declaration.params.size)?.let { reference ->
-            declaration.copy(value = reference.name, reference = ReferenceDeclaration(reference.uid))
+        val declarationResolved = generatedEntities[declaration.typeReference?.uid]?.get(declaration.params.size)?.let { reference ->
+            declaration.copy(value = reference.name, typeReference = ReferenceDeclaration(reference.uid))
         }
 
         return super.lowerTypeDeclaration(declarationResolved ?: declaration, owner)
@@ -118,7 +118,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                     it.processType(defValuesMap)
                                                 },
                                                 extending = false,
-                                                reference = ReferenceDeclaration(resolvedClassLike.uid)
+                                                typeReference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
                                         modifiers = resolvedClassLike.modifiers,
                                         definitionsInfo = emptyList()
@@ -138,7 +138,7 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
                                                     it.processType(defValuesMap)
                                                 },
                                                 extending = false,
-                                                reference = ReferenceDeclaration(resolvedClassLike.uid)
+                                                typeReference = ReferenceDeclaration(resolvedClassLike.uid)
                                         )),
                                         modifiers = resolvedClassLike.modifiers,
                                         definitionsInfo = resolvedClassLike.definitionsInfo
@@ -153,12 +153,12 @@ private class EntityWithDefaultTypeParamsGenerator(private val references: Map<S
     }
 
     override fun lowerHeritageClause(heritageClause: HeritageClauseDeclaration, owner: NodeOwner<ClassLikeDeclaration>?): HeritageClauseDeclaration {
-        checkForDefaultTypeParams(heritageClause.typeArguments, references[heritageClause.reference?.uid])
+        checkForDefaultTypeParams(heritageClause.typeArguments, references[heritageClause.typeReference?.uid])
         return super.lowerHeritageClause(heritageClause, owner)
     }
 
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
-        checkForDefaultTypeParams(declaration.params, references[declaration.reference?.uid])
+        checkForDefaultTypeParams(declaration.params, references[declaration.typeReference?.uid])
         return super.lowerTypeDeclaration(declaration, owner)
     }
 
@@ -196,7 +196,7 @@ private fun SourceSetDeclaration.resolveDefaultTypeParams(): SourceSetDeclaratio
     return sourceSetsWithIntroducedEntities.copy(sources = sourceSetsWithIntroducedEntities.sources.map { it.copy(root = SubstituteTypeLowering(generatedEntities).lowerSourceDeclaration(it.root)) })
 }
 
-class ResolveDefaultTypeParams(): TsLowering {
+class ResolveDefaultTypeParams : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.resolveDefaultTypeParams()
     }

@@ -189,7 +189,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
 
 private class IntroduceGeneratedMembersToDescendantClasses(private val generatedMembersMap: Map<String, List<MethodDeclaration>>) : TopLevelDeclarationLowering {
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
-        val generatedMembers = declaration.parentEntities.mapNotNull { generatedMembersMap[it.reference?.uid] }.flatten()
+        val generatedMembers = declaration.parentEntities.mapNotNull { generatedMembersMap[it.typeReference?.uid] }.flatten()
         return super.lowerClassDeclaration(declaration.copy(members = declaration.members + generatedMembers), owner)
 
     }

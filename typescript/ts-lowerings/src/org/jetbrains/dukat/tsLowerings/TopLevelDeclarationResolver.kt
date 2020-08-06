@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -51,7 +50,7 @@ class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDec
                 is TypeAliasDeclaration -> {
                     val typeReference = resolvedEntity.typeReference
                     if (typeReference is WithReferenceDeclaration) {
-                        resolveRecursive(typeReference.reference?.uid)
+                        resolveRecursive(typeReference.typeReference?.uid)
                     } else {
                         null
                     }

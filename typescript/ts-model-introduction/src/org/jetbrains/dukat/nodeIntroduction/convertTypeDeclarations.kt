@@ -86,7 +86,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
         is TypeDeclaration -> TypeValueNode(
                 value = value,
                 params = params.map { param -> param.convertToNode() },
-                typeReference = reference?.let {
+                typeReference = typeReference?.let {
                     ReferenceNode(it.uid)
                 },
                 nullable = nullable,
@@ -104,7 +104,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
         is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceDeclaration(
                 name,
                 typeParameters.map { it.convertToNode() },
-                reference,
+                typeReference,
                 nullable,
                 metaData ?: meta
         )

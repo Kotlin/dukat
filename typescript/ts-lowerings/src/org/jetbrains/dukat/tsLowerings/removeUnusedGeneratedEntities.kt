@@ -50,7 +50,7 @@ private fun ModuleDeclaration.removeUnusedGeneratedEntities(): ModuleDeclaration
                 typeRefs.add(uid)
             }
             is TypeDeclaration -> {
-                value.reference?.uid?.let { uid ->
+                value.typeReference?.uid?.let { uid ->
                     typeRefs.add(uid)
                 }
             }

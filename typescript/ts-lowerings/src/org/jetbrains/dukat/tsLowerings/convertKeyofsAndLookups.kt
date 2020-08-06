@@ -24,7 +24,7 @@ private class KeyOfAndLookupLowering(private val context: KeyOfAndLookupContext)
     ): ParameterValueDeclaration {
         val type = super.lowerParameterValue(declaration.type, owner.wrap(declaration))
         if (type is TypeDeclaration) {
-            val reference = type.reference
+            val reference = type.typeReference
             if (reference != null) {
                 val namedMembers = context.getNamedMembers(reference.uid)
                 return UnionTypeDeclaration(
@@ -48,7 +48,7 @@ private class KeyOfAndLookupLowering(private val context: KeyOfAndLookupContext)
         val objectType = super.lowerParameterValue(declaration.objectType, owner.wrap(declaration))
         val indexType = super.lowerParameterValue(declaration.indexType, owner.wrap(declaration))
         if (objectType is TypeDeclaration) {
-            val reference = objectType.reference
+            val reference = objectType.typeReference
             if (reference != null) {
                 val properties = context.getProperties(reference.uid)
                 val newType = when (indexType) {

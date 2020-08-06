@@ -12,7 +12,6 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -67,7 +66,7 @@ private class MergeClassLikesLowering(private val topLevelDeclarationResolver: T
 
     private fun resolveParentMethods(classLikeDeclaration: ClassLikeDeclaration): List<MemberDeclaration> {
         return classLikeDeclaration.parentEntities.flatMap { heritageClause ->
-            val parentClass = topLevelDeclarationResolver.resolveRecursive(heritageClause.reference?.uid)
+            val parentClass = topLevelDeclarationResolver.resolveRecursive(heritageClause.typeReference?.uid)
             if (parentClass is ClassLikeDeclaration) {
                 val typeParams = parentClass.typeParameters.mapIndexed { index, typeParam ->
                     Pair(typeParam.name, heritageClause.typeArguments.getOrNull(index))
@@ -144,7 +143,7 @@ private fun SourceSetDeclaration.mergeInterfaces(topLevelDeclarationResolver: To
     return copy(sources = sources.map { it.copy(root = MergeClassLikesLowering(topLevelDeclarationResolver).lowerSourceDeclaration(it.root)) })
 }
 
-class MergeClassLikes() : TsLowering {
+class MergeClassLikes : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         val topLevelDeclarationResolver = TopLevelDeclarationResolver(source)
         return source.mergeInterfaces(topLevelDeclarationResolver)
