@@ -4,10 +4,11 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.astCommon.MetaData
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class GeneratedInterfaceReferenceNode(
         val name: NameEntity,
-        val typeParameters: List<TypeNode>,
+        val typeParameters: List<ParameterValueDeclaration>,
         val reference: ReferenceEntity?,
 
         override val nullable: Boolean = false,

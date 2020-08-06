@@ -81,7 +81,7 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
     )
 }
 
-fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): TypeNode? {
+fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): ParameterValueDeclaration? {
     return when (this) {
         is TypeParamReferenceDeclaration -> TypeParameterNode(
                 name = value,
@@ -168,6 +168,6 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
 
 private val TYPE_ANY = TypeValueNode(IdentifierEntity("Any"), emptyList(), null, false)
 
-fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): TypeNode {
+fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): ParameterValueDeclaration {
     return convertToNodeNullable(meta) ?: TYPE_ANY
 }

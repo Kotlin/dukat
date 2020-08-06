@@ -93,6 +93,7 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -225,7 +226,7 @@ internal class DocumentConverter(
         return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
     }
 
-    fun TypeNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
+    fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
             is LiteralUnionNode -> {
@@ -413,7 +414,7 @@ internal class DocumentConverter(
     private fun MetaData?.processMeta(): String? {
         return when (this) {
             is SimpleMetaData -> value
-            is IntersectionMetadata -> params.filterIsInstance(TypeNode::class.java).map {
+            is IntersectionMetadata -> params.map {
                 it.process().translate()
             }.joinToString(" & ")
             else -> null
@@ -478,7 +479,7 @@ internal class DocumentConverter(
         } else null
     }
 
-    private fun TypeNode.isUnit(): Boolean {
+    private fun ParameterValueDeclaration.isUnit(): Boolean {
         return (this is TypeValueNode) && (value == IdentifierEntity("Unit"))
     }
 

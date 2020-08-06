@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class PropertyNode(
         val name: String,
-        val type: TypeNode,
+        val type: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
 
         val static: Boolean,

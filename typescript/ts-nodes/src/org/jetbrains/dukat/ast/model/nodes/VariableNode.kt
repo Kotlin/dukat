@@ -1,10 +1,11 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class VariableNode(
         var name: NameEntity,
-        val type: TypeNode,
+        val type: ParameterValueDeclaration,
 
         val inline: Boolean,
         val typeParameters: List<TypeValueNode>,

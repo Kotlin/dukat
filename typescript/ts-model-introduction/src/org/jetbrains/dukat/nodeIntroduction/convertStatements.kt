@@ -120,7 +120,7 @@ import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclar
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
-class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
+class ExpressionConverter(private val typeConverter: (ParameterValueDeclaration) -> TypeModel) {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {
         return when (this) {
             is StringLiteralExpressionDeclaration -> StringLiteralExpressionModel(

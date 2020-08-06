@@ -7,6 +7,6 @@ import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class HeritageNode(
         val name: NameEntity,
-        val typeArguments: List<TypeNode>,
+        val typeArguments: List<ParameterValueDeclaration>,
         val reference: ReferenceNode? = null
 ) : Entity

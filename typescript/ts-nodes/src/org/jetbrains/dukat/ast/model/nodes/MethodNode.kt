@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
+import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class MethodNode(
         val name: String,
         override val parameters: List<ParameterNode>,
-        val type: TypeNode,
+        val type: ParameterValueDeclaration,
         val typeParameters: List<TypeValueNode>,
 
         val static: Boolean,
