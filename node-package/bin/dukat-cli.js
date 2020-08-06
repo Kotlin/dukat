@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 var spawn = require('child_process').spawn;
 var path = require('path');
 var fs = require('fs');
@@ -10,7 +10,12 @@ var Readable = require('stream').Readable;
 var EventEmitter = require('events');
 
 var printError = function (errorMessage) {
-    console.error("ERROR: " + errorMessage);
+    if (typeof errorMessage !== "string") {
+        console.error("ERROR:");
+        console.error(errorMessage)
+    } else {
+        console.error("ERROR: " + errorMessage);
+    }
 };
 
 function run(command, args) {
@@ -23,18 +28,37 @@ function run(command, args) {
     return child;
 }
 
-function printNoJava() {
-    printError("It looks like you don't have java installed or it's just not reachable from command-line");
+function printInvalidJavaHome() {
+    printError("Your \"JAVA_HOME\" environment variable points to an invalid directory.");
     printError("As of now \"dukat\" requires Java Runtime Environment to be installed.");
+    printError("Either set \"JAVA_HOME\" to a proper Java installation,");
+    printError("or make sure \"java\" is callable from commandline and unset \"JAVA_HOME\".");
 }
 
-function guardJavaExists() {
-    exec("java -version", function (error, stdout, stderr) {
-        if (error) {
+function printNoJava() {
+    printError("\"java\" is not callable from commandline and no \"JAVA_HOME\" environment variable is set.");
+    printError("As of now \"dukat\" requires Java Runtime Environment to be installed.");
+    printError("Either set \"JAVA_HOME\" to a proper Java installation,");
+    printError("or make sure \"java\" is callable from commandline.");
+}
+
+function findJavaExecutable() {
+    var javaHome = process.env.JAVA_HOME
+    var result = javaHome ? path.join(javaHome, "bin", "java") : "java"
+    try {
+        execSync('"' + result + "\" -version", {
+            stdio: ['pipe', 'ignore', 'pipe']
+        });
+    } catch (error) {
+        printError(error)
+        if (javaHome) {
+            printInvalidJavaHome();
+        } else {
             printNoJava();
-            process.exit(error.code);
         }
-    });
+        process.exit(1);
+    }
+    return result
 }
 
 function createReadable() {
@@ -132,7 +156,7 @@ function cliMode(args) {
     var cliPath = path.resolve(runtimePath, "dukat-cli.jar");
     var classPath = [cliPath].join(path.delimiter);
 
-    guardJavaExists();
+    var java = findJavaExecutable();
 
     var argsProcessed = processArgs(args);
 
@@ -156,7 +180,7 @@ function cliMode(args) {
                 "-Ddukat.cli.internal.packagedir=" + packageDir,
                 "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
-            var dukatProcess = run("java", commandArgs);
+            var dukatProcess = run(java, commandArgs);
             inputStream.pipe(dukatProcess.stdin);
             return dukatProcess;
         } catch (e) {
@@ -174,7 +198,7 @@ function cliMode(args) {
             "-Ddukat.cli.internal.packagedir=" + packageDir,
             "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
-        return run("java", commandArgs);
+        return run(java, commandArgs);
     }
 
     process.exit(1);
