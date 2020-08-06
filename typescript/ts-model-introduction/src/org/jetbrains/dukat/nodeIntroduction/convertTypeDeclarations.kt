@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -79,8 +78,8 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
 
 fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): ParameterValueDeclaration? {
     return when (this) {
-        is TypeParamReferenceDeclaration -> TypeParameterNode(
-                name = value,
+        is TypeParamReferenceDeclaration -> TypeParamReferenceDeclaration(
+                value = value,
                 nullable = nullable,
                 meta = metaData ?: meta
         )

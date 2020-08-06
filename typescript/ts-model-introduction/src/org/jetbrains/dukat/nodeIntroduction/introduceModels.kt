@@ -23,7 +23,6 @@ import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.ReferenceOriginNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
@@ -92,6 +91,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
+import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import java.io.File
 
@@ -253,9 +253,9 @@ internal class DocumentConverter(
                     "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
                     null
             )
-            is TypeParameterNode -> {
+            is TypeParamReferenceDeclaration -> {
                 TypeParameterReferenceModel(
-                        name = name,
+                        name = value,
                         metaDescription = meta.processMeta(),
                         nullable = nullable
                 )

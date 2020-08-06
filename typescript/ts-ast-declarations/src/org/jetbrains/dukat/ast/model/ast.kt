@@ -7,7 +7,6 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
-import org.jetbrains.dukat.ast.model.nodes.TypeParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeValueNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.Entity
@@ -48,7 +47,6 @@ fun <T : Entity> Entity.duplicate(): T {
         is ObjectNode -> copy() as T
         is LiteralUnionNode -> copy() as T
         is TypeAliasNode -> copy() as T
-        is TypeParameterNode -> copy() as T
         is TypeValueNode -> copy() as T
         is VariableNode -> copy() as T
         else -> raiseConcern("can not copy ${this}") { this as T }
