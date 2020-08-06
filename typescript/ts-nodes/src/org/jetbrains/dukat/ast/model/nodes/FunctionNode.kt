@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.tsmodel.ExportQualifier
-import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -20,8 +18,6 @@ data class FunctionNode(
         val type: TypeNode,
         val typeParameters: List<TypeValueNode>,
 
-        override val exportQualifier: ExportQualifier?,
-
         val export: Boolean,
         val inline: Boolean,
         val operator: Boolean,
@@ -33,4 +29,4 @@ data class FunctionNode(
         val body: BlockDeclaration?,
         override val external: Boolean,
         val isGenerator: Boolean
-) : MemberEntity, TopLevelNode, ExportableNode, ParameterOwnerNode
+) : MemberEntity, TopLevelNode, ParameterOwnerNode

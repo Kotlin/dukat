@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.astCommon.NameEntity
 
 data class ClassNode(
@@ -10,6 +9,5 @@ data class ClassNode(
         val parentEntities: List<HeritageNode>,
 
         override val uid: String,
-        override val exportQualifier: ExportQualifier?,
         override val external: Boolean
-) : ClassLikeNode, ExportableNode
+) : ClassLikeNode

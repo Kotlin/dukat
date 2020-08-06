@@ -8,9 +8,6 @@ data class ModuleNode(
         val declarations: List<TopLevelNode> = emptyList(),
         val imports: Map<String, ImportNode>,
 
-        val jsModule: NameEntity?,
-        val jsQualifier: NameEntity?,
-
         override var uid: String,
         override val external: Boolean
 ) : TopLevelNode

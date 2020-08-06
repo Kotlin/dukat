@@ -43,6 +43,7 @@ import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
+import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
@@ -87,6 +88,7 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.nodeIntroduction.ExportQualifierMapBuilder
 import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
@@ -129,7 +131,11 @@ private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
 }
 
-internal class DocumentConverter(private val moduleNode: ModuleNode, private val uidToNameMapper: UidMapper) {
+internal class DocumentConverter(
+    private val moduleNode: ModuleNode,
+    private val uidToNameMapper: UidMapper,
+    private val exportQualifierMap: Map<String?, ExportQualifier>
+) {
     private val imports = mutableListOf<ImportModel>()
     private val expressionConverter = ExpressionConverter { typeNode ->
         typeNode.process()
@@ -139,8 +145,8 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleNode }
 
-        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
-            declaration.convertToModel()
+        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+            declaration.convertToModel(moduleNode)
         }
 
         val declarationsFiltered = mutableListOf<TopLevelModel>()
@@ -151,13 +157,18 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        moduleNode.jsModule?.let { qualifier ->
+        val exportQualifier = exportQualifierMap[moduleNode.uid]
+        val jsModuleQualifier = exportQualifier as? JsModule
+
+        jsModuleQualifier?.name?.let { qualifier ->
             annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
             annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
         }
 
-        moduleNode.jsQualifier?.let { qualifier ->
-            annotations.add(AnnotationModel("file:JsQualifier", listOf(qualifier.process { unquote(it) })))
+        jsModuleQualifier?.qualifier?.let { qualifier ->
+            if (qualifier) {
+                annotations.add(AnnotationModel("file:JsQualifier", listOf(moduleNode.qualifiedPackageName.process { unquote(it) })))
+            }
         }
 
         return ModuleModel(
@@ -635,7 +646,6 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
-        //val generatedMethods = collectParentGeneratedMethods(parentEntities)
 
         return ClassModel(
                 name = name,
@@ -654,7 +664,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                 },
                 typeParameters = convertTypeParams(typeParameters),
                 parentEntities = parentModelEntities,
-                annotations = exportQualifier.toAnnotation(),
+                annotations = exportQualifierMap[uid].toAnnotation(),
                 comment = null,
                 external = external,
                 inheritanceModifier = InheritanceModifierModel.OPEN,
@@ -716,7 +726,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
         )
     }
 
-    fun TopLevelEntity.convertToModel(): TopLevelModel? {
+    fun TopLevelEntity.convertToModel(moduleOwner: ModuleNode): TopLevelModel? {
         return when (this) {
             is ClassNode -> convertToClassModel()
             is InterfaceNode -> convertToInterfaceModel()
@@ -751,7 +761,7 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         type = type.process(),
 
                         typeParameters = convertTypeParams(typeParameters),
-                        annotations = exportQualifier.toAnnotation(),
+                        annotations = exportQualifierMap[uid].toAnnotation(),
                         export = export,
                         inline = inline,
                         operator = operator,
@@ -769,22 +779,29 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
                         external = external
                 )
             }
-            is VariableNode -> VariableModel(
-                    name = name,
-                    type = type.process(),
-                    annotations = exportQualifier.toAnnotation(),
-                    immutable = exportQualifier is JsModule,
-                    inline = inline,
-                    external = true,
-                    initializer = null,
-                    get = resolveGetter(),
-                    set = resolveSetter(),
-                    typeParameters = convertTypeParams(typeParameters),
-                    extend = extend.convert(),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null,
-                    explicitlyDeclaredType = explicitlyDeclaredType
-            )
+            is VariableNode -> {
+                val nameResolved = if (moduleOwner.packageName.isStringLiteral()) {
+                    (exportQualifierMap[uid] as? JsModule)?.name ?: name
+                } else {
+                    name
+                }
+                VariableModel(
+                        name = nameResolved,
+                        type = type.process(),
+                        annotations = exportQualifierMap[uid].toAnnotation(),
+                        immutable = exportQualifierMap[uid] is JsModule,
+                        inline = inline,
+                        external = true,
+                        initializer = null,
+                        get = resolveGetter(),
+                        set = resolveSetter(),
+                        typeParameters = convertTypeParams(typeParameters),
+                        extend = extend.convert(),
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        comment = null,
+                        explicitlyDeclaredType = explicitlyDeclaredType
+                )
+            }
             is ObjectNode -> ObjectModel(
                     name = name,
                     members = members.flatMap { member -> member.process() },
@@ -816,7 +833,11 @@ internal class DocumentConverter(private val moduleNode: ModuleNode, private val
 }
 
 
-private class NodeConverter(private val node: SourceSetNode, private val uidToNameMapper: UidMapper) {
+private class NodeConverter(
+    private val node: SourceSetNode,
+    private val uidToNameMapper: UidMapper,
+    private val exportQualifierMap: Map<String?, ExportQualifier>
+) {
 
     fun convert(): SourceSetModel {
         return SourceSetModel(
@@ -826,7 +847,7 @@ private class NodeConverter(private val node: SourceSetNode, private val uidToNa
                     val fileName = rootFile.normalize().absolutePath
 
                     val generated = mutableListOf<SourceFileModel>()
-                    val root = DocumentConverter(source.root, uidToNameMapper).convert(source.fileName, generated)
+                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap).convert(source.fileName, generated)
 
                     val module = SourceFileModel(
                             name = source.name,
@@ -873,13 +894,17 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
 }
 
 fun SourceSetDeclaration.introduceModels(moduleNameResolver: ModuleNameResolver): SourceSetModel {
-    val nodes = IntroduceNodes(moduleNameResolver).lower(this)
+     val exportQualifierMapBuilder = ExportQualifierMapBuilder(moduleNameResolver)
+     exportQualifierMapBuilder.lower(this)
+
+    val introduceNodes = IntroduceNodes()
+    val nodes = introduceNodes.lower(this)
 
     val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
     ReferenceVisitor { uid, fqModel ->
         uidToFqNameMapper[uid] = fqModel
     }.process(nodes)
 
-    return NodeConverter(nodes, uidToFqNameMapper).convert()
+    return NodeConverter(nodes, uidToFqNameMapper, exportQualifierMapBuilder.exportQualifierMap).convert()
 
 }

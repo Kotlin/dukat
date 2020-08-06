@@ -6,7 +6,6 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.tsLowerings.TsLowering
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
@@ -100,10 +99,10 @@ private abstract class ExportQualifierBuilder(
     abstract fun ModuleDeclaration.getModuleName(): NameEntity?
 }
 
-class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver) : TsLowering {
+class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver)  {
     val exportQualifierMap = mutableMapOf<String?, ExportQualifier>()
 
-    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+    fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.copy(sources = source.sources.map { sourceFileNode ->
 
             object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
