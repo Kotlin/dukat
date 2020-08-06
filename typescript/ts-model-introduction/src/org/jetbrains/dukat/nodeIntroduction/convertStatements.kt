@@ -1,10 +1,8 @@
-package org.jetrbains.dukat.nodeLowering.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.duplicate
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
-import org.jetbrains.dukat.ast.model.nodes.convertToNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
@@ -81,8 +79,6 @@ import org.jetbrains.dukat.astModel.statements.ThrowStatementModel
 import org.jetbrains.dukat.astModel.statements.WhenStatementModel
 import org.jetbrains.dukat.astModel.statements.WhileStatementModel
 import org.jetbrains.dukat.panic.raiseConcern
-import org.jetbrains.dukat.tsmodel.ArrayDestructuringDeclaration
-import org.jetbrains.dukat.tsmodel.BindingVariableDeclaration
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
@@ -123,7 +119,6 @@ import org.jetbrains.dukat.tsmodel.expression.templates.StringTemplateTokenDecla
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.templates.TemplateTokenDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
-import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 class ExpressionConverter(private val typeConverter: (TypeNode) -> TypeModel) {
     private fun LiteralExpressionDeclaration.convert(): ExpressionModel {

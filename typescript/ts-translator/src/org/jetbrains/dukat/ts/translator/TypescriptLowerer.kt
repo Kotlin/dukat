@@ -53,7 +53,7 @@ import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetrbains.dukat.nodeLowering.lowerings.introduceModels
+import org.jetbrains.dukat.nodeIntroduction.introduceModels
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,

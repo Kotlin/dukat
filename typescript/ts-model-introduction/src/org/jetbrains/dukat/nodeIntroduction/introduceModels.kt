@@ -1,4 +1,4 @@
-package org.jetrbains.dukat.nodeLowering.lowerings
+package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
@@ -88,8 +88,6 @@ import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.nodeIntroduction.ExportQualifierMapBuilder
-import org.jetbrains.dukat.nodeIntroduction.IntroduceNodes
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
@@ -132,9 +130,9 @@ private fun unquote(name: String): String {
 }
 
 internal class DocumentConverter(
-    private val moduleNode: ModuleNode,
-    private val uidToNameMapper: UidMapper,
-    private val exportQualifierMap: Map<String?, ExportQualifier>
+        private val moduleNode: ModuleNode,
+        private val uidToNameMapper: UidMapper,
+        private val exportQualifierMap: Map<String?, ExportQualifier>
 ) {
     private val imports = mutableListOf<ImportModel>()
     private val expressionConverter = ExpressionConverter { typeNode ->
@@ -834,9 +832,9 @@ internal class DocumentConverter(
 
 
 private class NodeConverter(
-    private val node: SourceSetNode,
-    private val uidToNameMapper: UidMapper,
-    private val exportQualifierMap: Map<String?, ExportQualifier>
+        private val node: SourceSetNode,
+        private val uidToNameMapper: UidMapper,
+        private val exportQualifierMap: Map<String?, ExportQualifier>
 ) {
 
     fun convert(): SourceSetModel {

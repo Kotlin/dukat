@@ -84,8 +84,7 @@ include 'ts-converter'
 include 'ts-lowerings'
 include 'ts-model'
 include 'ts-model-proto'
-include 'ts-node-introduction'
-include 'ts-node-lowering'
+include 'ts-model-introduction'
 include 'ts-translator'
 include 'ts-nodes'
 
@@ -109,8 +108,7 @@ project(':ts-converter').projectDir = file("$rootDir/typescript/ts-converter")
 project(':ts-lowerings').projectDir = file("$rootDir/typescript/ts-lowerings")
 project(':ts-model').projectDir = file("$rootDir/typescript/ts-model")
 project(':ts-model-proto').projectDir = file("$rootDir/typescript/ts-model-proto")
-project(':ts-node-introduction').projectDir = file("$rootDir/typescript/ts-node-introduction")
-project(':ts-node-lowering').projectDir = file("$rootDir/typescript/ts-node-lowering")
+project(':ts-model-introduction').projectDir = file("$rootDir/typescript/ts-model-introduction")
 project(':ts-translator').projectDir = file("$rootDir/typescript/ts-translator")
 project(':ts-nodes').projectDir = file("$rootDir/typescript/ts-nodes")
 

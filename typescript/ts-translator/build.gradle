@@ -18,6 +18,5 @@ dependencies {
     implementation(project(":ts-model"))
     implementation(project(":ts-model-proto"))
     implementation(project(":ts-nodes"))
-    implementation(project(":ts-node-introduction"))
-    implementation(project(":ts-node-lowering"))
+    implementation(project(":ts-model-introduction"))
 }

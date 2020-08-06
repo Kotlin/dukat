@@ -54,8 +54,7 @@ dependencies {
     implementation(project(":ts-ast-declarations"))
     implementation(project(":ts-lowerings"))
     implementation(project(":ts-model"))
-    implementation(project(":ts-node-introduction"))
-    implementation(project(":ts-node-lowering"))
+    implementation(project(":ts-model-introduction"))
     implementation(project(":ts-translator"))
 
     runtime 'org.jetbrains.kotlin:kotlin-reflect'
