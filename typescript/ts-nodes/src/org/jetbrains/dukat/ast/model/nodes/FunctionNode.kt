@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model.nodes
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
@@ -9,13 +8,6 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-sealed class FunctionNodeContext
-data class FunctionFromMethodSignatureDeclaration(val name: String, val params: List<IdentifierEntity>) : FunctionNodeContext()
-data class IndexSignatureGetter(val name: String) : FunctionNodeContext()
-data class IndexSignatureSetter(val name: String) : FunctionNodeContext()
-data class FunctionFromCallSignature(val params: List<IdentifierEntity>) : FunctionNodeContext()
-class FunctionNodeContextIrrelevant : FunctionNodeContext()
-
 data class FunctionNode(
         val name: NameEntity,
         val parameters: List<ParameterDeclaration>,
@@ -23,10 +15,6 @@ data class FunctionNode(
         val typeParameters: List<TypeDeclaration>,
 
         val export: Boolean,
-        val inline: Boolean,
-        val operator: Boolean,
-
-        val context: FunctionNodeContext,
         val uid: String,
 
         val body: BlockDeclaration?,

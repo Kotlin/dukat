@@ -2,11 +2,7 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
-import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
-import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -482,114 +478,6 @@ internal class DocumentConverter(
         )
     }
 
-    private fun FunctionNode.resolveBody(): BlockStatementModel? {
-        val blockStatements = when (val nodeContext = this.context) {
-            is IndexSignatureGetter -> listOf(
-                    ReturnStatementModel(
-                            PropertyAccessExpressionModel(
-                                    PropertyAccessExpressionModel(
-                                            ThisExpressionModel(),
-                                            CallExpressionModel(
-                                                    IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                                    listOf()
-                                            )
-                                    ),
-                                    CallExpressionModel(
-                                            IdentifierExpressionModel(
-                                                    IdentifierEntity("get")
-                                            ),
-                                            listOf(
-                                                    IdentifierExpressionModel(
-                                                            IdentifierEntity(nodeContext.name)
-                                                    )
-                                            )
-                                    )
-                            )
-                    )
-            )
-
-            is IndexSignatureSetter -> listOf(
-                    ExpressionStatementModel(
-                            PropertyAccessExpressionModel(
-                                    PropertyAccessExpressionModel(
-                                            ThisExpressionModel(),
-                                            CallExpressionModel(
-                                                    IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                                    listOf()
-                                            )
-                                    ),
-                                    CallExpressionModel(
-                                            IdentifierExpressionModel(
-                                                    IdentifierEntity("set")
-                                            ),
-                                            listOf(
-                                                    IdentifierExpressionModel(
-                                                            IdentifierEntity(nodeContext.name)
-                                                    ),
-                                                    IdentifierExpressionModel(
-                                                            IdentifierEntity("value")
-                                                    )
-                                            )
-                                    )
-                            )
-                    )
-            )
-
-            is FunctionFromCallSignature -> {
-                val chainCallExpression = PropertyAccessExpressionModel(
-                        PropertyAccessExpressionModel(
-                                ThisExpressionModel(),
-                                CallExpressionModel(
-                                        IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                        listOf()
-                                )
-                        ),
-                        CallExpressionModel(
-                                IdentifierExpressionModel(
-                                        IdentifierEntity("invoke")
-                                ),
-                                nodeContext.params.map { IdentifierExpressionModel(it) }
-                        )
-                )
-                listOf(
-                        if (type.isUnit()) {
-                            ExpressionStatementModel(chainCallExpression)
-                        } else {
-                            ReturnStatementModel(chainCallExpression)
-                        }
-                )
-            }
-            is FunctionFromMethodSignatureDeclaration -> {
-                val bodyExpression = PropertyAccessExpressionModel(
-                        PropertyAccessExpressionModel(
-                                ThisExpressionModel(),
-                                CallExpressionModel(
-                                        IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                        listOf()
-                                )
-                        ),
-                        CallExpressionModel(
-                                IdentifierExpressionModel(
-                                        IdentifierEntity(nodeContext.name)
-                                ),
-                                nodeContext.params.map { IdentifierExpressionModel(it) }
-                        )
-                )
-
-                listOf(
-                        if (type.isUnit()) {
-                            ExpressionStatementModel(bodyExpression)
-                        } else {
-                            ReturnStatementModel(bodyExpression)
-                        }
-                )
-            }
-            else -> null
-        }
-
-        return blockStatements?.let { BlockStatementModel(it) }
-    }
-
     private fun convertTypeParams(typeParameters: List<TypeDeclaration>, ignoreConstraints: Boolean = false): List<TypeParameterModel> {
         return typeParameters.map { typeParam ->
             TypeParameterModel(
@@ -706,29 +594,15 @@ internal class DocumentConverter(
                 FunctionModel(
                         name = name,
                         parameters = parameters.map { param ->
-                            val processedParam = param.process()
-                            if (inline) {
-                                processedParam.copy(initializer = if (param.optional) {
-                                    ExpressionStatementModel(
-                                            IdentifierExpressionModel(
-                                                    IdentifierEntity("null")
-                                            ),
-                                            null
-                                    )
-                                } else {
-                                    null
-                                })
-                            } else {
-                                processedParam
-                            }
+                            param.process()
                         },
                         type = type.process(),
 
                         typeParameters = convertTypeParams(typeParameters),
                         annotations = exportQualifierMap[uid].toAnnotation(),
                         export = export,
-                        inline = inline,
-                        operator = operator,
+                        inline = false,
+                        operator = false,
                         extend = null,
                         body = body?.let {
                             val convertedBody = expressionConverter.convertBlock(it)
@@ -737,7 +611,7 @@ internal class DocumentConverter(
                             } else {
                                 convertedBody
                             }
-                        } ?: resolveBody(),
+                        },
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null,
                         external = external

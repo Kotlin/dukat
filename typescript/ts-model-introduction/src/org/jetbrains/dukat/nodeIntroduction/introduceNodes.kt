@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -268,18 +267,15 @@ private class LowerDeclarationsToNodes {
 
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
         return FunctionNode(
-                IdentifierEntity(name),
-                convertParameters(parameters),
-                type.convertToNode(),
-                convertTypeParameters(typeParameters),
-                hasExportModifier(),
-                false,
-                false,
-                FunctionNodeContextIrrelevant(),
-                uid,
-                body,
-                inDeclaredModule || hasDeclareModifier(),
-                isGenerator
+                name = IdentifierEntity(name),
+                parameters = convertParameters(parameters),
+                type = type.convertToNode(),
+                typeParameters = convertTypeParameters(typeParameters),
+                export = hasExportModifier(),
+                uid = uid,
+                body = body,
+                external = inDeclaredModule || hasDeclareModifier(),
+                isGenerator = isGenerator
         )
     }
 
