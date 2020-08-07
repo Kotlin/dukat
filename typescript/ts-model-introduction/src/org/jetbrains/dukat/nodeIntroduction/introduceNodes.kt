@@ -12,7 +12,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
@@ -264,16 +263,11 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    private fun TypeAliasDeclaration.convert(): TypeAliasNode {
-        return TypeAliasNode(
-                name = aliasName,
-                typeReference = typeReference.convertToNode(),
-                typeParameters = typeParameters.map { typeParameter ->
-                    TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
-                },
-                uid = uid,
-                external = false
-        )
+    private fun TypeAliasDeclaration.convert(): TypeAliasDeclaration {
+        return copy(
+                aliasName = aliasName,
+                typeReference = typeReference.convertToNode()
+                )
     }
 
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {

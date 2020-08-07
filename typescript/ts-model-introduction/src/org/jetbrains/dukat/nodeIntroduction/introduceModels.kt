@@ -16,7 +16,6 @@ import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -87,6 +86,7 @@ import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -262,8 +262,8 @@ internal class DocumentConverter(
             }
             is TypeDeclaration -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
-                if ((node is TypeAliasNode) && (node.typeReference is UnionTypeDeclaration)) {
-                    dynamicType("typealias ${node.name} = dynamic")
+                if ((node is TypeAliasDeclaration) && (node.typeReference is UnionTypeDeclaration)) {
+                    dynamicType("typealias ${node.aliasName} = dynamic")
                 } else {
                     TypeValueModel(
                             value,
@@ -812,14 +812,16 @@ internal class DocumentConverter(
                     comment = null,
                     external = external
             )
-            is TypeAliasNode -> {
+            is TypeAliasDeclaration -> {
                 if (typeReference is UnionTypeDeclaration) {
                     null
                 } else {
                     TypeAliasModel(
-                            name = name,
+                            name = aliasName,
                             typeReference = typeReference.process(),
-                            typeParameters = convertTypeParams(typeParameters, true),
+                            typeParameters = convertTypeParams( typeParameters.map { typeParameter ->
+                                TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
+                            }, true),
                             visibilityModifier = VisibilityModifierModel.DEFAULT,
                             comment = null
                     )
@@ -871,8 +873,8 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
     }
 
-    fun visitTypeAliasNode(declaration: TypeAliasNode, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
+    fun visitTypeAliasNode(declaration: TypeAliasDeclaration, owner: ModuleNode) {
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.aliasName)))
     }
 
     fun visitEnumNode(declaration: EnumDeclaration, owner: ModuleNode) {
@@ -883,7 +885,7 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         node.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
                 is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
-                is TypeAliasNode -> visitTypeAliasNode(topLevelNode, node)
+                is TypeAliasDeclaration -> visitTypeAliasNode(topLevelNode, node)
                 is EnumDeclaration -> visitEnumNode(topLevelNode, node)
                 is ModuleNode -> visitModule(topLevelNode)
             }
