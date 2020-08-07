@@ -9,7 +9,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -36,6 +35,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -120,7 +120,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode {
+    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration {
         return if (declaration.optional) {
             PropertyNode(
                     name = declaration.name,
@@ -306,7 +306,7 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberNode? {
+    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration? {
         val memberDeclaration = convertMethodSignatureDeclaration(declaration)
         return when (memberDeclaration) {
             is PropertyNode -> memberDeclaration
@@ -318,7 +318,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberNode> {
+    fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
         return when (declaration) {
             is FunctionDeclaration -> listOf(MethodNode(
                     declaration.name,
@@ -336,7 +336,7 @@ private class LowerDeclarationsToNodes {
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
             is ConstructorDeclaration -> listOf(declaration.convert())
-            else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberNode>() }
+            else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberDeclaration>() }
         }
     }
 

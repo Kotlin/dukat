@@ -13,7 +13,6 @@ import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -84,6 +83,7 @@ import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
+import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -97,7 +97,7 @@ import java.io.File
 
 private val logger = Logging.logger("introduceModels")
 
-private fun MemberNode.isStatic() = when (this) {
+private fun MemberDeclaration.isStatic() = when (this) {
     is MethodNode -> static
     is PropertyNode -> static
     else -> false
@@ -339,7 +339,7 @@ internal class DocumentConverter(
         return emptyList()
     }
 
-    private fun MemberNode.process(): List<MemberModel> {
+    private fun MemberDeclaration.process(): List<MemberModel> {
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorNode -> listOfNotNull(
@@ -368,7 +368,7 @@ internal class DocumentConverter(
                     explicitlyDeclaredType = explicitlyDeclaredType,
                     lateinit = lateinit
             ))
-            else -> raiseConcern("unprocessed MemberNode: ${this}") { listOf<MemberModel>() }
+            else -> raiseConcern("unprocessed MemberDeclaration: ${this}") { listOf<MemberModel>() }
         }
     }
 
