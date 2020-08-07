@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -206,12 +205,13 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    private fun convertToHeritageNodes(declarations: List<HeritageClauseDeclaration>): List<HeritageNode> {
+    private fun convertToHeritageNodes(declarations: List<HeritageClauseDeclaration>): List<HeritageClauseDeclaration> {
         return declarations.map { declaration ->
-            HeritageNode(
+            HeritageClauseDeclaration(
                     name = declaration.name.convert(),
                     typeArguments = declaration.typeArguments.map { it.convertToNode() },
-                    reference = declaration.typeReference
+                    typeReference = declaration.typeReference,
+                    extending = declaration.extending
             )
         }
     }

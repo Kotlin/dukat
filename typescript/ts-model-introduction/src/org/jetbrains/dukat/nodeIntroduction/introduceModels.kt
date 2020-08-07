@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
@@ -81,6 +80,7 @@ import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
@@ -201,10 +201,10 @@ internal class DocumentConverter(
         }
     }
 
-    private fun HeritageNode.convertToModel(): HeritageModel {
-        val isNamedImport = reference?.origin == ReferenceOriginDeclaration.NAMED_IMPORT
+    private fun HeritageClauseDeclaration.convertToModel(): HeritageModel {
+        val isNamedImport = typeReference?.origin == ReferenceOriginDeclaration.NAMED_IMPORT
         if (isNamedImport) {
-            reference?.getFqName()?.let { resolvedName ->
+            typeReference?.getFqName()?.let { resolvedName ->
                 imports.add(ImportModel(resolvedName, name.rightMost()))
             }
         }
@@ -212,7 +212,7 @@ internal class DocumentConverter(
         val fqName = if (isNamedImport) {
             name
         } else {
-            reference?.getFqName()
+            typeReference?.getFqName()
         }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
@@ -439,7 +439,7 @@ internal class DocumentConverter(
         }
     }
 
-    private fun convertParentEntities(parentEntities: List<HeritageNode>): List<HeritageModel> {
+    private fun convertParentEntities(parentEntities: List<HeritageClauseDeclaration>): List<HeritageModel> {
         return parentEntities.map { parentEntity -> parentEntity.convertToModel() }
     }
 
