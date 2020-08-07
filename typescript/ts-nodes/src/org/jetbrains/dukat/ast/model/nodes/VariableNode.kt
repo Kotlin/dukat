@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.ast.model.nodes
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -11,7 +12,7 @@ data class VariableNode(
         val inline: Boolean,
         val typeParameters: List<TypeDeclaration>,
         val extend: ClassLikeReferenceNode?,
-        override val uid: String,
-        override val external: Boolean,
+        val uid: String,
+        val external: Boolean,
         val explicitlyDeclaredType: Boolean
-) : TopLevelNode
+) : TopLevelDeclaration

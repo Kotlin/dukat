@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -78,6 +77,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
@@ -732,9 +732,9 @@ internal class DocumentConverter(
         return when (this) {
             is ClassNode -> convertToClassModel()
             is InterfaceNode -> convertToInterfaceModel()
-            is EnumNode -> {
+            is EnumDeclaration -> {
                 EnumModel(
-                        name = name,
+                        name = IdentifierEntity(name),
                         values = values.map { token -> EnumTokenModel(token.value, token.meta) },
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null
@@ -875,8 +875,8 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
     }
 
-    fun visitEnumNode(declaration: EnumNode, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
+    fun visitEnumNode(declaration: EnumDeclaration, owner: ModuleNode) {
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(IdentifierEntity(declaration.name))))
     }
 
     fun visitModule(node: ModuleNode) {
@@ -884,7 +884,7 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
             when (topLevelNode) {
                 is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
                 is TypeAliasNode -> visitTypeAliasNode(topLevelNode, node)
-                is EnumNode -> visitEnumNode(topLevelNode, node)
+                is EnumDeclaration -> visitEnumNode(topLevelNode, node)
                 is ModuleNode -> visitModule(topLevelNode)
             }
         }

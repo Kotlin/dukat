@@ -10,5 +10,5 @@ data class ObjectNode(
 
         val parentEntities: List<HeritageClauseDeclaration>,
         override val uid: String,
-        override val external: Boolean
+        val external: Boolean
 ) : ClassLikeNode

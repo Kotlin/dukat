@@ -2,8 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
-import org.jetbrains.dukat.ast.model.nodes.EnumNode
-import org.jetbrains.dukat.ast.model.nodes.EnumTokenNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
@@ -14,7 +12,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.TopLevelNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -43,6 +40,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -230,7 +228,7 @@ private class LowerDeclarationsToNodes {
         )
     }
 
-    private fun InterfaceDeclaration.convert(inDeclaredModule: Boolean): TopLevelNode {
+    private fun InterfaceDeclaration.convert(inDeclaredModule: Boolean): TopLevelDeclaration {
         return InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, true) },
@@ -263,15 +261,6 @@ private class LowerDeclarationsToNodes {
                 convertParameters(parameters),
                 convertTypeParameters(typeParameters),
                 body
-        )
-    }
-
-    private fun EnumDeclaration.convert(): EnumNode {
-        return EnumNode(
-                name = IdentifierEntity(name),
-                values = values.map { value -> EnumTokenNode(value.value, value.meta) },
-                uid = uid,
-                external = false
         )
     }
 
@@ -340,7 +329,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelNode {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelDeclaration {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
             if (type.canBeJson()) {
@@ -386,7 +375,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelNode? {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelDeclaration? {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration, inDeclaredModule)
             is FunctionDeclaration -> declaration.convert(inDeclaredModule)
@@ -394,7 +383,7 @@ private class LowerDeclarationsToNodes {
             is InterfaceDeclaration -> declaration.convert(inDeclaredModule)
             is GeneratedInterfaceDeclaration -> declaration.convert()
             is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule)
-            is EnumDeclaration -> declaration.convert()
+            is EnumDeclaration -> declaration
             is TypeAliasDeclaration -> declaration.convert()
             else -> null
         }
@@ -423,7 +412,7 @@ private class LowerDeclarationsToNodes {
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val imports = mutableMapOf<String, ImportNode>()
-        val nonImports = mutableListOf<TopLevelNode>()
+        val nonImports = mutableListOf<TopLevelDeclaration>()
 
         documentRoot.declarations.forEach { declaration ->
             if (declaration is ImportEqualsDeclaration) {

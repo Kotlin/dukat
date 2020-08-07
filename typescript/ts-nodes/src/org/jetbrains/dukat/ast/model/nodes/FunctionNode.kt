@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -27,9 +28,9 @@ data class FunctionNode(
 
         val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
-        override val uid: String,
+        val uid: String,
 
         val body: BlockDeclaration?,
-        override val external: Boolean,
+        val external: Boolean,
         val isGenerator: Boolean
-) : MemberEntity, TopLevelNode, ParameterOwnerNode
+) : MemberEntity, TopLevelDeclaration, ParameterOwnerNode
