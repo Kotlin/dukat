@@ -18,15 +18,11 @@ import org.jetbrains.dukat.ast.model.nodes.MemberNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.TypeAliasNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.VariableNode
-import org.jetbrains.dukat.tsmodel.ExportQualifier
-import org.jetbrains.dukat.tsmodel.JsDefault
-import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -85,7 +81,11 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.JsDefault
+import org.jetbrains.dukat.tsmodel.JsModule
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -372,7 +372,7 @@ internal class DocumentConverter(
         }
     }
 
-    private fun ParameterNode.processAsLambdaParam(context: TranslationContext = TranslationContext.IRRELEVANT): LambdaParameterModel {
+    private fun ParameterDeclaration.processAsLambdaParam(context: TranslationContext = TranslationContext.IRRELEVANT): LambdaParameterModel {
         return LambdaParameterModel(
                 type = type.process(context),
                 //TODO: we have to do this check because somewhere deep in constrainToDeclaration conversion something is passing empty param
@@ -386,14 +386,18 @@ internal class DocumentConverter(
     }
 
 
-    private fun ParameterNode.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+    private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+        val initializerResolved = if (initializer != null || optional) {
+            TypeDeclaration(IdentifierEntity("definedExternally"), emptyList())
+        } else null
+
         return ParameterModel(
                 type = type.process(context),
                 name = name,
                 initializer = when {
-                    initializer != null -> ExpressionStatementModel(
+                    initializerResolved != null -> ExpressionStatementModel(
                             IdentifierExpressionModel(
-                                    initializer!!.value
+                                    initializerResolved.value
                             ),
                             null
                     )

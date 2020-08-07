@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
+import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
@@ -16,7 +17,7 @@ class FunctionNodeContextIrrelevant : FunctionNodeContext()
 
 data class FunctionNode(
         val name: NameEntity,
-        override val parameters: List<ParameterNode>,
+        override val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeDeclaration>,
 

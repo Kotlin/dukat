@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.ParameterNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -51,7 +50,7 @@ private fun ParameterValueDeclaration.extractVarargType(): ParameterValueDeclara
     return this
 }
 
-fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterNode {
+fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CONTEXT.IRRELEVANT): ParameterDeclaration {
     var varargResolved = vararg
     val parameterValueDeclaration = if (vararg) {
         if (context == PARAMETER_CONTEXT.IRRELEVANT) {
@@ -63,14 +62,13 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
     } else {
         type
     }
-    return ParameterNode(
+    return ParameterDeclaration(
             name = name,
             type = parameterValueDeclaration.convertToNode(),
-            initializer = if (initializer != null || optional) {
-                TypeDeclaration(IdentifierEntity("definedExternally"), emptyList())
-            } else null,
+            initializer = initializer,
             vararg = varargResolved,
-            optional = optional
+            optional = optional,
+            explicitlyDeclaredType = explicitlyDeclaredType
     )
 }
 
