@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -149,7 +148,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 nullable = nullable,
                 meta = metaData ?: meta
         )
-        is TypeNode -> this
+        is LiteralUnionNode -> this
         else -> null
     }
 }
