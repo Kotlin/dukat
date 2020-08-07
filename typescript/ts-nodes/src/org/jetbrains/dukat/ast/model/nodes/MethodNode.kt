@@ -8,7 +8,7 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 data class MethodNode(
         val name: String,
-        override val parameters: List<ParameterDeclaration>,
+        val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeDeclaration>,
 
@@ -18,4 +18,4 @@ data class MethodNode(
 
         val body: BlockDeclaration?,
         val isGenerator: Boolean
-) : MemberDeclaration, ParameterOwnerNode
+) : MemberDeclaration

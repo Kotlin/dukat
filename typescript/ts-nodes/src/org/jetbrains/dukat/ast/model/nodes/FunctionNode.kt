@@ -18,7 +18,7 @@ class FunctionNodeContextIrrelevant : FunctionNodeContext()
 
 data class FunctionNode(
         val name: NameEntity,
-        override val parameters: List<ParameterDeclaration>,
+        val parameters: List<ParameterDeclaration>,
         val type: ParameterValueDeclaration,
         val typeParameters: List<TypeDeclaration>,
 
@@ -33,4 +33,4 @@ data class FunctionNode(
         val body: BlockDeclaration?,
         val external: Boolean,
         val isGenerator: Boolean
-) : MemberEntity, TopLevelDeclaration, ParameterOwnerNode
+) : MemberEntity, TopLevelDeclaration
