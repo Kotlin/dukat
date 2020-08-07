@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
@@ -30,7 +29,6 @@ import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
-import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -75,6 +73,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
@@ -86,6 +85,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
+import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -338,13 +338,22 @@ internal class DocumentConverter(
         return emptyList()
     }
 
+    private fun convertParameterDeclarations(typeParams: List<TypeParameterDeclaration>): List<TypeDeclaration> {
+        return typeParams.map { typeParam ->
+            TypeDeclaration(
+                    value = typeParam.name,
+                    params = typeParam.constraints.map { it.convertToNode() }
+            )
+        }
+    }
+
     private fun MemberDeclaration.process(): List<MemberModel> {
         // TODO: how ClassModel end up here?
         return when (this) {
-            is ConstructorNode -> listOfNotNull(
+            is ConstructorDeclaration -> listOfNotNull(
                 ConstructorModel(
                     parameters = parameters.map { param -> param.process().copy() },
-                    typeParameters = convertTypeParams(typeParameters)
+                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters))
                 ),
                 body?.let {
                     InitBlockModel(

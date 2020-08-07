@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionNodeContextIrrelevant
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
@@ -255,11 +254,9 @@ private class LowerDeclarationsToNodes {
     }
 
 
-    private fun ConstructorDeclaration.convert(): ConstructorNode {
-        return ConstructorNode(
-                convertParameters(parameters),
-                convertTypeParameters(typeParameters),
-                body
+    private fun ConstructorDeclaration.convert(): ConstructorDeclaration {
+        return copy(
+                parameters = convertParameters(parameters)
         )
     }
 
