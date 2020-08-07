@@ -15,7 +15,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -86,6 +85,7 @@ import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
+import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -444,45 +444,6 @@ internal class DocumentConverter(
         return parentEntities.map { parentEntity -> parentEntity.convertToModel() }
     }
 
-    private fun VariableNode.resolveGetter(): StatementModel? {
-        return if (inline) {
-            ExpressionStatementModel(
-                    PropertyAccessExpressionModel(
-                            PropertyAccessExpressionModel(
-                                    ThisExpressionModel(),
-                                    CallExpressionModel(
-                                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                            listOf()
-                                    )
-                            ),
-                            IdentifierExpressionModel(
-                                    name.rightMost()
-                            )
-                    )
-            )
-        } else null
-    }
-
-    private fun VariableNode.resolveSetter(): StatementModel? {
-        return if (inline) {
-            AssignmentStatementModel(
-                    PropertyAccessExpressionModel(
-                            PropertyAccessExpressionModel(
-                                    ThisExpressionModel(),
-                                    CallExpressionModel(
-                                            IdentifierExpressionModel(IdentifierEntity("asDynamic")),
-                                            listOf()
-                                    )
-                            ),
-                            IdentifierExpressionModel(
-                                    name.rightMost()
-                            )
-                    ),
-                    IdentifierExpressionModel(IdentifierEntity("value"))
-            )
-        } else null
-    }
-
     private fun ParameterValueDeclaration.isUnit(): Boolean {
         return (this is TypeDeclaration) && (value == IdentifierEntity("Unit"))
     }
@@ -782,23 +743,23 @@ internal class DocumentConverter(
                         external = external
                 )
             }
-            is VariableNode -> {
+            is VariableDeclaration -> {
                 val nameResolved = if (moduleOwner.packageName.isStringLiteral()) {
-                    (exportQualifierMap[uid] as? JsModule)?.name ?: name
+                    (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
                 } else {
-                    name
+                    IdentifierEntity(name)
                 }
                 VariableModel(
                         name = nameResolved,
                         type = type.process(),
                         annotations = exportQualifierMap[uid].toAnnotation(),
                         immutable = exportQualifierMap[uid] is JsModule,
-                        inline = inline,
+                        inline = false,
                         external = true,
                         initializer = null,
-                        get = resolveGetter(),
-                        set = resolveSetter(),
-                        typeParameters = convertTypeParams(typeParameters),
+                        get = null,
+                        set = null,
+                        typeParameters = emptyList(),
                         extend = null,
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null,

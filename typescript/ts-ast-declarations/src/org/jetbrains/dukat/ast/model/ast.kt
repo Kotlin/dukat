@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -40,7 +39,6 @@ fun <T : Entity> Entity.duplicate(): T {
         is InterfaceNode -> copy() as T
         is ObjectNode -> copy() as T
         is LiteralUnionNode -> copy() as T
-        is VariableNode -> copy() as T
         else -> raiseConcern("can not copy ${this}") { this as T }
     }
 }

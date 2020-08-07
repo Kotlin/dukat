@@ -11,7 +11,6 @@ import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.VariableNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -322,13 +321,14 @@ private class LowerDeclarationsToNodes {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
             if (type.canBeJson()) {
-                VariableNode(
-                        IdentifierEntity(declaration.name),
-                        TypeDeclaration(IdentifierEntity("Json"), emptyList()),
-                        false,
-                        emptyList(),
-                        declaration.uid,
-                        inDeclaredModule || declaration.explicitlyDeclaredType
+                VariableDeclaration(
+                        name = declaration.name,
+                        type = TypeDeclaration(IdentifierEntity("Json"), emptyList()),
+                        uid = declaration.uid,
+                        modifiers = emptySet(),
+                        explicitlyDeclaredType = inDeclaredModule || declaration.explicitlyDeclaredType,
+                        definitionsInfo = emptyList(),
+                        initializer = null
                 )
             } else {
                 //TODO: don't forget to create owner
@@ -349,13 +349,9 @@ private class LowerDeclarationsToNodes {
                 })
             }
         } else {
-            VariableNode(
-                    IdentifierEntity(declaration.name),
-                    type.convertToNode(),
-                    false,
-                    emptyList(),
-                    declaration.uid,
-                    inDeclaredModule || declaration.explicitlyDeclaredType
+            declaration.copy(
+                    type = type.convertToNode(),
+                    explicitlyDeclaredType = inDeclaredModule || declaration.explicitlyDeclaredType
             )
         }
     }
