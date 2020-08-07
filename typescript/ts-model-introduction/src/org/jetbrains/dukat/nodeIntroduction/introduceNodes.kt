@@ -334,7 +334,6 @@ private class LowerDeclarationsToNodes {
                         emptyList(),
                         null,
                         declaration.uid,
-                        declaration.hasDeclareModifier(),
                         inDeclaredModule || declaration.explicitlyDeclaredType
                 )
             } else {
@@ -363,7 +362,6 @@ private class LowerDeclarationsToNodes {
                     emptyList(),
                     null,
                     declaration.uid,
-                    inDeclaredModule || declaration.hasDeclareModifier(),
                     inDeclaredModule || declaration.explicitlyDeclaredType
             )
         }
