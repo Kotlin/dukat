@@ -271,7 +271,6 @@ private class LowerDeclarationsToNodes {
     }
 
     private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
-
         return FunctionNode(
                 IdentifierEntity(name),
                 convertParameters(parameters),
@@ -280,7 +279,6 @@ private class LowerDeclarationsToNodes {
                 hasExportModifier(),
                 false,
                 false,
-                null,
                 FunctionNodeContextIrrelevant(),
                 uid,
                 body,
@@ -332,7 +330,6 @@ private class LowerDeclarationsToNodes {
                         TypeDeclaration(IdentifierEntity("Json"), emptyList()),
                         false,
                         emptyList(),
-                        null,
                         declaration.uid,
                         inDeclaredModule || declaration.explicitlyDeclaredType
                 )
@@ -360,7 +357,6 @@ private class LowerDeclarationsToNodes {
                     type.convertToNode(),
                     false,
                     emptyList(),
-                    null,
                     declaration.uid,
                     inDeclaredModule || declaration.explicitlyDeclaredType
             )

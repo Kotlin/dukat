@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeReferenceNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ConstructorNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
@@ -432,13 +431,6 @@ internal class DocumentConverter(
         }
     }
 
-    private fun ClassLikeReferenceNode?.convert(): ClassLikeReferenceModel? {
-        return this?.let { extendNode ->
-            ClassLikeReferenceModel(uidToNameMapper[extendNode.uid]?.fqName
-                    ?: extendNode.name, extendNode.typeParameters)
-        }
-    }
-
     private fun convertParentEntities(parentEntities: List<HeritageClauseDeclaration>): List<HeritageModel> {
         return parentEntities.map { parentEntity -> parentEntity.convertToModel() }
     }
@@ -767,7 +759,7 @@ internal class DocumentConverter(
                         export = export,
                         inline = inline,
                         operator = operator,
-                        extend = extend.convert(),
+                        extend = null,
                         body = body?.let {
                             val convertedBody = expressionConverter.convertBlock(it)
                             if (isGenerator) {
@@ -798,7 +790,7 @@ internal class DocumentConverter(
                         get = resolveGetter(),
                         set = resolveSetter(),
                         typeParameters = convertTypeParams(typeParameters),
-                        extend = extend.convert(),
+                        extend = null,
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null,
                         explicitlyDeclaredType = explicitlyDeclaredType

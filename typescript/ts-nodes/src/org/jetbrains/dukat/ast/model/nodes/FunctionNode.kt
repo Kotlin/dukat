@@ -26,7 +26,6 @@ data class FunctionNode(
         val inline: Boolean,
         val operator: Boolean,
 
-        val extend: ClassLikeReferenceNode?,
         val context: FunctionNodeContext,
         val uid: String,
 

@@ -11,7 +11,6 @@ data class VariableNode(
 
         val inline: Boolean,
         val typeParameters: List<TypeDeclaration>,
-        val extend: ClassLikeReferenceNode?,
         val uid: String,
         val explicitlyDeclaredType: Boolean
 ) : TopLevelDeclaration
