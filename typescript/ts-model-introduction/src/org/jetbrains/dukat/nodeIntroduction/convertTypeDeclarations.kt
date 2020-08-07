@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.TypeNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
@@ -87,7 +86,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 meta = metaData ?: meta
         )
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
-        is FunctionTypeDeclaration -> FunctionTypeNode(
+        is FunctionTypeDeclaration -> FunctionTypeDeclaration(
                 parameters = parameters.map { parameterDeclaration ->
                     parameterDeclaration.convertToNode(PARAMETER_CONTEXT.FUNCTION_TYPE)
                 },

@@ -8,7 +8,6 @@ import org.jetbrains.dukat.ast.model.nodes.EnumNode
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromCallSignature
 import org.jetbrains.dukat.ast.model.nodes.FunctionFromMethodSignatureDeclaration
 import org.jetbrains.dukat.ast.model.nodes.FunctionNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionTypeNode
 import org.jetbrains.dukat.ast.model.nodes.HeritageNode
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureGetter
 import org.jetbrains.dukat.ast.model.nodes.IndexSignatureSetter
@@ -88,6 +87,7 @@ import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -274,7 +274,7 @@ internal class DocumentConverter(
                     )
                 }
             }
-            is FunctionTypeNode -> {
+            is FunctionTypeDeclaration -> {
                 FunctionTypeModel(
                         parameters = (parameters.map { param ->
                             param.processAsLambdaParam()
