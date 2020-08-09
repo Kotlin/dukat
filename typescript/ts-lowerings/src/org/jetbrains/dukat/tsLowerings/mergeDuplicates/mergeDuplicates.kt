@@ -9,6 +9,7 @@ import org.jetbrains.dukat.tsmodel.FunctionLikeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.SourceFileDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
@@ -134,6 +135,7 @@ private fun List<MemberDeclaration>.mergeMembers() : List<MemberDeclaration> {
             is ConstructorDeclaration -> constructors += member.mergeDuplicates()
             is FunctionDeclaration -> methods += member.mergeDuplicates()
             is CallSignatureDeclaration -> callSignatures += member.mergeDuplicates()
+            is PropertyDeclaration -> otherMembers += member.mergeDuplicates()
             else -> otherMembers += member
         }
     }
@@ -149,6 +151,10 @@ private fun List<MemberDeclaration>.mergeMembers() : List<MemberDeclaration> {
 }
 
 private fun ParameterDeclaration.mergeDuplicates() = copy(
+        type = type.mergeDuplicates()
+)
+
+private fun PropertyDeclaration.mergeDuplicates() = copy(
         type = type.mergeDuplicates()
 )
 

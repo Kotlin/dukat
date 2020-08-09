@@ -9,7 +9,19 @@ class ObjectConstraint(
         val instantiatedClass: PropertyOwnerConstraint? = null
 ) : PropertyOwnerConstraint(owner) {
     val propertyNames: Set<String>
-        get() = properties.keys
+        get() {
+            val names = properties.keys.toMutableSet()
+
+            if (instantiatedClass is PropertyOwner) {
+                val classPrototype = instantiatedClass["prototype"]
+
+                if (classPrototype is ObjectConstraint) {
+                    names.addAll(classPrototype.propertyNames)
+                }
+            }
+
+            return names
+        }
 
     private val properties = LinkedHashMap<String, Constraint>()
 
