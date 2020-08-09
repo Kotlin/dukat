@@ -74,7 +74,7 @@ private fun NameEntity.unquote(): NameEntity {
 }
 
 
-private class LowerDeclarationsToNodes {
+private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
     private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
@@ -210,21 +210,21 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    private fun ClassDeclaration.convert(inDeclaredModule: Boolean): ClassNode {
+    private fun ClassDeclaration.convert(): ClassNode {
         return ClassNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || hasDeclareModifier()) },
+                members.flatMap { member -> lowerMemberDeclaration(member, rootIsDeclaration || hasDeclareModifier()) },
                 typeParameters.map { typeParameter ->
                     TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
                 convertToHeritageNodes(parentEntities),
 
                 uid,
-                inDeclaredModule || hasDeclareModifier()
+                rootIsDeclaration || hasDeclareModifier()
         )
     }
 
-    private fun InterfaceDeclaration.convert(inDeclaredModule: Boolean): TopLevelDeclaration {
+    private fun InterfaceDeclaration.convert(): TopLevelDeclaration {
         return InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, true) },
@@ -232,7 +232,7 @@ private class LowerDeclarationsToNodes {
                 convertToHeritageNodes(parentEntities),
                 false,
                 uid,
-                inDeclaredModule || hasDeclareModifier()
+                rootIsDeclaration || hasDeclareModifier()
         )
     }
 
@@ -265,7 +265,7 @@ private class LowerDeclarationsToNodes {
                 )
     }
 
-    private fun FunctionDeclaration.convert(inDeclaredModule: Boolean): FunctionNode {
+    private fun FunctionDeclaration.convert(): FunctionNode {
         return FunctionNode(
                 name = IdentifierEntity(name),
                 parameters = convertParameters(parameters),
@@ -274,7 +274,7 @@ private class LowerDeclarationsToNodes {
                 export = hasExportModifier(),
                 uid = uid,
                 body = body,
-                external = inDeclaredModule || hasDeclareModifier(),
+                external = rootIsDeclaration || hasDeclareModifier(),
                 isGenerator = isGenerator
         )
     }
@@ -313,7 +313,7 @@ private class LowerDeclarationsToNodes {
         }
     }
 
-    fun lowerVariableDeclaration(declaration: VariableDeclaration, inDeclaredModule: Boolean): TopLevelDeclaration {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
         val type = declaration.type
         return if (type is ObjectLiteralDeclaration) {
             if (type.canBeJson()) {
@@ -322,7 +322,7 @@ private class LowerDeclarationsToNodes {
                         type = TypeDeclaration(IdentifierEntity("Json"), emptyList()),
                         uid = declaration.uid,
                         modifiers = emptySet(),
-                        explicitlyDeclaredType = inDeclaredModule || declaration.explicitlyDeclaredType,
+                        explicitlyDeclaredType = rootIsDeclaration || declaration.explicitlyDeclaredType,
                         definitionsInfo = emptyList(),
                         initializer = null
                 )
@@ -330,7 +330,7 @@ private class LowerDeclarationsToNodes {
                 //TODO: don't forget to create owner
                 val objectNode = ObjectNode(
                         IdentifierEntity(declaration.name),
-                        type.members.flatMap { member -> lowerMemberDeclaration(member, inDeclaredModule || declaration.hasDeclareModifier()) },
+                        type.members.flatMap { member -> lowerMemberDeclaration(member, rootIsDeclaration || declaration.hasDeclareModifier()) },
                         emptyList(),
                         declaration.uid,
                         declaration.hasDeclareModifier()
@@ -347,19 +347,19 @@ private class LowerDeclarationsToNodes {
         } else {
             declaration.copy(
                     type = type.convertToNode(),
-                    explicitlyDeclaredType = inDeclaredModule || declaration.explicitlyDeclaredType
+                    explicitlyDeclaredType = rootIsDeclaration || declaration.explicitlyDeclaredType
             )
         }
     }
 
-    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?, inDeclaredModule: Boolean): TopLevelDeclaration? {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?): TopLevelDeclaration? {
         return when (declaration) {
-            is VariableDeclaration -> lowerVariableDeclaration(declaration, inDeclaredModule)
-            is FunctionDeclaration -> declaration.convert(inDeclaredModule)
-            is ClassDeclaration -> declaration.convert(inDeclaredModule)
-            is InterfaceDeclaration -> declaration.convert(inDeclaredModule)
+            is VariableDeclaration -> lowerVariableDeclaration(declaration)
+            is FunctionDeclaration -> declaration.convert()
+            is ClassDeclaration -> declaration.convert()
+            is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> declaration.convert()
-            is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName, inDeclaredModule)
+            is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName)
             is EnumDeclaration -> declaration
             is TypeAliasDeclaration -> declaration.convert()
             else -> null
@@ -382,7 +382,7 @@ private class LowerDeclarationsToNodes {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?, isDeclaration: Boolean): ModuleNode {
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?): ModuleNode {
         val name = documentRoot.name
 
         val shortName = name.unquote()
@@ -398,7 +398,7 @@ private class LowerDeclarationsToNodes {
                         declaration.uid
                 )
             } else {
-                lowerTopLevelDeclaration(declaration, fullPackageName, isDeclaration)?.let { nonImports.add(it) }
+                lowerTopLevelDeclaration(declaration, fullPackageName)?.let { nonImports.add(it) }
             }
         }
 
@@ -408,7 +408,7 @@ private class LowerDeclarationsToNodes {
                 declarations = nonImports,
                 imports = imports,
                 uid = documentRoot.uid,
-                external = isDeclaration
+                external = rootIsDeclaration
         )
     }
 }
@@ -420,7 +420,7 @@ class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
 
         return SourceFileNode(
                 fileName,
-                LowerDeclarationsToNodes().lowerPackageDeclaration(root, null, root.kind == ModuleDeclarationKind.DECLARATION_FILE),
+                LowerDeclarationsToNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE).lowerPackageDeclaration(root, null),
                 references,
                 null
         )
