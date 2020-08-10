@@ -19,9 +19,9 @@ private class RemoveDuplicateMembersLowering : TopLevelModelLowering {
 
     private fun TypeModel.normalize(): TypeModel {
         return when(this) {
-            is TypeValueModel -> copy(metaDescription = null, params = params.map { it.copy(type = it.type.normalize()) })
+            is TypeValueModel -> copy(metaDescription = null, params = params.map { it.copy(type = it.type.normalize()) }, value = fqName ?: value)
             is TypeParameterReferenceModel -> copy(metaDescription = null)
-            is FunctionTypeModel -> copy(metaDescription = null, parameters = parameters.map { it.copy(type = it.type.normalize()) })
+            is FunctionTypeModel -> copy(metaDescription = null, parameters = parameters.map { it.copy(type = it.type.normalize(), name = null) })
             else -> this
         }
     }
