@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model
 
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
@@ -35,7 +34,6 @@ fun <T : Entity> Entity.duplicate(): T {
         is TypeDeclaration -> copy() as T
         is VariableDeclaration -> copy() as T
 
-        is FunctionNode -> copy() as T
         is InterfaceNode -> copy() as T
         is ObjectNode -> copy() as T
         is LiteralUnionNode -> copy() as T

@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -265,16 +264,12 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 )
     }
 
-    private fun FunctionDeclaration.convert(): FunctionNode {
-        return FunctionNode(
-                name = IdentifierEntity(name),
+    private fun FunctionDeclaration.convert(): FunctionDeclaration {
+        return copy(
                 parameters = convertParameters(parameters),
                 type = type.convertToNode(),
-                typeParameters = convertTypeParameters(typeParameters),
-                export = hasExportModifier(),
                 uid = uid,
                 body = body,
-                external = rootIsDeclaration || hasDeclareModifier(),
                 isGenerator = isGenerator
         )
     }
@@ -408,7 +403,8 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 declarations = nonImports,
                 imports = imports,
                 uid = documentRoot.uid,
-                external = rootIsDeclaration
+                external = rootIsDeclaration,
+                kind  = documentRoot.kind
         )
     }
 }

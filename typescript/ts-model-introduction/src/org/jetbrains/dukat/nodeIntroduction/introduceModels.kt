@@ -2,7 +2,6 @@ package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.FunctionNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.MethodNode
@@ -71,6 +70,7 @@ import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
+import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
@@ -127,7 +127,8 @@ private fun unquote(name: String): String {
 internal class DocumentConverter(
         private val moduleNode: ModuleNode,
         private val uidToNameMapper: UidMapper,
-        private val exportQualifierMap: Map<String?, ExportQualifier>
+        private val exportQualifierMap: Map<String?, ExportQualifier>,
+        private val rootIsDeclaration: Boolean
 ) {
     private val imports = mutableListOf<ImportModel>()
     private val expressionConverter = ExpressionConverter { typeNode ->
@@ -138,7 +139,7 @@ internal class DocumentConverter(
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleNode }
 
-        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
             declaration.convertToModel(moduleNode)
         }
 
@@ -590,17 +591,17 @@ internal class DocumentConverter(
                         comment = null
                 )
             }
-            is FunctionNode -> {
+            is FunctionDeclaration -> {
                 FunctionModel(
-                        name = name,
+                        name = IdentifierEntity(name),
                         parameters = parameters.map { param ->
                             param.process()
                         },
                         type = type.process(),
 
-                        typeParameters = convertTypeParams(typeParameters),
+                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         annotations = exportQualifierMap[uid].toAnnotation(),
-                        export = export,
+                        export = hasExportModifier(),
                         inline = false,
                         operator = false,
                         extend = null,
@@ -614,7 +615,7 @@ internal class DocumentConverter(
                         },
                         visibilityModifier = VisibilityModifierModel.DEFAULT,
                         comment = null,
-                        external = external
+                        external = rootIsDeclaration || hasDeclareModifier()
                 )
             }
             is VariableDeclaration -> {
@@ -687,7 +688,7 @@ private class NodeConverter(
                     val fileName = rootFile.normalize().absolutePath
 
                     val generated = mutableListOf<SourceFileModel>()
-                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap).convert(source.fileName, generated)
+                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == org.jetbrains.dukat.tsmodel.ModuleDeclarationKind.DECLARATION_FILE).convert(source.fileName, generated)
 
                     val module = SourceFileModel(
                             name = source.name,
