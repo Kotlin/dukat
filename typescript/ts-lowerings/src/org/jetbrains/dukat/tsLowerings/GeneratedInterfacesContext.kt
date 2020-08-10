@@ -9,6 +9,7 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -44,20 +45,20 @@ private fun <T> List<T>.isIdenticalTo(list: List<T>, condition: (a: T, b: T) -> 
     return this.zip(list).all { (a, b) -> condition(a, b) }
 }
 
-private fun FunctionDeclaration.isIdenticalTo(functionDeclaration: FunctionDeclaration): Boolean {
-    if (!type.isIdenticalTo(functionDeclaration.type)) {
+private fun MethodDeclaration.isIdenticalTo(methodDeclaration: MethodDeclaration): Boolean {
+    if (!type.isIdenticalTo(methodDeclaration.type)) {
         return false
     }
 
-    if (modifiers != functionDeclaration.modifiers) {
+    if (modifiers != methodDeclaration.modifiers) {
         return false
     }
 
-    if (!typeParameters.isIdenticalTo(functionDeclaration.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
+    if (!typeParameters.isIdenticalTo(methodDeclaration.typeParameters) { a, b -> a.isIdenticalTo(b) }) {
         return false
     }
 
-    return parameters.isIdenticalTo(functionDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }
+    return parameters.isIdenticalTo(methodDeclaration.parameters) { a, b -> a.isIdenticalTo(b) }
 }
 
 
@@ -143,7 +144,7 @@ private fun MemberEntity.isIdenticalTo(memberDeclaration: MemberEntity): Boolean
         return false
     }
 
-    if ((this is FunctionDeclaration) && (memberDeclaration is FunctionDeclaration)) {
+    if ((this is MethodDeclaration) && (memberDeclaration is MethodDeclaration)) {
         return isIdenticalTo(memberDeclaration)
     }
 
@@ -227,7 +228,7 @@ class GeneratedInterfacesContext {
                 is PropertyDeclaration -> {
                     member.type.resolveTypeParams(typeParams)
                 }
-                is FunctionDeclaration -> {
+                is MethodDeclaration -> {
                     member.parameters.forEach { param -> param.type.resolveTypeParams(typeParams) }
                     member.type.resolveTypeParams(typeParams)
                 }

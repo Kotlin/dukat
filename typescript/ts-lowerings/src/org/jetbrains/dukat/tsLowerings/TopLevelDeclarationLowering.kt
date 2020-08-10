@@ -3,7 +3,6 @@ import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -13,7 +12,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
 interface TopLevelDeclarationLowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration = declaration
-    fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration = declaration
+    fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<ModuleDeclaration>?): FunctionDeclaration = declaration
     fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? = declaration
     fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? = declaration
     fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): GeneratedInterfaceDeclaration = declaration
@@ -28,11 +27,10 @@ interface TopLevelDeclarationLowering {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun lowerTopLevelDeclaration(declaration: TopLevelDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration, owner)
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner as NodeOwner<FunctionOwnerDeclaration>)
+            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, owner)
             is ClassLikeDeclaration -> lowerClassLikeDeclaration(declaration, owner)
             is ModuleDeclaration -> lowerModuleModel(declaration, owner.wrap(declaration))
             is TypeAliasDeclaration -> lowerTypeAliasDeclaration(declaration, owner)

@@ -23,6 +23,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.expression.BinaryExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.CallExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.ConditionalExpressionDeclaration
@@ -38,6 +39,41 @@ import org.jetbrains.dukat.tsmodel.expression.literal.ObjectLiteralExpressionDec
 import org.jetbrains.dukat.tsmodel.expression.literal.StringLiteralExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.IdentifierExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.expression.name.QualifierExpressionDeclaration
+
+fun MethodDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
+    return this.body?.let {
+        val pathWalker = PathWalker()
+
+        val versions = mutableListOf<FunctionConstraint.Overload>()
+
+        do {
+            val functionScope = Scope(owner)
+
+            val parameterConstraints = MutableList(parameters.size) { i ->
+                // Store constraints of parameters in scope,
+                // and in parameter list (in case the variable is replaced)
+                val parameterConstraint = CompositeConstraint(owner)
+                functionScope[parameters[i].name] = parameterConstraint
+                parameters[i].name to parameterConstraint
+            }
+
+            val returnTypeConstraints = it.calculateConstraints(functionScope, pathWalker) ?: VoidTypeConstraint
+
+            versions.add(FunctionConstraint.Overload(
+                    returnConstraints = returnTypeConstraints,
+                    parameterConstraints = parameterConstraints
+            ))
+        } while (pathWalker.startNextPath())
+
+        val functionConstraint = FunctionConstraint(owner, versions)
+
+        if (name != "") {
+            owner[name] = functionConstraint
+        }
+
+        functionConstraint
+    }
+}
 
 fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
     return this.body?.let {
@@ -73,6 +109,7 @@ fun FunctionDeclaration.addTo(owner: PropertyOwner) : FunctionConstraint? {
         functionConstraint
     }
 }
+
 
 fun ClassDeclaration.addTo(owner: PropertyOwner, path: PathWalker) : ClassConstraint? {
     val className = name // Needed for smart cast
@@ -238,6 +275,7 @@ fun LiteralExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path
 fun ExpressionDeclaration.calculateConstraints(owner: PropertyOwner, path: PathWalker) : Constraint {
     return when (this) {
         is FunctionDeclaration -> this.addTo(owner) ?: NoTypeConstraint
+        is MethodDeclaration -> this.addTo(owner) ?: NoTypeConstraint
         is ClassDeclaration -> this.addTo(owner, path) ?: NoTypeConstraint
         is IdentifierExpressionDeclaration -> owner[this] ?: ReferenceConstraint(this.identifier, owner)
         is QualifierExpressionDeclaration -> owner[this, path] ?: CompositeConstraint(owner)

@@ -4,6 +4,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
@@ -30,12 +31,17 @@ internal fun MemberDeclaration.normalize(): MemberDeclaration {
     return when (this) {
         is CallSignatureDeclaration -> this.normalize()
         is ConstructorDeclaration -> this.normalize()
-        is FunctionDeclaration -> this.normalize()
+        is MethodDeclaration -> this.normalize()
         else -> this
     }
 }
 
 internal fun FunctionTypeDeclaration.normalize() = copy(
+        parameters = parameters.map { it.normalize() },
+        type = type.normalize()
+)
+
+internal fun MethodDeclaration.normalize() = copy(
         parameters = parameters.map { it.normalize() },
         type = type.normalize()
 )

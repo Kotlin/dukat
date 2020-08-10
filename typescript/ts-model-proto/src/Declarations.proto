@@ -134,6 +134,17 @@ message FunctionDeclarationProto {
     bool isGenerator = 9;
 }
 
+message MethodDeclarationProto {
+    string name = 1;
+    repeated ParameterDeclarationProto parameters = 2;
+    ParameterValueDeclarationProto type = 3;
+    repeated TypeParameterDeclarationProto typeParameters = 4;
+    repeated ModifierDeclarationProto modifiers = 5;
+    BlockDeclarationProto body = 6;
+    bool optional = 7;
+    bool isGenerator = 8;
+}
+
 message IndexSignatureDeclarationProto {
     repeated ParameterDeclarationProto indexTypes = 1;
     ParameterValueDeclarationProto returnType = 2;
@@ -177,11 +188,11 @@ message MemberDeclarationProto {
     oneof type {
         CallSignatureDeclarationProto callSignature = 1;
         ConstructorDeclarationProto constructorDeclaration = 2;
-        FunctionDeclarationProto functionDeclaration = 3;
-        IndexSignatureDeclarationProto indexSignature = 4;
-        MethodSignatureDeclarationProto methodSignature = 5;
-        PropertyDeclarationProto property = 6;
-        ObjectLiteralDeclarationProto objectLiteral = 7;
+        IndexSignatureDeclarationProto indexSignature = 3;
+        MethodSignatureDeclarationProto methodSignature = 4;
+        PropertyDeclarationProto property = 5;
+        ObjectLiteralDeclarationProto objectLiteral = 6;
+        MethodDeclarationProto method = 7;
     }
 }
 

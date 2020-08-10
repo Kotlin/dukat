@@ -6,10 +6,10 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -18,16 +18,15 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 
-private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
-    return FunctionDeclaration(
+private fun MethodSignatureDeclaration.convertToMethod(): MethodDeclaration {
+    return MethodDeclaration(
             name = name,
             parameters = parameters,
             typeParameters = typeParameters,
             type = type,
             modifiers = modifiers,
             body = null,
-            definitionsInfo = emptyList(),
-            uid = "__NO_UID__",
+            optional = optional,
             isGenerator = false
     )
 }
@@ -35,11 +34,6 @@ private fun MethodSignatureDeclaration.convertToMethod(): FunctionDeclaration {
 private fun mergeParentEntities(parentEntitiesA: List<HeritageClauseDeclaration>, parentEntitiesB: List<HeritageClauseDeclaration>): List<HeritageClauseDeclaration> {
     val parentSet = parentEntitiesA.toSet()
     return parentEntitiesA + parentEntitiesB.filter { parentEntity -> !parentSet.contains(parentEntity) }
-}
-
-private fun mergeVariableAndInterface(a: VariableDeclaration, b: InterfaceDeclaration): InterfaceDeclaration {
-    println("MERGE VAR ${a} and ${b}")
-    return b
 }
 
 
@@ -113,7 +107,7 @@ private class MergeClassLikesLowering(private val topLevelDeclarationResolver: T
                 else -> a
             }
             is VariableDeclaration -> when (b) {
-                is InterfaceDeclaration -> mergeVariableAndInterface(a, b)
+                is InterfaceDeclaration -> b
                 else -> a
             }
             else -> a

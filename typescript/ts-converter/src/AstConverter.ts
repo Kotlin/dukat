@@ -339,8 +339,9 @@ export class AstConverter {
           this.convertType(declaration.type) : this.createTypeDeclaration("Unit"),
         typeParameterDeclarations,
         this.convertModifiers(declaration.modifiers),
-        this.convertBlock(declaration.body),
-        declaration.asteriskToken
+        declaration.questionToken,
+        declaration.asteriskToken,
+        this.convertBlock(declaration.body)
       );
     }
 
@@ -348,9 +349,8 @@ export class AstConverter {
   }
 
 
-  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, isGenerator: boolean): MemberDeclaration {
-    // TODO: reintroduce method declaration
-    return this.astFactory.createFunctionDeclarationAsMember(name, parameters, type, typeParams, modifiers, body, "__NO_UID__", isGenerator);
+  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, optional: boolean, isGenerator: boolean, body: Block | null): MemberDeclaration {
+    return this.astFactory.createMethodDeclaration(name, parameters, type, typeParams, modifiers, optional, isGenerator, body);
   }
 
   createTypeDeclaration(value: string, params: Array<TypeDeclaration> = []): TypeDeclaration {
@@ -908,8 +908,6 @@ export class AstConverter {
           body
       )
     }
-
-    //TODO convert other iteration statements than while statement
 
     return decl
   }

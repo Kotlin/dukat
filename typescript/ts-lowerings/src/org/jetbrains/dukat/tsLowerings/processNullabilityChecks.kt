@@ -1,11 +1,10 @@
 package org.jetbrains.dukat.tsLowerings
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.BlockDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.IfStatementDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.WhileStatementDeclaration
@@ -104,8 +103,8 @@ private class ProcessNullabilityChecksLowering(private val typeContext: Statemen
     }
 
     override fun lowerFunctionDeclaration(
-        declaration: FunctionDeclaration,
-        owner: NodeOwner<FunctionOwnerDeclaration>?
+            declaration: FunctionDeclaration,
+            owner: NodeOwner<ModuleDeclaration>?
     ): FunctionDeclaration {
         typeContext.startScope()
         declaration.parameters.forEach {

@@ -2,9 +2,9 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
@@ -22,7 +22,7 @@ private class RemoveThisParametersLowering : DeclarationLowering {
         return super.lowerMethodSignatureDeclaration(declaration.copy(parameters = removeThisParam(declaration.parameters)), owner)
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<ModuleDeclaration>?): FunctionDeclaration {
         return super.lowerFunctionDeclaration(declaration.copy(parameters = removeThisParam(declaration.parameters)), owner)
     }
 }

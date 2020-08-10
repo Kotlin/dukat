@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -33,7 +32,7 @@ class SyntheticExportModifiersLowering(private val exportAssignments: Map<String
         return declaration.copy(modifiers = declaration.modifiers + declaration.resolveSyntheticExport())
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<ModuleDeclaration>?): FunctionDeclaration {
         return declaration.copy(modifiers = declaration.modifiers + declaration.resolveSyntheticExport())
     }
 

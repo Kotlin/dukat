@@ -54,6 +54,7 @@ import {
   KeyOfTypeDeclarationProto,
   MemberDeclarationProto,
   MethodSignatureDeclarationProto,
+  MethodDeclarationProto,
   ModifierDeclarationProto,
   ModuleDeclarationProto,
   NameDeclarationProto,
@@ -355,14 +356,6 @@ export class AstFactory {
     return functionDeclaration
   }
 
-  createFunctionDeclarationAsMember(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, uid: string, isGenerator: boolean): MemberDeclaration {
-    let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, [], uid, isGenerator);
-
-    let memberProto = new MemberDeclarationProto();
-    memberProto.setFunctiondeclaration(functionDeclaration);
-    return memberProto;
-  }
-
   createFunctionDeclarationAsTopLevel(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, body: Block | null, definitionsInfo: Array<DefinitionInfoDeclaration>, uid: string, isGenerator: boolean): StatementDeclaration {
     let functionDeclaration = this.createFunctionDeclaration(name, parameters, type, typeParams, modifiers, body, definitionsInfo, uid, isGenerator);
 
@@ -473,18 +466,6 @@ export class AstFactory {
     return typeDeclaration;
   }
 
-  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
-    let methodDeclaration = new FunctionDeclarationProto();
-    methodDeclaration.setName(name);
-    methodDeclaration.setParametersList(parameters);
-    methodDeclaration.setType(type);
-    methodDeclaration.setTypeparametersList(typeParams);
-
-    let memberProto = new MemberDeclarationProto();
-    memberProto.setFunctiondeclaration(methodDeclaration);
-    return memberProto;
-  }
-
   createMethodSignatureDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, optional: boolean, modifiers: Array<ModifierDeclaration>): MemberDeclaration {
     let methodSignature = new MethodSignatureDeclarationProto();
     methodSignature.setName(name);
@@ -498,6 +479,27 @@ export class AstFactory {
     memberProto.setMethodsignature(methodSignature);
     return memberProto;
   }
+
+  createMethodDeclaration(name: string, parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>, modifiers: Array<ModifierDeclaration>, optional: boolean, isGenerator: boolean, body: BlockDeclarationProto | null): MemberDeclaration {
+    let method = new MethodDeclarationProto();
+    method.setName(name);
+    method.setParametersList(parameters);
+    method.setType(type);
+    method.setTypeparametersList(typeParams);
+    method.setOptional(optional);
+    method.setModifiersList(modifiers);
+    method.setOptional(optional);
+    method.setIsgenerator(isGenerator);
+
+    if (body) {
+      method.setBody(body);
+    }
+
+    let memberProto = new MemberDeclarationProto();
+    memberProto.setMethod(method);
+    return memberProto;
+  }
+
 
   createModifierDeclaration(name: MODIFIER_KINDMap[keyof MODIFIER_KINDMap]): ModifierDeclaration {
     let modifierDeclaration = new ModifierDeclarationProto();

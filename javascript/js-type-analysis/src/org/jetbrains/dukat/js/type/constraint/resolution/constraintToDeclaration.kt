@@ -26,15 +26,14 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.ExportAssignmentDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
-import org.jetbrains.dukat.tsmodel.WithUidDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
@@ -77,20 +76,6 @@ private fun Constraint.toParameterDeclaration(name: String): ParameterDeclaratio
     )
 }
 
-private fun FunctionConstraint.toDeclarations(name: String, modifiers: Set<ModifierDeclaration>) = overloads.map {
-    FunctionDeclaration(
-            name = name,
-            parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
-            type = it.returnConstraints.toType(),
-            typeParameters = emptyList(),
-            modifiers = modifiers,
-            body = null,
-            definitionsInfo = emptyList(),
-            uid = generateUID(),
-            isGenerator = false
-    )
-}
-
 private fun FunctionConstraint.toConstructors() = overloads.map {
     ConstructorDeclaration(
             parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
@@ -114,8 +99,34 @@ private fun CallableConstraint.toCallSignature() = CallSignatureDeclaration(
         typeParameters = emptyList()
 )
 
-private fun FunctionConstraint.toMemberDeclarations(name: String, isStatic: Boolean) =
-        this.toDeclarations(name, if (isStatic) STATIC_MODIFIERS else emptySet())
+private fun FunctionConstraint.toMemberDeclarations(name: String, isStatic: Boolean) : List<MemberDeclaration> = overloads.mapNotNull {
+        val modifiers = if (isStatic) STATIC_MODIFIERS else emptySet()
+        MethodDeclaration(
+                name = name,
+                parameters = it.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+                type = it.returnConstraints.toType(),
+                typeParameters = emptyList(),
+                modifiers = modifiers,
+                body = null,
+                optional = true,
+                isGenerator = false
+        )
+}
+
+private fun FunctionConstraint.Overload.convertToTopLevelDeclaration(name: String, modifiers: Set<ModifierDeclaration>): FunctionDeclaration =
+    FunctionDeclaration(
+            name = name,
+            parameters = this.parameterConstraints.map { (name, constraint) -> constraint.toParameterDeclaration(name) },
+            type = this.returnConstraints.toType(),
+            typeParameters = emptyList(),
+            modifiers = modifiers,
+            body = null,
+            definitionsInfo = emptyList(),
+            uid = generateUID(),
+            isGenerator = false
+    )
+
+private fun FunctionConstraint.convertToTopLevelDeclarations(name: String, modifiers: Set<ModifierDeclaration>) = overloads.map { it.convertToTopLevelDeclaration(name, modifiers) }
 
 private fun Constraint.toMemberDeclarations(name: String, isStatic: Boolean = false) : List<MemberDeclaration> {
     return when (this) {
@@ -232,18 +243,18 @@ private fun Constraint.toType() : ParameterValueDeclaration {
     }
 }
 
-private fun Constraint.toDeclarations(name: String, exportModifiers: Set<ModifierDeclaration>) : List<TopLevelDeclaration> {
+private fun Constraint.convertToTopLevelDeclarations(name: String, exportModifiers: Set<ModifierDeclaration>) : List<TopLevelDeclaration> {
     return when (this) {
         is ClassConstraint -> listOf(this.toDeclaration(name, exportModifiers))
-        is FunctionConstraint -> this.toDeclarations(name, exportModifiers)
+        is FunctionConstraint -> this.convertToTopLevelDeclarations(name, exportModifiers)
         is CompositeConstraint -> raiseConcern("Unexpected composited type for variable named '$name'. Should be resolved by this point!") { emptyList<TopLevelDeclaration>() }
         else -> listOf(getVariableDeclaration(name, this.toType(), exportModifiers))
     }
 }
 
-fun Constraint.toDeclarations(name: String) = toDeclarations(name, EXPORT_MODIFIERS)
+fun Constraint.convertToTopLevelDeclarations(name: String) = convertToTopLevelDeclarations(name, EXPORT_MODIFIERS)
 
 fun Constraint.asDefaultToDeclarations(defaultExportName: String) : List<TopLevelDeclaration> {
-    return this.toDeclarations(defaultExportName, DECLARE_MODIFIERS).toMutableList()
+    return this.convertToTopLevelDeclarations(defaultExportName, DECLARE_MODIFIERS).toMutableList()
 }
 

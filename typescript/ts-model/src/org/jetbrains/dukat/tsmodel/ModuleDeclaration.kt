@@ -18,4 +18,4 @@ data class ModuleDeclaration(
         override val uid: String,
         val resourceName: String,
         val kind: ModuleDeclarationKind
-) : TopLevelDeclaration, FunctionOwnerDeclaration, WithModifiersDeclaration, MergeableDeclaration
+) : TopLevelDeclaration, WithModifiersDeclaration, MergeableDeclaration

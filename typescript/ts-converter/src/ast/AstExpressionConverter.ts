@@ -483,8 +483,9 @@ export class AstExpressionConverter {
                 method.type ? this.astConverter.convertType(method.type) : this.astConverter.createTypeDeclaration("Unit"),
                 this.astConverter.convertTypeParams(method.typeParameters),
                 this.astConverter.convertModifiers(method.modifiers),
-                this.astConverter.convertBlock(method.body),
-                method.asteriskToken
+                method.questionToken,
+                method.asteriskToken,
+                this.astConverter.convertBlock(method.body)
             );
         } else {
             return null;

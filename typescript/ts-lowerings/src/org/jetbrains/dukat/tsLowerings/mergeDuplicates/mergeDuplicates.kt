@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.astCommon.MetaData
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
@@ -109,6 +110,18 @@ private fun List<FunctionDeclaration>.mergeFunctions() : List<FunctionDeclaratio
     }
 }
 
+private fun List<MethodDeclaration>.mergeMethods() : List<MethodDeclaration> {
+    val groups = this.groupBy { it.normalize() }
+
+    return groups.map { (_, functions) ->
+        if (functions.size == 1) {
+            functions[0]
+        } else {
+            functions[0].copy(type = functions.combinedReturnType())
+        }
+    }
+}
+
 private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSignatureDeclaration> {
     val fixedCallSignatures = map { it.mergeDuplicates() }
 
@@ -126,13 +139,13 @@ private fun List<CallSignatureDeclaration>.mergeCallSignatures() : List<CallSign
 private fun List<MemberDeclaration>.mergeMembers() : List<MemberDeclaration> {
     val otherMembers = mutableListOf<MemberDeclaration>()
     val constructors = mutableListOf<ConstructorDeclaration>()
-    val methods = mutableListOf<FunctionDeclaration>()
+    val methods = mutableListOf<MethodDeclaration>()
     val callSignatures = mutableListOf<CallSignatureDeclaration>()
 
     forEach { member ->
         when (member) {
             is ConstructorDeclaration -> constructors += member.mergeDuplicates()
-            is FunctionDeclaration -> methods += member.mergeDuplicates()
+            is MethodDeclaration -> methods += member.mergeDuplicates()
             is CallSignatureDeclaration -> callSignatures += member.mergeDuplicates()
             else -> otherMembers += member
         }
@@ -143,7 +156,7 @@ private fun List<MemberDeclaration>.mergeMembers() : List<MemberDeclaration> {
     members.addAll(constructors.distinct())
     members.addAll(callSignatures.mergeCallSignatures())
     members.addAll(otherMembers)
-    members.addAll(methods.mergeFunctions())
+    members.addAll(methods.mergeMethods())
 
     return members
 }
@@ -174,6 +187,11 @@ private fun FunctionTypeDeclaration.mergeDuplicates() = copy(
 )
 
 private fun FunctionDeclaration.mergeDuplicates() = copy(
+        parameters = parameters.map { it.mergeDuplicates() },
+        type = type.mergeDuplicates()
+)
+
+private fun MethodDeclaration.mergeDuplicates() = copy(
         parameters = parameters.map { it.mergeDuplicates() },
         type = type.mergeDuplicates()
 )

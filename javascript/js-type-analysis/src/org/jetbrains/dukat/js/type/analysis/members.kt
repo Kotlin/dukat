@@ -6,14 +6,14 @@ import org.jetbrains.dukat.js.type.constraint.properties.ClassConstraint
 import org.jetbrains.dukat.js.type.propertyOwner.PropertyOwner
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
 fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
-    owner.constructorConstraint = FunctionDeclaration(
+    owner.constructorConstraint = MethodDeclaration(
             name = "",
             parameters = parameters,
             type = TypeDeclaration(
@@ -23,8 +23,7 @@ fun ConstructorDeclaration.addTo(owner: ClassConstraint) {
             typeParameters = typeParameters,
             modifiers = modifiers,
             body = body,
-            definitionsInfo = emptyList(),
-            uid = "",
+            optional = false,
             isGenerator = false
     ).addTo(owner)
 }
@@ -35,7 +34,7 @@ fun PropertyDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
 
 fun MemberDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
     when (this) {
-        is FunctionDeclaration -> this.addTo(owner)
+        is MethodDeclaration -> this.addTo(owner)
         is PropertyDeclaration -> this.addTo(owner, path)
         else -> raiseConcern("Unexpected member entity type <${this::class}> in object.") { this }
     }
@@ -44,7 +43,7 @@ fun MemberDeclaration.addTo(owner: PropertyOwner, path: PathWalker) {
 fun MemberDeclaration.addToClass(owner: ClassConstraint, path: PathWalker) {
     when (this) {
         is ConstructorDeclaration -> this.addTo(owner)
-        is FunctionDeclaration -> if (this.modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)) {
+        is MethodDeclaration -> if (this.modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)) {
             this.addTo(owner)
         } else {
             val ownerPrototype = owner["prototype"]

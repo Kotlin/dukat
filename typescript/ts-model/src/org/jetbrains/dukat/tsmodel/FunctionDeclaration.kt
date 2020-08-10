@@ -5,7 +5,7 @@ import org.jetbrains.dukat.tsmodel.expression.ExpressionDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 
 data class FunctionDeclaration(
-        override val name: String,
+        val name: String,
         override val parameters: List<ParameterDeclaration>,
         override val type: ParameterValueDeclaration,
         override val typeParameters: List<TypeParameterDeclaration>,
@@ -15,4 +15,4 @@ data class FunctionDeclaration(
         override val uid: String,
         val isGenerator: Boolean
 ) : StatementDeclaration, WithUidDeclaration, WithModifiersDeclaration,
-    ExpressionDeclaration, FunctionLikeDeclaration, MergeableDeclaration, MethodDeclaration, NamedMemberDeclaration
+    ExpressionDeclaration, FunctionLikeDeclaration, MergeableDeclaration, ParameterOwnerDeclaration

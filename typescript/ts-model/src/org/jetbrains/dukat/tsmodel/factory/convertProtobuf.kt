@@ -29,6 +29,7 @@ import org.jetbrains.dukat.tsmodel.types.IndexTypeDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.types.KeyOfTypeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -131,6 +132,7 @@ import org.jetbrains.dukat.tsmodelproto.IndexSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.InterfaceDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.LiteralExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.MemberDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.MethodDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.MethodSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ModifierDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ModuleDeclarationProto
@@ -272,6 +274,21 @@ fun FunctionDeclarationProto.convert(): FunctionDeclaration {
             definitionsInfoList.map { it.convert() },
             uid,
             isGenerator
+    )
+}
+
+fun MethodDeclarationProto.convert(): MethodDeclaration {
+    return MethodDeclaration(
+            name = name,
+            parameters = parametersList.map { it.convert() },
+            type = type.convert(),
+            typeParameters = typeParametersList.map { it.convert() },
+            modifiers = modifiersList.mapNotNull { it.convert() }.toSet(),
+            body = if (hasBody()) {
+                body.convert()
+            } else null,
+            optional = optional,
+            isGenerator = isGenerator
     )
 }
 
@@ -497,10 +514,10 @@ fun MemberDeclarationProto.convert(): MemberDeclaration {
     return when {
         hasConstructorDeclaration() -> constructorDeclaration.convert()
         hasMethodSignature() -> methodSignature.convert()
-        hasFunctionDeclaration() -> functionDeclaration.convert()
         hasProperty() -> property.convert()
         hasIndexSignature() -> indexSignature.convert()
         hasCallSignature() -> callSignature.convert()
+        hasMethod() -> method.convert()
         else -> throw Exception("unknown MemberEntityProto: ${this}")
     }
 }

@@ -15,6 +15,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
+import org.jetbrains.dukat.tsmodel.CallableMemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -58,13 +59,13 @@ private fun <T : Entity> Entity.duplicate(): T {
     }
 }
 
-private fun MethodDeclaration.copyWithParams(params: List<ParameterDeclaration>): MethodDeclaration {
+private fun CallableMemberDeclaration.copyWithParams(params: List<ParameterDeclaration>): CallableMemberDeclaration {
     return when (this) {
         is ConstructorDeclaration -> copy(parameters = params)
-        is FunctionDeclaration -> copy(parameters = params)
         is MethodSignatureDeclaration -> copy(parameters = params)
         is CallSignatureDeclaration -> copy(parameters = params)
         is IndexSignatureDeclaration -> copy(parameters = params)
+        is MethodDeclaration -> copy(parameters = params)
         else -> raiseConcern("can not update params for ${this}") { this }
     }
 }
@@ -92,7 +93,7 @@ private fun specifyArguments(params: List<ParameterDeclaration>): List<List<Para
     }
 }
 
-private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableMap<String, MutableList<MethodDeclaration>>) : TopLevelDeclarationLowering {
+private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableMap<String, MutableList<CallableMemberDeclaration>>) : TopLevelDeclarationLowering {
 
     fun generateParams(params: List<ParameterDeclaration>): Pair<List<List<ParameterDeclaration>>, Boolean> {
         val specifyParams = specifyArguments(params)
@@ -105,7 +106,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
         }
     }
 
-    fun generateMethods(declaration: MethodDeclaration, uid: String?): List<MethodDeclaration> {
+    fun generateMethods(declaration: CallableMemberDeclaration, uid: String?): List<CallableMemberDeclaration> {
         val generatedParams = generateParams(declaration.parameters)
         return generatedParams.first.map { params ->
             val declarationResolved = declaration.copyWithParams(params)
@@ -117,7 +118,14 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
         }
     }
 
-    private fun MethodDeclaration.asKey() = parameters.map { param ->
+    private fun ConstructorDeclaration.asKey() = parameters.map { param ->
+        param.type.duplicate<ParameterValueDeclaration>().let {
+            it.meta = null
+            it
+        }
+    }
+
+    private fun FunctionDeclaration.asKey() = parameters.map { param ->
         param.type.duplicate<ParameterValueDeclaration>().let {
             it.meta = null
             it
@@ -140,7 +148,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
         val members = declaration.members.flatMap { member ->
             when (member) {
                 is ConstructorDeclaration -> generateConstructors(member)
-                is MethodDeclaration -> generateMethods(member, null)
+                is CallableMemberDeclaration -> generateMethods(member, null)
                 else -> listOf(member)
             }
         }
@@ -150,7 +158,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
     override fun lowerGeneratedInterfaceDeclaration(declaration: GeneratedInterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): GeneratedInterfaceDeclaration {
         val members = declaration.members.flatMap { member ->
             when (member) {
-                is MethodDeclaration -> generateMethods(member, declaration.uid)
+                is CallableMemberDeclaration -> generateMethods(member, declaration.uid)
                 else -> listOf(member)
             }
         }
@@ -160,7 +168,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
     override fun lowerInterfaceDeclaration(declaration: InterfaceDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration {
         val members = declaration.members.flatMap { member ->
             when (member) {
-                is MethodDeclaration -> generateMethods(member, declaration.uid)
+                is CallableMemberDeclaration -> generateMethods(member, declaration.uid)
                 else -> listOf(member)
             }
         }
@@ -187,7 +195,7 @@ private class SpecifyUnionTypeLowering(private val generatedMethodsMap: MutableM
     }
 }
 
-private class IntroduceGeneratedMembersToDescendantClasses(private val generatedMembersMap: Map<String, List<MethodDeclaration>>) : TopLevelDeclarationLowering {
+private class IntroduceGeneratedMembersToDescendantClasses(private val generatedMembersMap: Map<String, List<CallableMemberDeclaration>>) : TopLevelDeclarationLowering {
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
         val generatedMembers = declaration.parentEntities.mapNotNull { generatedMembersMap[it.typeReference?.uid] }.flatten()
         return super.lowerClassDeclaration(declaration.copy(members = declaration.members + generatedMembers), owner)
@@ -197,7 +205,7 @@ private class IntroduceGeneratedMembersToDescendantClasses(private val generated
 
 class SpecifyUnionType : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
-        val generatedMethodsMap = mutableMapOf<String, MutableList<MethodDeclaration>>()
+        val generatedMethodsMap = mutableMapOf<String, MutableList<CallableMemberDeclaration>>()
 
         val unrolledSourceSet = source.copy(sources = source.sources.map { sourceFile ->
             sourceFile.copy(root = SpecifyUnionTypeLowering(generatedMethodsMap).lowerSourceDeclaration(sourceFile.root))

@@ -28,6 +28,7 @@ import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -76,8 +77,7 @@ private fun NameEntity.unquote(): NameEntity {
 
 private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
-    private fun FunctionDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-
+    private fun MethodDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
     fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyNode {
@@ -293,23 +293,23 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
     fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
         return when (declaration) {
-            is FunctionDeclaration -> listOf(MethodNode(
-                    declaration.name,
-                    convertParameters(declaration.parameters),
-                    declaration.type.convertToNode(),
-                    convertTypeParameters(declaration.typeParameters),
-                    declaration.isStatic(),
-                    false,
-                    true,
-                    declaration.body,
-                    declaration.isGenerator
+            is MethodDeclaration -> listOf(MethodNode(
+                    name = declaration.name,
+                    parameters = convertParameters(declaration.parameters),
+                    type = declaration.type.convertToNode(),
+                    typeParameters = convertTypeParameters(declaration.typeParameters),
+                    static = declaration.isStatic(),
+                    operator = false,
+                    open = true,
+                    body = declaration.body,
+                    isGenerator = declaration.isGenerator
             ))
             is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
             is ConstructorDeclaration -> listOf(declaration.convert())
-            else -> raiseConcern("unkown member declaration ${this}") { emptyList<MemberDeclaration>() }
+            else -> raiseConcern("unkown member declaration ${declaration::class.java}") { emptyList<MemberDeclaration>() }
         }
     }
 

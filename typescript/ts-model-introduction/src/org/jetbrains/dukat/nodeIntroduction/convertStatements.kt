@@ -383,7 +383,7 @@ class ExpressionConverter(private val typeConverter: (ParameterValueDeclaration)
                 expression.convert(),
                 convertBlock(body)
             )
-            else -> raiseConcern("unable to process ForOfStatementDeclaration $this") {
+            else -> raiseConcern("unable to process ForOfStatementDeclaration $variable") {
                 ExpressionStatementModel(
                     IdentifierExpressionModel(IdentifierEntity("ERROR"))
                 )

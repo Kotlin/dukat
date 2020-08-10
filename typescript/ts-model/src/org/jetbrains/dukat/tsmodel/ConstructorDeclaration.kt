@@ -5,4 +5,4 @@ data class ConstructorDeclaration(
         val typeParameters: List<TypeParameterDeclaration>,
         override val modifiers: Set<ModifierDeclaration>,
         val body: BlockDeclaration?
-) : MethodDeclaration, WithModifiersDeclaration
+) : CallableMemberDeclaration, WithModifiersDeclaration

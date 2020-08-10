@@ -10,7 +10,6 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
-import org.jetbrains.dukat.tsmodel.FunctionOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexTypeDeclaration
@@ -18,6 +17,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.types.KeyOfTypeDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -72,17 +72,17 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         return declaration.copy(
                 parameters = declaration.parameters.map { indexType -> lowerParameterDeclaration(indexType, owner.wrap(declaration)) },
                 returnType = lowerParameterValue(declaration.returnType, owner.wrap(declaration))
-        );
+        )
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun lowerMemberDeclaration(declaration: MemberDeclaration, owner: NodeOwner<MemberOwnerDeclaration>?): MemberDeclaration {
         val newOwner = owner.wrap(declaration)
         return when (declaration) {
-            is FunctionDeclaration -> lowerFunctionDeclaration(declaration, newOwner as NodeOwner<FunctionOwnerDeclaration>)
             is PropertyDeclaration -> lowerPropertyDeclaration(declaration, newOwner)
             is ConstructorDeclaration -> lowerConstructorDeclaration(declaration, newOwner)
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration, newOwner)
+            is MethodDeclaration -> lowerMethodDeclaration(declaration, newOwner)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration, newOwner)
             is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration, newOwner)
             else -> {
@@ -102,7 +102,18 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         )
     }
 
-    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<FunctionOwnerDeclaration>?): FunctionDeclaration {
+    fun lowerMethodDeclaration(declaration: MethodDeclaration, owner: NodeOwner<MemberDeclaration>?): MethodDeclaration {
+        return declaration.copy(
+                parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
+                typeParameters = declaration.typeParameters.map { typeParameter ->
+                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
+                },
+                type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
+                body = declaration.body?.let { lowerBlockStatement(it) }
+        )
+    }
+
+    override fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<ModuleDeclaration>?): FunctionDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
