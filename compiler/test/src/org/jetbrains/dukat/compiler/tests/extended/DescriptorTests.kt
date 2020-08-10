@@ -37,7 +37,7 @@ class DescriptorTests {
 
         val targetPath = "./build/test/data/descriptors/$name"
         File(targetPath).deleteRecursively()
-        compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
+        compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null, null)
 
         val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
             sourceFile.root.flattenDeclarations().map {
