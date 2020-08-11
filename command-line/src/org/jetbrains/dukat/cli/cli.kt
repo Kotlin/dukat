@@ -169,7 +169,7 @@ where possible options include:
     -m  String                      use this value as @file:JsModule annotation value whenever such annotation occurs
     -d  <path>                      destination directory for files with converted declarations (by default declarations are generated in current directory)
     -v, -version                    print version
-    --no-header                      don't print note with link to dukat repository at the beginning of each file
+    --no-header                     don't print note with link to dukat repository at the beginning of each file
 """.trimIndent()
     )
 }
