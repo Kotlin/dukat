@@ -91,8 +91,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 getter = declaration.optional,
                 setter = declaration.optional,  // TODO: it's actually wrong
 
-                open = true,
-
                 explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType,
 
                 lateinit = !inDeclaredDeclaration && (declaration.initializer == null)
@@ -127,7 +125,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     initializer = null,
                     getter = true,
                     setter = false,
-                    open = true,
                     explicitlyDeclaredType = true,
                     lateinit = false
             )
@@ -287,7 +284,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     body = declaration.body,
                     isGenerator = declaration.isGenerator
             ))
-            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).mapNotNull { it }
+            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).map { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
@@ -321,7 +318,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
                 objectNode.copy(members = objectNode.members.map {
                     when (it) {
-                        is PropertyNode -> it.copy(open = false)
                         is MethodNode -> it.copy(open = false)
                         else -> it
                     }

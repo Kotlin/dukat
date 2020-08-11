@@ -188,7 +188,7 @@ internal class DocumentConverter(
 
     private fun ClassLikeNode.processMembers(): Members {
         val (staticNodes, ownNodes) = members.partition { it.isStatic() }
-        return Members(ownNodes.flatMap { it.process() }, staticNodes.flatMap { it.process() })
+        return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 
     private fun UnionTypeDeclaration.convertMeta(): String {
@@ -344,7 +344,7 @@ internal class DocumentConverter(
         }
     }
 
-    private fun MemberDeclaration.process(): List<MemberModel> {
+    private fun MemberDeclaration.process(owner: ClassLikeNode): List<MemberModel> {
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorDeclaration -> listOfNotNull(
@@ -369,7 +369,7 @@ internal class DocumentConverter(
                     initializer = expressionConverter.convertExpression(initializer),
                     getter = getter,
                     setter = setter,
-                    open = open,
+                    open = owner !is ObjectNode,
                     explicitlyDeclaredType = explicitlyDeclaredType,
                     lateinit = lateinit
             ))
@@ -643,7 +643,7 @@ internal class DocumentConverter(
             }
             is ObjectNode -> ObjectModel(
                     name = name,
-                    members = members.flatMap { member -> member.process() },
+                    members = members.flatMap { member -> member.process(this) },
                     parentEntities = convertParentEntities(parentEntities),
                     visibilityModifier = VisibilityModifierModel.DEFAULT,
                     comment = null,

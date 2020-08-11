@@ -17,8 +17,6 @@ data class PropertyNode(
         val getter: Boolean,
         val setter: Boolean,
 
-        val open: Boolean,
-
         val explicitlyDeclaredType: Boolean,
 
         val lateinit: Boolean
