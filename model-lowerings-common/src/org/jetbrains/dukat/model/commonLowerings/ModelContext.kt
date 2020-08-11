@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -11,6 +12,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 
 data class ResolvedClassLike<T : ClassLikeModel>(
@@ -82,6 +84,34 @@ class ModelContext(sourceSetModel: SourceSetModel) {
         myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
     }
 
+    private fun processSubtypes(type: TypeModel, paramSubstitutions: Map<NameEntity, TypeModel>): TypeModel {
+        return when (type) {
+            is TypeValueModel -> {
+                type.copy(params = type.params.map { param ->
+                    param.copy(
+                        type = processSubtypes(
+                            when (val oldType = param.type) {
+                                is TypeValueModel -> unalias(oldType)
+                                else -> oldType
+                            },
+                            paramSubstitutions
+                        )
+                    )
+                })
+            }
+            is FunctionTypeModel -> {
+                type.copy(
+                    parameters = type.parameters.map { parameter ->
+                        parameter.copy(type = processSubtypes(parameter.type, paramSubstitutions))
+                    },
+                    type = processSubtypes(type.type, paramSubstitutions)
+                )
+            }
+            is TypeParameterReferenceModel -> paramSubstitutions[type.name] ?: type
+            else -> type
+        }
+    }
+
     fun unalias(typeModel: TypeValueModel): TypeModel {
         val typeResolved = myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
             if (typeReference is TypeValueModel) {
@@ -91,18 +121,13 @@ class ModelContext(sourceSetModel: SourceSetModel) {
             }
         } ?: typeModel
 
-        return if (typeResolved is TypeValueModel) {
-            typeResolved.copy(params = typeResolved.params.map { param ->
-                param.copy(
-                        type = when (param.type) {
-                            is TypeValueModel -> unalias(param.type as TypeValueModel)
-                            else -> param.type
-                        }
-                )
-            })
-        } else {
-            typeResolved
+        val aliasParamNames = myAliases[typeModel.fqName]?.typeParameters?.mapNotNull {
+            (it.type as? TypeValueModel)?.value
         }
+        val actualParams = typeModel.params.map { it.type }
+        val paramSubstitutions = aliasParamNames?.zip(actualParams)?.toMap() ?: emptyMap()
+
+        return processSubtypes(typeResolved, paramSubstitutions)
     }
 
     private fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {
