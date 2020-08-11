@@ -261,16 +261,12 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
     fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
         return when (declaration) {
-            is MethodDeclaration -> listOf(MethodNode(
-                    name = declaration.name,
-                    parameters = convertParameters(declaration.parameters),
+            is MethodDeclaration -> listOf(
+                declaration.copy(
                     type = declaration.type.convertToNode(),
-                    typeParameters = convertTypeParameters(declaration.typeParameters),
-                    static = declaration.isStatic(),
-                    operator = false,
-                    body = declaration.body,
-                    isGenerator = declaration.isGenerator
-            ))
+                    parameters = convertParameters(declaration.parameters)
+                )
+            )
             is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).map { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))

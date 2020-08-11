@@ -77,6 +77,8 @@ import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MethodDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -94,6 +96,7 @@ import java.io.File
 private val logger = Logging.logger("introduceModels")
 
 private fun MemberDeclaration.isStatic() = when (this) {
+    is MethodDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     is MethodNode -> static
     is PropertyNode -> static
     else -> false
@@ -377,6 +380,20 @@ internal class DocumentConverter(
                 )
             )
             is MethodNode -> listOf(process(owner))
+            is MethodDeclaration -> listOf(
+                 MethodModel(
+                    name = IdentifierEntity(name),
+                    type = type.process(),
+                    parameters = parameters.map { param -> param.process() },
+                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                    static = isStatic(),
+                    override = null,
+                    annotations = emptyList(),
+                    operator = false,
+                    open = owner !is ObjectNode,
+                    body = null
+                 )
+            )
             is PropertyNode -> listOf(PropertyModel(
                     name = IdentifierEntity(name),
                     type = type.process(TranslationContext.PROPERTY(getter || setter)),
