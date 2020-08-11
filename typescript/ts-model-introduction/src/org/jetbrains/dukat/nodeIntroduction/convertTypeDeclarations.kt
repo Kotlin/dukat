@@ -72,33 +72,22 @@ fun ParameterDeclaration.convertToNode(context: PARAMETER_CONTEXT = PARAMETER_CO
 
 fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null): ParameterValueDeclaration? {
     return when (this) {
-        is TypeParamReferenceDeclaration -> TypeParamReferenceDeclaration(
-                value = value,
-                nullable = nullable,
-                meta = metaData ?: meta
-        )
-        is TypeDeclaration -> TypeDeclaration(
-                value = value,
+        is TypeParamReferenceDeclaration -> copy(meta = metaData ?: meta)
+        is TypeDeclaration -> copy(
                 params = params.map { param -> param.convertToNode() },
-                typeReference = typeReference,
-                nullable = nullable,
                 meta = metaData ?: meta
         )
         //TODO: investigate where we still have FunctionTypeDeclarations up to this point
-        is FunctionTypeDeclaration -> FunctionTypeDeclaration(
+        is FunctionTypeDeclaration -> copy(
                 parameters = parameters.map { parameterDeclaration ->
                     parameterDeclaration.convertToNode(PARAMETER_CONTEXT.FUNCTION_TYPE)
                 },
                 type = type.convertToNode(),
-                nullable = nullable,
                 meta = metaData ?: meta
         )
-        is GeneratedInterfaceReferenceDeclaration -> GeneratedInterfaceReferenceDeclaration(
-                name,
-                typeParameters.map { it.convertToNode() },
-                typeReference,
-                nullable,
-                metaData ?: meta
+        is GeneratedInterfaceReferenceDeclaration -> copy(
+                typeParameters = typeParameters.map { it.convertToNode() },
+                meta = metaData ?: meta
         )
         is IntersectionTypeDeclaration -> {
             params[0].convertToNodeNullable(IntersectionMetadata(params.map {
@@ -136,16 +125,14 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                     )
                 }
                 else -> {
-                    UnionTypeDeclaration(
+                    copy(
                             params = params.map { param -> param.convertToNode() },
-                            nullable = nullable,
                             meta = metaData ?: meta
                     )
                 }
             }
-        is TupleDeclaration -> TupleDeclaration(
+        is TupleDeclaration -> copy(
                 params = params.map { param -> param.convertToNode() },
-                nullable = nullable,
                 meta = metaData ?: meta
         )
         is LiteralUnionNode -> this
