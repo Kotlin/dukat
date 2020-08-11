@@ -43,9 +43,7 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
-import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
@@ -76,7 +74,6 @@ private fun NameEntity.unquote(): NameEntity {
 
 private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
-    private fun MethodDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
 
     fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyNode {
@@ -142,39 +139,12 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         }
     }
 
-    private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
-        return when (this) {
-            is UnionTypeDeclaration -> params
-            else -> listOf(this)
-        }
-    }
-
-
-    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<MethodNode> {
+    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<IndexSignatureDeclaration> {
         return listOf(
-                MethodNode(
-                        "get",
-                        convertParameters(declaration.parameters),
-                        declaration.returnType.makeNullable().convertToNode(),
-                        emptyList(),
-                        false,
-                        true,
-                        null,
-                        false
-                )
-        ) + declaration.returnType.unroll().map { returnType ->
-            MethodNode(
-                    "set",
-                    convertParameters(declaration.parameters + listOf(ParameterDeclaration("value", returnType.convertToNodeNullable()
-                            ?: returnType, null, false, false, true))),
-                    TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
-                    emptyList(),
-                    false,
-                    true,
-                    null,
-                    false
+            declaration.copy(
+                parameters = convertParameters(declaration.parameters)
             )
-        }
+        )
     }
 
 

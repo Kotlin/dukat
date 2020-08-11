@@ -86,11 +86,13 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.makeNullable
 import java.io.File
 
 private val logger = Logging.logger("introduceModels")
@@ -116,6 +118,8 @@ private typealias UidMapper = Map<String, FqNode>
 
 data class FqNode(val node: Entity, val fqName: NameEntity)
 
+private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
+
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),
         emptyList(),
@@ -126,6 +130,13 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
 // TODO: duplication, think of separate place to have this (but please don't call it utils )))
 private fun unquote(name: String): String {
     return name.replace("(?:^[\"|\'`])|(?:[\"|\'`]$)".toRegex(), "")
+}
+
+private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
+    return when (this) {
+        is UnionTypeDeclaration -> params
+        else -> listOf(this)
+    }
 }
 
 internal class DocumentConverter(
@@ -379,6 +390,44 @@ internal class DocumentConverter(
                 body = null
                 )
             )
+            is IndexSignatureDeclaration -> listOf(
+                MethodModel(
+                    name = IdentifierEntity("get"),
+                    type = returnType.makeNullable().convertToNode().process(),
+                    parameters = parameters.map { param -> param.process() },
+                    typeParameters = emptyList(),
+
+                    annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
+                    open = owner !is ObjectNode,
+                    override = null,
+
+                    static = false,
+                    operator = true,
+                    body = null
+                )
+            ) + returnType.convertToNode().unroll().map { unrolledReturnType ->
+                MethodModel(
+                        name = IdentifierEntity("set"),
+                        type = UNIT_TYPE,
+                        parameters = (parameters).map { param -> param.process() } + ParameterModel(
+                            name = "value",
+                            type = unrolledReturnType.process(),
+                            initializer = null,
+                            vararg = false,
+                            modifier = null
+                        ),
+                        typeParameters = emptyList(),
+
+                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
+                        open = owner !is ObjectNode,
+                        override = null,
+
+                        static = false,
+                        operator = true,
+                        body = null
+                )
+            }
+
             is MethodNode -> listOf(process(owner))
             is MethodDeclaration -> listOf(
                  MethodModel(
