@@ -74,7 +74,6 @@ class DescriptorTests {
                 "class/inheritance/overridesFromReferencedFile",
                 "class/inheritance/overridingStdLib",
                 "class/inheritance/simple",
-                "inheritance/missingMembers/ambiguousProperties",
                 "interface/inheritance/simple",
                 "interface/inheritance/withQualifiedParent",
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",

@@ -9,7 +9,7 @@ data class PropertyModel(
         val typeParameters: List<TypeParameterModel>,
 
         val static: Boolean,
-        val override: NameEntity?,
+        val override: List<NameEntity>?,
         val immutable: Boolean,
 
         val initializer: ExpressionModel?,
