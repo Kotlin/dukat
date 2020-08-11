@@ -6,7 +6,6 @@ import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -76,6 +75,7 @@ import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
+import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
@@ -95,7 +95,7 @@ private val logger = Logging.logger("introduceModels")
 
 private fun MemberDeclaration.isStatic() = when (this) {
     is MethodDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-    is PropertyNode -> static
+    is PropertyDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     else -> false
 }
 
@@ -472,20 +472,23 @@ internal class DocumentConverter(
                          }
                  )
             )
-            is PropertyNode -> listOf(PropertyModel(
-                    name = IdentifierEntity(name),
-                    type = type.process(TranslationContext.PROPERTY(getter || setter)),
-                    typeParameters = convertTypeParams(typeParameters),
-                    static = static,
-                    override = null,
-                    immutable = getter && !setter,
-                    initializer = expressionConverter.convertExpression(initializer),
-                    getter = getter,
-                    setter = setter,
-                    open = owner !is ObjectNode,
-                    explicitlyDeclaredType = explicitlyDeclaredType,
-                    lateinit = lateinit
-            ))
+            is PropertyDeclaration -> {
+                val initializer = expressionConverter.convertExpression(initializer)
+                listOf(PropertyModel(
+                        name = IdentifierEntity(name),
+                        type = type.process(TranslationContext.PROPERTY(optional)),
+                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                        static = isStatic(),
+                        override = null,
+                        immutable = false,
+                        initializer = initializer,
+                        getter = optional,
+                        setter = optional, // TODO: it's actually wrong
+                        open = owner !is ObjectNode,
+                        explicitlyDeclaredType = explicitlyDeclaredType,
+                        lateinit = !rootIsDeclaration && (initializer == null)
+                ))
+            }
             else -> raiseConcern("unprocessed MemberDeclaration: ${this}") { listOf<MemberModel>() }
         }
     }

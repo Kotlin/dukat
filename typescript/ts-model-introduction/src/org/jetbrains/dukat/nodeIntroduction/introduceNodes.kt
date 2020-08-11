@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
-import org.jetbrains.dukat.ast.model.nodes.PropertyNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -72,23 +71,11 @@ private fun NameEntity.unquote(): NameEntity {
 
 private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
-    private fun PropertyDeclaration.isStatic() = modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-
-    fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyNode {
+    fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyDeclaration {
         val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
-        return PropertyNode(
-                name = declaration.name,
+        return declaration.copy(
                 type = parameterValueDeclaration.convertToNode(),
-                typeParameters = convertTypeParameters(declaration.typeParameters),
-
-                static = declaration.isStatic(),
-                initializer = declaration.initializer,
-                getter = declaration.optional,
-                setter = declaration.optional,  // TODO: it's actually wrong
-
-                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType,
-
-                lateinit = !inDeclaredDeclaration && (declaration.initializer == null)
+                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType
         )
     }
 
