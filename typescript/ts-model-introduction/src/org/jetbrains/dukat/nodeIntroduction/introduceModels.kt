@@ -440,7 +440,14 @@ internal class DocumentConverter(
                     annotations = emptyList(),
                     operator = false,
                     open = owner !is ObjectNode,
-                    body = null
+                    body = body?.let {
+                             val convertedBody = expressionConverter.convertBlock(it)
+                             if (isGenerator) {
+                                 convertedBody.wrapBodyAsLazyIterator()
+                             } else {
+                                 convertedBody
+                             }
+                         }
                  )
             )
             is PropertyNode -> listOf(PropertyModel(
