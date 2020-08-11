@@ -274,18 +274,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         )
     }
 
-    fun lowerMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration? {
-        val memberDeclaration = convertMethodSignatureDeclaration(declaration)
-        return when (memberDeclaration) {
-            is PropertyNode -> memberDeclaration
-            is MethodNode -> memberDeclaration.copy(
-                    parameters = memberDeclaration.parameters,
-                    type = memberDeclaration.type.convertToNode()
-            )
-            else -> raiseConcern("unkown method signature") { null }
-        }
-    }
-
     fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
         return when (declaration) {
             is MethodDeclaration -> listOf(MethodNode(
@@ -299,7 +287,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     body = declaration.body,
                     isGenerator = declaration.isGenerator
             ))
-            is MethodSignatureDeclaration -> listOf(lowerMethodSignatureDeclaration(declaration)).mapNotNull { it }
+            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).mapNotNull { it }
             is CallSignatureDeclaration -> listOf(declaration.convert())
             is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
             is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
