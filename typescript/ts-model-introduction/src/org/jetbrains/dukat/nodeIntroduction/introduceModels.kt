@@ -77,6 +77,7 @@ import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
+import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
@@ -412,7 +413,38 @@ internal class DocumentConverter(
                         body = null
                 )
             }
+            is MethodSignatureDeclaration -> {
+                return if (optional) {
+                    PropertyNode(
+                            name = name,
+                            type = FunctionTypeDeclaration(
+                                    parameters,
+                                    type.convertToNode(),
+                                    true,
+                                    null
+                            ),
+                            typeParameters = convertParameterDeclarations(typeParameters),
+                            static = false,
+                            initializer = null,
+                            getter = true,
+                            setter = false,
+                            explicitlyDeclaredType = true,
+                            lateinit = false
+                    ).process(owner)
+                } else {
+                    MethodDeclaration(
+                            name = name,
+                            type = type.convertToNode(),
+                            typeParameters = typeParameters,
+                            parameters = parameters,
+                            modifiers = modifiers,
+                            body = null,
+                            optional = false,
+                            isGenerator = false
+                    ).process(owner)
+                }
 
+            }
             is MethodDeclaration -> listOf(
                  MethodModel(
                     name = IdentifierEntity(name),

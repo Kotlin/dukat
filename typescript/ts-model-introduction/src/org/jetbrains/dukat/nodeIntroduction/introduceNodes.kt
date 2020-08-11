@@ -107,35 +107,10 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     }
 
     private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration {
-        return if (declaration.optional) {
-            PropertyNode(
-                    name = declaration.name,
-                    type = FunctionTypeDeclaration(
-                            convertParameters(declaration.parameters),
-                            declaration.type.convertToNode(),
-                            true,
-                            null
-                    ),
-                    typeParameters = convertTypeParameters(declaration.typeParameters),
-                    static = false,
-                    initializer = null,
-                    getter = true,
-                    setter = false,
-                    explicitlyDeclaredType = true,
-                    lateinit = false
-            )
-        } else {
-            MethodDeclaration(
-                name = declaration.name,
-                type = declaration.type.convertToNode(),
-                typeParameters = declaration.typeParameters,
-                parameters = convertParameters(declaration.parameters),
-                modifiers = declaration.modifiers,
-                body = null,
-                optional = false,
-                isGenerator = false
-            )
-        }
+        return declaration.copy(
+            type = declaration.type.convertToNode(),
+            parameters = convertParameters(declaration.parameters)
+        )
     }
 
     private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<IndexSignatureDeclaration> {
