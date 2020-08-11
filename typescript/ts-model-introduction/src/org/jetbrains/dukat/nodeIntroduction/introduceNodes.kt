@@ -3,7 +3,6 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -126,15 +125,15 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     lateinit = false
             )
         } else {
-            MethodNode(
-                    declaration.name,
-                    convertParameters(declaration.parameters),
-                    declaration.type.convertToNode(),
-                    convertTypeParameters(declaration.typeParameters),
-                    false,
-                    false,
-                    null,
-                    false
+            MethodDeclaration(
+                name = declaration.name,
+                type = declaration.type.convertToNode(),
+                typeParameters = declaration.typeParameters,
+                parameters = convertParameters(declaration.parameters),
+                modifiers = declaration.modifiers,
+                body = null,
+                optional = false,
+                isGenerator = false
             )
         }
     }

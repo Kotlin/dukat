@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.MethodNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.PropertyNode
@@ -99,7 +98,6 @@ private val logger = Logging.logger("introduceModels")
 
 private fun MemberDeclaration.isStatic() = when (this) {
     is MethodDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
-    is MethodNode -> static
     is PropertyNode -> static
     else -> false
 }
@@ -337,19 +335,6 @@ internal class DocumentConverter(
         }
     }
 
-    private fun MethodNode.resolveAnnotations(): List<AnnotationModel> {
-        if (operator) {
-            return when (name) {
-                "get" -> listOf(AnnotationModel("nativeGetter", emptyList()))
-                "set" -> listOf(AnnotationModel("nativeSetter", emptyList()))
-                "invoke" -> listOf(AnnotationModel("nativeInvoke", emptyList()))
-                else -> emptyList()
-            }
-        }
-
-        return emptyList()
-    }
-
     private fun convertParameterDeclarations(typeParams: List<TypeParameterDeclaration>): List<TypeDeclaration> {
         return typeParams.map { typeParam ->
             TypeDeclaration(
@@ -428,7 +413,6 @@ internal class DocumentConverter(
                 )
             }
 
-            is MethodNode -> listOf(process(owner))
             is MethodDeclaration -> listOf(
                  MethodModel(
                     name = IdentifierEntity(name),
@@ -641,32 +625,6 @@ internal class DocumentConverter(
                 comment = null,
                 external = external,
                 visibilityModifier = VisibilityModifierModel.DEFAULT
-        )
-    }
-
-    private fun MethodNode.process(owner: ClassLikeNode, override: NameEntity? = null): MethodModel {
-        return MethodModel(
-                name = IdentifierEntity(name),
-                parameters = parameters.map { param -> param.process() },
-                type = type.process(),
-                typeParameters = convertTypeParams(typeParameters),
-
-                static = static,
-
-                override = override,
-                operator = operator,
-                annotations = resolveAnnotations(),
-
-                open = owner !is ObjectNode,
-
-                body = body?.let {
-                    val convertedBody = expressionConverter.convertBlock(it)
-                    if (isGenerator) {
-                        convertedBody.wrapBodyAsLazyIterator()
-                    } else {
-                        convertedBody
-                    }
-                }
         )
     }
 
