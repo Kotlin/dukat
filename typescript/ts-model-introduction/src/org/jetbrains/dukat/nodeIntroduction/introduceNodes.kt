@@ -178,16 +178,10 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     }
 
 
-    private fun CallSignatureDeclaration.convert(): MethodNode {
-        return MethodNode(
-                "invoke",
-                convertParameters(parameters),
-                type.convertToNode(),
-                convertTypeParameters(typeParameters),
-                false,
-                true,
-                null,
-                false
+    private fun CallSignatureDeclaration.convert(): CallSignatureDeclaration {
+        return copy(
+            parameters = convertParameters(parameters),
+            type = type.convertToNode()
         )
     }
 
@@ -230,7 +224,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
 
     private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
-        val declaration = InterfaceNode(
+        return InterfaceNode(
                 name,
                 members.flatMap { member -> lowerMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
@@ -239,8 +233,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 uid,
                 true
         )
-
-        return declaration
     }
 
 

@@ -67,6 +67,7 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
+import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
@@ -357,6 +358,23 @@ internal class DocumentConverter(
                         body = expressionConverter.convertBlock(it)
                     )
                 }
+            )
+            is CallSignatureDeclaration -> listOf(
+                MethodModel(
+                name = IdentifierEntity("invoke"),
+                parameters = parameters.map { param -> param.process() },
+                type = type.process(),
+                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+
+                static = false,
+
+                override = null,
+                operator = true,
+                annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
+
+                open = owner !is ObjectNode,
+                body = null
+                )
             )
             is MethodNode -> listOf(process(owner))
             is PropertyNode -> listOf(PropertyModel(
