@@ -51,15 +51,11 @@ import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
 import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
-import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
-import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
-import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
@@ -395,7 +391,7 @@ internal class DocumentConverter(
                 MethodModel(
                         name = IdentifierEntity("set"),
                         type = UNIT_TYPE,
-                        parameters = (parameters).map { param -> param.process() } + ParameterModel(
+                        parameters = parameters.map { param -> param.process() } + ParameterModel(
                             name = "value",
                             type = unrolledReturnType.process(),
                             initializer = null,
@@ -415,33 +411,43 @@ internal class DocumentConverter(
             }
             is MethodSignatureDeclaration -> {
                 return if (optional) {
-                    PropertyNode(
-                            name = name,
-                            type = FunctionTypeDeclaration(
-                                    parameters,
-                                    type.convertToNode(),
-                                    true,
-                                    null
-                            ),
-                            typeParameters = convertParameterDeclarations(typeParameters),
-                            static = false,
-                            initializer = null,
-                            getter = true,
-                            setter = false,
-                            explicitlyDeclaredType = true,
-                            lateinit = false
-                    ).process(owner)
+                    listOf(
+                            PropertyModel(
+                                    name = IdentifierEntity(name),
+                                    type =  FunctionTypeModel(
+                                            parameters = (parameters.map { param ->
+                                                param.processAsLambdaParam()
+                                            }),
+                                            type = type.process(),
+                                            metaDescription = null,
+                                            nullable = true
+                                    ),
+                                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                                    static = false,
+                                    override = null,
+                                    immutable = true,
+                                    getter = true,
+                                    setter = false,
+                                    initializer = null,
+                                    explicitlyDeclaredType = true,
+                                    open = owner !is ObjectNode,
+                                    lateinit = false
+                            )
+                    )
                 } else {
-                    MethodDeclaration(
-                            name = name,
-                            type = type.convertToNode(),
-                            typeParameters = typeParameters,
-                            parameters = parameters,
-                            modifiers = modifiers,
-                            body = null,
-                            optional = false,
-                            isGenerator = false
-                    ).process(owner)
+                    listOf(
+                    MethodModel(
+                        name = IdentifierEntity(name),
+                        type = type.process(),
+                        parameters = parameters.map { param -> param.process() },
+                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                        static = isStatic(),
+                        override = null,
+                        annotations = emptyList(),
+                        open = owner !is ObjectNode,
+                        body = null,
+                        operator = false
+                    ))
                 }
 
             }
