@@ -358,7 +358,7 @@ internal class DocumentConverter(
                     )
                 }
             )
-            is MethodNode -> listOf(process())
+            is MethodNode -> listOf(process(owner))
             is PropertyNode -> listOf(PropertyModel(
                     name = IdentifierEntity(name),
                     type = type.process(TranslationContext.PROPERTY(getter || setter)),
@@ -553,7 +553,7 @@ internal class DocumentConverter(
         )
     }
 
-    private fun MethodNode.process(override: NameEntity? = null): MethodModel {
+    private fun MethodNode.process(owner: ClassLikeNode, override: NameEntity? = null): MethodModel {
         return MethodModel(
                 name = IdentifierEntity(name),
                 parameters = parameters.map { param -> param.process() },
@@ -566,7 +566,7 @@ internal class DocumentConverter(
                 operator = operator,
                 annotations = resolveAnnotations(),
 
-                open = open,
+                open = owner !is ObjectNode,
 
                 body = body?.let {
                     val convertedBody = expressionConverter.convertBlock(it)

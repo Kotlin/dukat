@@ -136,7 +136,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     convertTypeParameters(declaration.typeParameters),
                     false,
                     false,
-                    true,
                     null,
                     false
             )
@@ -160,7 +159,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                         emptyList(),
                         false,
                         true,
-                        true,
                         null,
                         false
                 )
@@ -172,7 +170,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     TypeDeclaration(IdentifierEntity("Unit"), emptyList()),
                     emptyList(),
                     false,
-                    true,
                     true,
                     null,
                     false
@@ -188,7 +185,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 type.convertToNode(),
                 convertTypeParameters(typeParameters),
                 false,
-                true,
                 true,
                 null,
                 false
@@ -280,7 +276,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                     typeParameters = convertTypeParameters(declaration.typeParameters),
                     static = declaration.isStatic(),
                     operator = false,
-                    open = true,
                     body = declaration.body,
                     isGenerator = declaration.isGenerator
             ))
@@ -308,20 +303,13 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 )
             } else {
                 //TODO: don't forget to create owner
-                val objectNode = ObjectNode(
+                ObjectNode(
                         IdentifierEntity(declaration.name),
                         type.members.flatMap { member -> lowerMemberDeclaration(member, rootIsDeclaration || declaration.hasDeclareModifier()) },
                         emptyList(),
                         declaration.uid,
                         declaration.hasDeclareModifier()
                 )
-
-                objectNode.copy(members = objectNode.members.map {
-                    when (it) {
-                        is MethodNode -> it.copy(open = false)
-                        else -> it
-                    }
-                })
             }
         } else {
             declaration.copy(

@@ -14,8 +14,6 @@ data class MethodNode(
 
         val static: Boolean,
         val operator: Boolean,
-        val open: Boolean,
-
         val body: BlockDeclaration?,
         val isGenerator: Boolean
 ) : MemberDeclaration
