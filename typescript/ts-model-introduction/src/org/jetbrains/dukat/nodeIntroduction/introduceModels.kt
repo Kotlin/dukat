@@ -479,7 +479,7 @@ internal class DocumentConverter(
             )
             is PropertyDeclaration -> {
                 val initializer = expressionConverter.convertExpression(initializer)
-                
+
                 val immutable = false
 
                 listOf(PropertyModel(
