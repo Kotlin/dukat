@@ -491,7 +491,7 @@ internal class DocumentConverter(
                         setter = optional, // TODO: it's actually wrong
                         open = owner.isOpen(),
                         explicitlyDeclaredType = explicitlyDeclaredType,
-                        lateinit = !rootIsDeclaration && (initializer == null)
+                        lateinit = !rootIsDeclaration && (initializer == null) && (owner !is ObjectLiteralDeclaration)
                 ))
             }
             else -> raiseConcern("unprocessed MemberDeclaration: ${this}") { listOf<MemberModel>() }
