@@ -1,5 +1,7 @@
 package org.jetbrains.dukat.descriptors
 
+import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
@@ -13,9 +15,21 @@ import java.io.File
 
 fun writeDescriptorsToFile(translator: InputTranslator<ByteArray>, data: ByteArray, outputDir: String) {
     val sourceSet = translator.translate(data)
-    val moduleDescriptor = sourceSet.translateToDescriptors()
 
-    val name = File(sourceSet.sources.first().fileName).nameWithoutExtension
+    val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
+        sourceFile.root.flattenDeclarations().map {
+            SourceFileModel(
+                sourceFile.name,
+                sourceFile.fileName,
+                it,
+                sourceFile.referencedFiles
+            )
+        }
+    })
+
+    val moduleDescriptor = flattenedSourceSet.translateToDescriptors()
+
+    val name = File(flattenedSourceSet.sources.first().fileName).nameWithoutExtension
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
