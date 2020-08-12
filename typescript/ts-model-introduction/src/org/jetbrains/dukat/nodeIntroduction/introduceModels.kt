@@ -479,19 +479,22 @@ internal class DocumentConverter(
             )
             is PropertyDeclaration -> {
                 val initializer = expressionConverter.convertExpression(initializer)
+                
+                val immutable = false
+
                 listOf(PropertyModel(
                         name = IdentifierEntity(name),
                         type = type.process(TranslationContext.PROPERTY(optional)),
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         static = isStatic(),
                         override = null,
-                        immutable = false,
+                        immutable = immutable,
                         initializer = initializer,
                         getter = optional,
                         setter = optional, // TODO: it's actually wrong
                         open = owner.isOpen(),
                         explicitlyDeclaredType = explicitlyDeclaredType,
-                        lateinit = !rootIsDeclaration && (initializer == null) && (owner !is ObjectLiteralDeclaration)
+                        lateinit = !rootIsDeclaration && immutable && (initializer == null)
                 ))
             }
             else -> raiseConcern("unprocessed MemberDeclaration: ${this}") { listOf<MemberModel>() }
