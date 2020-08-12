@@ -167,7 +167,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 members.flatMap { member -> convertMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                false,
                 uid,
                 rootIsDeclaration || hasDeclareModifier()
         )
@@ -180,7 +179,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 members.flatMap { member -> convertMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
-                true,
                 uid,
                 true
         )

@@ -11,7 +11,6 @@ data class InterfaceNode(
         val typeParameters: List<TypeDeclaration>,
         val parentEntities: List<HeritageClauseDeclaration>,
 
-        val generated: Boolean,
         override val uid: String,
         val external: Boolean
 ) : ClassLikeNode
