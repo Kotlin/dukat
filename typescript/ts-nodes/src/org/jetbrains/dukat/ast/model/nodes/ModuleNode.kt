@@ -8,7 +8,6 @@ data class ModuleNode(
         val packageName: NameEntity,
         var qualifiedPackageName: NameEntity,
         val declarations: List<TopLevelDeclaration> = emptyList(),
-        val imports: Map<String, ImportNode>,
 
         var uid: String,
         val external: Boolean,

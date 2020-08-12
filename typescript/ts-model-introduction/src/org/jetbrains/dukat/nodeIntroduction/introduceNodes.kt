@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
@@ -21,7 +20,6 @@ import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
@@ -245,25 +243,14 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         val shortName = name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
-        val imports = mutableMapOf<String, ImportNode>()
-        val nonImports = mutableListOf<TopLevelDeclaration>()
-
-        documentRoot.declarations.forEach { declaration ->
-            if (declaration is ImportEqualsDeclaration) {
-                imports[declaration.name] = ImportNode(
-                        declaration.moduleReference.convert(),
-                        declaration.uid
-                )
-            } else {
-                lowerTopLevelDeclaration(declaration, fullPackageName)?.let { nonImports.add(it) }
-            }
+        val declarations = documentRoot.declarations.mapNotNull { declaration ->
+                lowerTopLevelDeclaration(declaration, fullPackageName)
         }
 
         return ModuleNode(
                 packageName = name,
                 qualifiedPackageName = fullPackageName,
-                declarations = nonImports,
-                imports = imports,
+                declarations = declarations,
                 uid = documentRoot.uid,
                 external = rootIsDeclaration,
                 kind  = documentRoot.kind
