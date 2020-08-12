@@ -5,7 +5,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -63,6 +62,7 @@ import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -83,11 +83,13 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 import java.io.File
 
@@ -114,6 +116,7 @@ private typealias UidMapper = Map<String, FqNode>
 data class FqNode(val node: Entity, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
+private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
 
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),
@@ -133,6 +136,8 @@ private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> 
         else -> listOf(this)
     }
 }
+
+private fun Declaration.isOpen() = this !is ObjectLiteralDeclaration
 
 internal class DocumentConverter(
         private val moduleNode: ModuleNode,
@@ -341,7 +346,7 @@ internal class DocumentConverter(
         }
     }
 
-    private fun MemberDeclaration.process(owner: ClassLikeNode): List<MemberModel> {
+    private fun MemberDeclaration.process(owner: Declaration): List<MemberModel> {
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorDeclaration -> listOfNotNull(
@@ -368,7 +373,7 @@ internal class DocumentConverter(
                 operator = true,
                 annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
 
-                open = owner !is ObjectNode,
+                open = owner.isOpen(),
                 body = null
                 )
             )
@@ -380,7 +385,7 @@ internal class DocumentConverter(
                     typeParameters = emptyList(),
 
                     annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
-                    open = owner !is ObjectNode,
+                    open = owner.isOpen(),
                     override = null,
 
                     static = false,
@@ -401,7 +406,7 @@ internal class DocumentConverter(
                         typeParameters = emptyList(),
 
                         annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
-                        open = owner !is ObjectNode,
+                        open = owner.isOpen(),
                         override = null,
 
                         static = false,
@@ -430,7 +435,7 @@ internal class DocumentConverter(
                                     setter = false,
                                     initializer = null,
                                     explicitlyDeclaredType = true,
-                                    open = owner !is ObjectNode,
+                                    open = owner.isOpen(),
                                     lateinit = false
                             )
                     )
@@ -444,7 +449,7 @@ internal class DocumentConverter(
                         static = isStatic(),
                         override = null,
                         annotations = emptyList(),
-                        open = owner !is ObjectNode,
+                        open = owner.isOpen(),
                         body = null,
                         operator = false
                     ))
@@ -461,7 +466,7 @@ internal class DocumentConverter(
                     override = null,
                     annotations = emptyList(),
                     operator = false,
-                    open = owner !is ObjectNode,
+                    open = owner.isOpen(),
                     body = body?.let {
                              val convertedBody = expressionConverter.convertBlock(it)
                              if (isGenerator) {
@@ -484,7 +489,7 @@ internal class DocumentConverter(
                         initializer = initializer,
                         getter = optional,
                         setter = optional, // TODO: it's actually wrong
-                        open = owner !is ObjectNode,
+                        open = owner.isOpen(),
                         explicitlyDeclaredType = explicitlyDeclaredType,
                         lateinit = !rootIsDeclaration && (initializer == null)
                 ))
@@ -709,36 +714,61 @@ internal class DocumentConverter(
                 )
             }
             is VariableDeclaration -> {
+                val variableType = type
+
                 val nameResolved = if (moduleOwner.packageName.isStringLiteral()) {
                     (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)
                 }
-                VariableModel(
-                        name = nameResolved,
-                        type = type.process(),
-                        annotations = exportQualifierMap[uid].toAnnotation(),
-                        immutable = exportQualifierMap[uid] is JsModule,
-                        inline = false,
-                        external = true,
-                        initializer = null,
-                        get = null,
-                        set = null,
-                        typeParameters = emptyList(),
-                        extend = null,
-                        visibilityModifier = VisibilityModifierModel.DEFAULT,
-                        comment = null,
-                        explicitlyDeclaredType = explicitlyDeclaredType
-                )
+
+                return if (variableType is ObjectLiteralDeclaration) {
+                    if (variableType.canBeJson()) {
+                        VariableModel(
+                                name = nameResolved,
+                                type = JSON_TYPE,
+                                annotations = mutableListOf(),
+                                immutable = false,
+                                inline = false,
+                                external = true,
+                                initializer = null,
+                                get = null,
+                                set = null,
+                                typeParameters = emptyList(),
+                                extend = null,
+                                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                                comment = null,
+                                explicitlyDeclaredType = explicitlyDeclaredType
+                        )
+                    } else {
+                        ObjectModel(
+                                name = IdentifierEntity(name),
+                                members = variableType.members.flatMap { member -> member.process(variableType) },
+                                parentEntities = emptyList(),
+                                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                                comment = null,
+                                external = hasDeclareModifier()
+                        )
+                    }
+                } else {
+                    VariableModel(
+                            name = nameResolved,
+                            type = type.process(),
+                            annotations = exportQualifierMap[uid].toAnnotation(),
+                            immutable = exportQualifierMap[uid] is JsModule,
+                            inline = false,
+                            external = true,
+                            initializer = null,
+                            get = null,
+                            set = null,
+                            typeParameters = emptyList(),
+                            extend = null,
+                            visibilityModifier = VisibilityModifierModel.DEFAULT,
+                            comment = null,
+                            explicitlyDeclaredType = explicitlyDeclaredType
+                    )
+                }
             }
-            is ObjectNode -> ObjectModel(
-                    name = name,
-                    members = members.flatMap { member -> member.process(this) },
-                    parentEntities = convertParentEntities(parentEntities),
-                    visibilityModifier = VisibilityModifierModel.DEFAULT,
-                    comment = null,
-                    external = external
-            )
             is TypeAliasDeclaration -> {
                 if (typeReference is UnionTypeDeclaration) {
                     null

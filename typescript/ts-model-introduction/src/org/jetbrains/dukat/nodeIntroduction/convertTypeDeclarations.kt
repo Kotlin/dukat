@@ -10,6 +10,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IntersectionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
+import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
@@ -135,6 +136,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 params = params.map { param -> param.convertToNode() },
                 meta = metaData ?: meta
         )
+        is ObjectLiteralDeclaration -> copy(members = members.flatMap { member -> convertMemberDeclaration(member, true) })
         is LiteralUnionNode -> this
         else -> null
     }

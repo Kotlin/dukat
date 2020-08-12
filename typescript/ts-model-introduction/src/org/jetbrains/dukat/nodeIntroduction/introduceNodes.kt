@@ -4,7 +4,6 @@ import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.ImportNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
-import org.jetbrains.dukat.ast.model.nodes.ObjectNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -27,7 +26,6 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -41,7 +39,6 @@ import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
-import org.jetbrains.dukat.tsmodel.types.canBeJson
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
 
@@ -68,20 +65,66 @@ private fun NameEntity.unquote(): NameEntity {
     }
 }
 
+fun convertMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
+    return when (declaration) {
+        is MethodDeclaration -> listOf(
+                declaration.copy(
+                        type = declaration.type.convertToNode(),
+                        parameters = convertParameters(declaration.parameters)
+                )
+        )
+        is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).map { it }
+        is CallSignatureDeclaration -> listOf(declaration.convert())
+        is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
+        is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
+        is ConstructorDeclaration -> listOf(declaration.convert())
+        else -> raiseConcern("unkown member declaration ${declaration::class.java}") { emptyList<MemberDeclaration>() }
+    }
+}
+
+private fun convertParameters(parameters: List<ParameterDeclaration>): List<ParameterDeclaration> {
+    return parameters.map { param -> param.convertToNode() }
+}
+
+private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration {
+    return declaration.copy(
+            type = declaration.type.convertToNode(),
+            parameters = convertParameters(declaration.parameters)
+    )
+}
+
+fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyDeclaration {
+    val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
+    return declaration.copy(
+            type = parameterValueDeclaration.convertToNode(),
+            explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType
+    )
+}
+
+private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<IndexSignatureDeclaration> {
+    return listOf(
+            declaration.copy(
+                    parameters = convertParameters(declaration.parameters)
+            )
+    )
+}
+
+private fun CallSignatureDeclaration.convert(): CallSignatureDeclaration {
+    return copy(
+            parameters = convertParameters(parameters),
+            type = type.convertToNode()
+    )
+}
+
+private fun ConstructorDeclaration.convert(): ConstructorDeclaration {
+    return copy(
+            parameters = convertParameters(parameters)
+    )
+}
+
 
 private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 
-    fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyDeclaration {
-        val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
-        return declaration.copy(
-                type = parameterValueDeclaration.convertToNode(),
-                explicitlyDeclaredType = inDeclaredDeclaration || declaration.explicitlyDeclaredType
-        )
-    }
-
-    private fun convertParameters(parameters: List<ParameterDeclaration>): List<ParameterDeclaration> {
-        return parameters.map { param -> param.convertToNode() }
-    }
 
     private fun convertTypeParameters(typeParams: List<TypeParameterDeclaration>): List<TypeDeclaration> {
         return typeParams.map { typeParam ->
@@ -92,28 +135,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         }
     }
 
-    private fun convertMethodSignatureDeclaration(declaration: MethodSignatureDeclaration): MemberDeclaration {
-        return declaration.copy(
-            type = declaration.type.convertToNode(),
-            parameters = convertParameters(declaration.parameters)
-        )
-    }
-
-    private fun convertIndexSignatureDeclaration(declaration: IndexSignatureDeclaration): List<IndexSignatureDeclaration> {
-        return listOf(
-            declaration.copy(
-                parameters = convertParameters(declaration.parameters)
-            )
-        )
-    }
-
-
-    private fun CallSignatureDeclaration.convert(): CallSignatureDeclaration {
-        return copy(
-            parameters = convertParameters(parameters),
-            type = type.convertToNode()
-        )
-    }
 
     private fun convertToHeritageNodes(declarations: List<HeritageClauseDeclaration>): List<HeritageClauseDeclaration> {
         return declarations.map { declaration ->
@@ -129,7 +150,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     private fun ClassDeclaration.convert(): ClassNode {
         return ClassNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member, rootIsDeclaration || hasDeclareModifier()) },
+                members.flatMap { member -> convertMemberDeclaration(member, rootIsDeclaration || hasDeclareModifier()) },
                 typeParameters.map { typeParameter ->
                     TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                 },
@@ -143,7 +164,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     private fun InterfaceDeclaration.convert(): TopLevelDeclaration {
         return InterfaceNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member, true) },
+                members.flatMap { member -> convertMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 false,
@@ -156,19 +177,12 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
         return InterfaceNode(
                 name,
-                members.flatMap { member -> lowerMemberDeclaration(member, true) },
+                members.flatMap { member -> convertMemberDeclaration(member, true) },
                 convertTypeParameters(typeParameters),
                 convertToHeritageNodes(parentEntities),
                 true,
                 uid,
                 true
-        )
-    }
-
-
-    private fun ConstructorDeclaration.convert(): ConstructorDeclaration {
-        return copy(
-                parameters = convertParameters(parameters)
         )
     }
 
@@ -189,52 +203,12 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         )
     }
 
-    fun lowerMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: Boolean): List<MemberDeclaration> {
-        return when (declaration) {
-            is MethodDeclaration -> listOf(
-                declaration.copy(
-                    type = declaration.type.convertToNode(),
-                    parameters = convertParameters(declaration.parameters)
-                )
-            )
-            is MethodSignatureDeclaration -> listOf(convertMethodSignatureDeclaration(declaration)).map { it }
-            is CallSignatureDeclaration -> listOf(declaration.convert())
-            is PropertyDeclaration -> listOf(convertPropertyDeclaration(declaration, inDeclaredDeclaration))
-            is IndexSignatureDeclaration -> convertIndexSignatureDeclaration(declaration)
-            is ConstructorDeclaration -> listOf(declaration.convert())
-            else -> raiseConcern("unkown member declaration ${declaration::class.java}") { emptyList<MemberDeclaration>() }
-        }
-    }
-
-    fun lowerVariableDeclaration(declaration: VariableDeclaration): TopLevelDeclaration {
+    fun lowerVariableDeclaration(declaration: VariableDeclaration): VariableDeclaration {
         val type = declaration.type
-        return if (type is ObjectLiteralDeclaration) {
-            if (type.canBeJson()) {
-                VariableDeclaration(
-                        name = declaration.name,
-                        type = TypeDeclaration(IdentifierEntity("Json"), emptyList()),
-                        uid = declaration.uid,
-                        modifiers = emptySet(),
-                        explicitlyDeclaredType = rootIsDeclaration || declaration.explicitlyDeclaredType,
-                        definitionsInfo = emptyList(),
-                        initializer = null
-                )
-            } else {
-                //TODO: don't forget to create owner
-                ObjectNode(
-                        IdentifierEntity(declaration.name),
-                        type.members.flatMap { member -> lowerMemberDeclaration(member, rootIsDeclaration || declaration.hasDeclareModifier()) },
-                        emptyList(),
-                        declaration.uid,
-                        declaration.hasDeclareModifier()
-                )
-            }
-        } else {
-            declaration.copy(
-                    type = type.convertToNode(),
-                    explicitlyDeclaredType = rootIsDeclaration || declaration.explicitlyDeclaredType
-            )
-        }
+        return declaration.copy(
+                type = type.convertToNode(),
+                explicitlyDeclaredType = rootIsDeclaration || declaration.explicitlyDeclaredType
+        )
     }
 
     private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?): TopLevelDeclaration? {
