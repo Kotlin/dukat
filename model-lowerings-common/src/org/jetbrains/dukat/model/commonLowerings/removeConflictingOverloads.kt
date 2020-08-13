@@ -170,7 +170,10 @@ class RemoveConflictingOverloads : ModelLowering {
             }
         }
 
-        val moduleResolved = module.copy(declarations = declarationsResolved)
+        val moduleResolved = module.copy(
+            declarations = declarationsResolved,
+            submodules = module.submodules.map { lower(it) }
+        )
         return ConflictingOverloads().lowerRoot(moduleResolved, NodeOwner(moduleResolved, null))
     }
 }

@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.ImportModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
@@ -11,6 +12,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 
 data class ResolvedClassLike<T : ClassLikeModel>(
@@ -82,26 +84,45 @@ class ModelContext(sourceSetModel: SourceSetModel) {
         myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
     }
 
-    fun unalias(typeModel: TypeValueModel): TypeModel {
-        val typeResolved = myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
-            if (typeReference is TypeValueModel) {
-                unalias(typeReference)
-            } else {
-                typeReference
-            }
-        } ?: typeModel
+    fun unalias(typeModel: TypeModel, paramSubstitutions: Map<NameEntity, TypeModel> = mapOf()): TypeModel {
+        val typeResolved = when (typeModel) {
+            is TypeValueModel -> myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
+                if (typeReference is TypeValueModel) {
+                    unalias(typeReference, paramSubstitutions)
+                } else {
+                    typeReference
+                }
+            } ?: typeModel
+            else -> typeModel
+        }
 
-        return if (typeResolved is TypeValueModel) {
-            typeResolved.copy(params = typeResolved.params.map { param ->
-                param.copy(
-                        type = when (param.type) {
-                            is TypeValueModel -> unalias(param.type as TypeValueModel)
-                            else -> param.type
-                        }
+        val newParamSubstitutions = when (typeModel) {
+            is TypeValueModel -> {
+                val aliasParamNames = myAliases[typeModel.fqName]?.typeParameters?.mapNotNull {
+                    (it.type as? TypeValueModel)?.value
+                }
+                val actualParams = typeModel.params.map { it.type }
+                aliasParamNames?.zip(actualParams)?.toMap() ?: emptyMap()
+            }
+            else -> emptyMap()
+        }
+
+        return when (typeResolved) {
+            is TypeValueModel -> {
+                typeResolved.copy(params = typeResolved.params.map { param ->
+                    param.copy(type = unalias(param.type, paramSubstitutions + newParamSubstitutions))
+                })
+            }
+            is FunctionTypeModel -> {
+                typeResolved.copy(
+                    parameters = typeResolved.parameters.map { parameter ->
+                        parameter.copy(type = unalias(parameter.type, paramSubstitutions + newParamSubstitutions))
+                    },
+                    type = unalias(typeResolved.type, paramSubstitutions + newParamSubstitutions)
                 )
-            })
-        } else {
-            typeResolved
+            }
+            is TypeParameterReferenceModel -> paramSubstitutions[typeResolved.name] ?: typeResolved
+            else -> typeResolved
         }
     }
 
