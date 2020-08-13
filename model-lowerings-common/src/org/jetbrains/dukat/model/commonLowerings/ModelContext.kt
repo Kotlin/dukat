@@ -84,50 +84,46 @@ class ModelContext(sourceSetModel: SourceSetModel) {
         myAliases[ownerName.appendLeft(typeAlias.name)] = typeAlias
     }
 
-    private fun processSubtypes(type: TypeModel, paramSubstitutions: Map<NameEntity, TypeModel>): TypeModel {
-        return when (type) {
+    fun unalias(typeModel: TypeModel, paramSubstitutions: Map<NameEntity, TypeModel> = mapOf()): TypeModel {
+        val typeResolved = when (typeModel) {
+            is TypeValueModel -> myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
+                if (typeReference is TypeValueModel) {
+                    unalias(typeReference, paramSubstitutions)
+                } else {
+                    typeReference
+                }
+            } ?: typeModel
+            else -> typeModel
+        }
+
+        val newParamSubstitutions = when (typeModel) {
             is TypeValueModel -> {
-                type.copy(params = type.params.map { param ->
-                    param.copy(
-                        type = processSubtypes(
-                            when (val oldType = param.type) {
-                                is TypeValueModel -> unalias(oldType)
-                                else -> oldType
-                            },
-                            paramSubstitutions
-                        )
-                    )
+                val aliasParamNames = myAliases[typeModel.fqName]?.typeParameters?.mapNotNull {
+                    (it.type as? TypeValueModel)?.value
+                }
+                val actualParams = typeModel.params.map { it.type }
+                aliasParamNames?.zip(actualParams)?.toMap() ?: emptyMap()
+            }
+            else -> emptyMap()
+        }
+
+        return when (typeResolved) {
+            is TypeValueModel -> {
+                typeResolved.copy(params = typeResolved.params.map { param ->
+                    param.copy(type = unalias(param.type, paramSubstitutions + newParamSubstitutions))
                 })
             }
             is FunctionTypeModel -> {
-                type.copy(
-                    parameters = type.parameters.map { parameter ->
-                        parameter.copy(type = processSubtypes(parameter.type, paramSubstitutions))
+                typeResolved.copy(
+                    parameters = typeResolved.parameters.map { parameter ->
+                        parameter.copy(type = unalias(parameter.type, paramSubstitutions + newParamSubstitutions))
                     },
-                    type = processSubtypes(type.type, paramSubstitutions)
+                    type = unalias(typeResolved.type, paramSubstitutions + newParamSubstitutions)
                 )
             }
-            is TypeParameterReferenceModel -> paramSubstitutions[type.name] ?: type
-            else -> type
+            is TypeParameterReferenceModel -> paramSubstitutions[typeResolved.name] ?: typeResolved
+            else -> typeResolved
         }
-    }
-
-    fun unalias(typeModel: TypeValueModel): TypeModel {
-        val typeResolved = myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
-            if (typeReference is TypeValueModel) {
-                unalias(typeReference)
-            } else {
-                typeReference
-            }
-        } ?: typeModel
-
-        val aliasParamNames = myAliases[typeModel.fqName]?.typeParameters?.mapNotNull {
-            (it.type as? TypeValueModel)?.value
-        }
-        val actualParams = typeModel.params.map { it.type }
-        val paramSubstitutions = aliasParamNames?.zip(actualParams)?.toMap() ?: emptyMap()
-
-        return processSubtypes(typeResolved, paramSubstitutions)
     }
 
     private fun resolveInterface(name: NameEntity?): ResolvedClassLike<InterfaceModel>? {
