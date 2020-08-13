@@ -31,6 +31,6 @@ class CliBodyTranslator : CliTranslator() {
             ConstNameResolver(moduleName)
         }
 
-        translateWithBodyBinaryBundle(binData, dirName, moduleNameResolver, null, reportPath)
+        translateWithBodyBinaryBundle(binData, dirName, moduleNameResolver, null, reportPath, null)
     }
 }

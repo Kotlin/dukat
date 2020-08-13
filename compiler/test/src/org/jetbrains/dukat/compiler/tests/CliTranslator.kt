@@ -43,7 +43,7 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binData, dirName, JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null)), reportPath, withDescriptors)
+        translateBinaryBundle(binData, dirName, JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null)), reportPath, withDescriptors, null)
     }
 }
 

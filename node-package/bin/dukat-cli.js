@@ -74,7 +74,7 @@ function getStdLib() {
 
 function processArgs(args) {
     var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
-    var ordinary_args = new Set(["--descriptors"]);
+    var ordinary_args = new Set(["--descriptors", "--no-header"]);
     var count = 0;
 
     var binaryOutput = null;
@@ -145,9 +145,9 @@ function createReadableStream(binary, onData, onEnd) {
 
 function cliMode(args) {
     var packageDir = path.resolve(__dirname, "..");
+    var version = require(path.resolve(packageDir, "package.json")).version;
 
     if (args[0] == "-v" || args[0] == "version") {
-        var version = require(path.resolve(packageDir, "package.json")).version;
         console.log("dukat version " + version);
         return;
     }
@@ -178,7 +178,8 @@ function cliMode(args) {
 
             var commandArgs = [
                 "-Ddukat.cli.internal.packagedir=" + packageDir,
-                "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+                "-cp", classPath, "org.jetbrains.dukat.cli.CliKt",
+                version].concat(args);
 
             var dukatProcess = run(java, commandArgs);
             inputStream.pipe(dukatProcess.stdin);
@@ -196,7 +197,8 @@ function cliMode(args) {
     } else if (is_idl) {
         var commandArgs = [
             "-Ddukat.cli.internal.packagedir=" + packageDir,
-            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt",
+            version].concat(args);
 
         return run(java, commandArgs);
     }
