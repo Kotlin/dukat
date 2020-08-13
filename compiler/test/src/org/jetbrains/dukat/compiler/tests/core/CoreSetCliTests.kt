@@ -7,7 +7,6 @@ import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
@@ -41,7 +40,7 @@ open class CoreSetCliTests {
         assertContentEqualsBinary(name, tsPath, ktPath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
-    open fun getTranslator(): CliTranslator = createStandardCliTranslator()
+    open fun getTranslator(): CliTranslator = CliTranslator()
 
     companion object {
         @JvmStatic

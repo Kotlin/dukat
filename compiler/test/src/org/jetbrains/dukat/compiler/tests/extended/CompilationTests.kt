@@ -2,7 +2,6 @@ package org.jetbrains.dukat.compiler.tests.extended
 
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
-import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
@@ -38,7 +37,7 @@ private class TiedPrintStream(private val mainStream: PrintStream, private val s
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class, TestsEnded::class)
 abstract class CompilationTests {
 
-    protected fun getTranslator(): CliTranslator = createStandardCliTranslator()
+    protected fun getTranslator(): CliTranslator = CliTranslator()
 
     companion object {
         val COMPILATION_ERROR_ASSERTION = "COMPILATION ERROR"

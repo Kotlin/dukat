@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TopNCompilationTests" type="JUnit" factoryName="JUnit" singleton="false" nameIsGenerated="true">
-    <module name="dukat.compiler.test" />
+    <module name="compiler_test" />
     <useClassPathOnly />
     <extension name="coverage">
       <pattern>
@@ -12,7 +12,7 @@
     <option name="MAIN_CLASS_NAME" value="org.jetbrains.dukat.compiler.tests.extended.TopNCompilationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
-    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended.topn=true -Ddukat.test.resources.topN=./build/tests/topN -Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent" />
+    <option name="VM_PARAMETERS" value="-Ddukat.test.failure.always=true -Ddukat.test.extended.topn=true -Ddukat.test.resources.topN=./build/tests/topN -Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent -Ddukat.test.omitSuppressAnnotations=false" />
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <envs>

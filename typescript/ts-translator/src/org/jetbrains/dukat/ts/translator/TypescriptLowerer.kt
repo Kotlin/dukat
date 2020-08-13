@@ -57,7 +57,8 @@ import org.jetbrains.dukat.nodeIntroduction.introduceModels
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
-        private val packageName: NameEntity?
+        private val packageName: NameEntity?,
+        private val addSuppressAnnotations: Boolean
 ) : ECMAScriptLowerer {
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
@@ -118,7 +119,7 @@ open class TypescriptLowerer(
                         RemoveDuplicateMembers(),
                         RearrangeConstructors(),
                         AddImports(),
-                        AddStandardImportsAndAnnotations()
+                        AddStandardImportsAndAnnotations(addSuppressAnnotations)
                 )
 
         return models

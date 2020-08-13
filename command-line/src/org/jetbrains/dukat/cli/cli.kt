@@ -310,7 +310,7 @@ fun main(vararg args: String) {
 
         when {
             isDTsTranslation -> {
-                val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName))
+                val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName, true))
                 val sourceSet = translator.translate(System.`in`.readBytes())
                 translateSourceSet(
                         sourceSet,

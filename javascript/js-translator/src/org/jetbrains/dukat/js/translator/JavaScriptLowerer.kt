@@ -7,7 +7,7 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import org.jetbrains.dukat.tsLowerings.mergeDuplicates.mergeDuplicates
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
-class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver, null) {
+class JavaScriptLowerer(nameResolver: ModuleNameResolver) : TypescriptLowerer(nameResolver, null, true) {
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         return super.lower(
                 sourceSet

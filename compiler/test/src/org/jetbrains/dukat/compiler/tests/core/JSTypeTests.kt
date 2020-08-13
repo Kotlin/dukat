@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.compiler.tests.core
 
+import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
-import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
@@ -29,7 +29,7 @@ class JSTypeTests : OutputTests() {
         assertContentEqualsBinary(name, jsPath, ktPath)
     }
 
-    override fun getTranslator(): InputTranslator<String> = createStandardCliTranslator(JavaScriptLowerer(ConstNameResolver()))
+    override fun getTranslator(): InputTranslator<String> = CliTranslator(JavaScriptLowerer(ConstNameResolver()))
 
     companion object {
         @JvmStatic

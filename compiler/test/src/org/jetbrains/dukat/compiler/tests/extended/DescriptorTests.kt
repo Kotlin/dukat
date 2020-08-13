@@ -3,8 +3,8 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.cli.compileUnits
+import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
-import org.jetbrains.dukat.compiler.tests.createStandardCliTranslator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
@@ -14,7 +14,6 @@ import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
 import org.jetbrains.kotlin.name.FqName
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -70,7 +69,7 @@ class DescriptorTests {
     }
 
     companion object {
-        private val translator = createStandardCliTranslator()
+        private val translator = CliTranslator()
 
         private val skippedDescriptorTests = setOf(
                 "class/inheritance/overrides",
