@@ -2,7 +2,7 @@ package org.jetbrains.dukat.compiler.tests
 
 import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.cli.translateBinaryBundle
+import org.jetbrains.dukat.cli.translateSourceSet
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
@@ -43,7 +43,8 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
             ConstNameResolver(moduleName)
         }
 
-        translateBinaryBundle(binData, dirName, JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null)), reportPath, withDescriptors)
+        val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null))
+        translateSourceSet(translator.translate(binData), dirName, reportPath, withDescriptors)
     }
 }
 

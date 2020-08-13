@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
 import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
@@ -45,18 +46,17 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-fun translateBinaryBundle(
-        input: ByteArray,
+fun translateSourceSet(
+        sourceSet: SourceSetModel,
         outDir: String?,
-        translator: InputTranslator<ByteArray>,
         pathToReport: String?,
         generateDescriptors: Boolean
 ) {
     if (!generateDescriptors) {
-        val translatedUnits = translateModule(input, translator)
+        val translatedUnits = translateModule(sourceSet)
         compileUnits(translatedUnits, outDir, pathToReport)
     } else {
-        writeDescriptorsToFile(translator, input, outDir ?: "./")
+        writeDescriptorsToFile(sourceSet, outDir ?: "./")
     }
 }
 
@@ -310,20 +310,22 @@ fun main(vararg args: String) {
 
         when {
             isDTsTranslation -> {
-                translateBinaryBundle(
-                        System.`in`.readBytes(),
+                val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName))
+                val sourceSet = translator.translate(System.`in`.readBytes())
+                translateSourceSet(
+                        sourceSet,
                         options.outDir,
-                        JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName)),
                         options.reportPath,
                         options.generateDescriptors
                 )
             }
 
             isJsTranslation -> {
-                translateBinaryBundle(
-                        System.`in`.readBytes(),
+                val translator = JsRuntimeByteArrayTranslator(JavaScriptLowerer(moduleResolver))
+                val sourceSet = translator.translate(System.`in`.readBytes())
+                translateSourceSet(
+                        sourceSet,
                         options.outDir,
-                        JsRuntimeByteArrayTranslator(JavaScriptLowerer(moduleResolver)),
                         options.reportPath,
                         options.generateDescriptors
                 )

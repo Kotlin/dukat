@@ -1,8 +1,8 @@
 package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astModel.SourceFileModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
-import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
@@ -13,9 +13,7 @@ import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.utils.JsMetadataVersion
 import java.io.File
 
-fun writeDescriptorsToFile(translator: InputTranslator<ByteArray>, data: ByteArray, outputDir: String) {
-    val sourceSet = translator.translate(data)
-
+fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String) {
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
