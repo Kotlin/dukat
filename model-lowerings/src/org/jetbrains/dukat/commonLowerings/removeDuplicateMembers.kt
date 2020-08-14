@@ -47,12 +47,12 @@ private class RemoveDuplicateMembersLowering(private val context: ModelContext) 
         return members.distinctBy { it.asKey() }
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val declaration = ownerContext.node
         return super.lowerClassModel(ownerContext.copy(node = declaration.copy(members = declaration.distinctMembers())), parentModule)
     }
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val declaration = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(members = declaration.distinctMembers())), parentModule)
     }

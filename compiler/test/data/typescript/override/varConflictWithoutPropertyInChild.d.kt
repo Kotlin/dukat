@@ -1,4 +1,4 @@
-// [test] simple.kt
+// [test] varConflictWithoutPropertyInChild.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
@@ -16,15 +16,15 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface Foo {
-    fun bar()
-    fun bar(a: Number)
-    val baz: Any
+external open class B {
+    open val x: Boolean
 }
 
-external interface Boo : Foo {
-    override fun bar()
-    override fun bar(b: Number)
-    fun bar(c: String)
-    override var baz: Number
+external interface C {
+    val x: Boolean?
+        get() = definedExternally
+}
+
+external open class A : B, C {
+    override val x: Boolean
 }

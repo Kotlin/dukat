@@ -83,7 +83,9 @@ class DescriptorTests {
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
                 "misc/missedOverloads",
                 "stdlib/convertTsStdlib",
-                "typePredicate/simple"
+                "typePredicate/simple",
+                "override/varConflict",
+                "override/varConflictWithoutPropertyInChild"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 
         @JvmStatic

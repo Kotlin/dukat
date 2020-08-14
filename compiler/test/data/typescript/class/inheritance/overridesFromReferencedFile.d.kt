@@ -65,5 +65,5 @@ external interface BaseEvent {
     fun getElement(): Element
     fun <T : Shape> transform(shape: T = definedExternally): T
     fun getSortOfEventTarget(): SortOfEventTarget
-    var prop: Any
+    val prop: Any
 }

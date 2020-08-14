@@ -47,13 +47,13 @@ class RemoveRedundantTypeParamsLowering: TopLevelModelLowering {
         }
     }
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         return super.lowerInterfaceModel(ownerContext.copy(node = ownerContext.node.copy(
             members = ownerContext.node.members.map { member -> lowerMemberModel(ownerContext.wrap(member)) }
         )), parentModule)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         return super.lowerClassModel(ownerContext.copy(node = ownerContext.node.copy(
                 members = ownerContext.node.members.map { member -> lowerMemberModel(ownerContext.wrap(member)) }
         )), parentModule)

@@ -28,7 +28,7 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.TSLIBROOT
 import org.jetbrains.dukat.stdlibGenerator.generated.stdlibClassMethodsMap
 
-private data class MemberData(val fqName: NameEntity?, val memberModel: MemberModel, val ownerModel: ClassLikeModel)
+internal data class MemberData(val fqName: NameEntity?, val memberModel: MemberModel, val ownerModel: ClassLikeModel)
 
 internal enum class MemberOverrideStatus {
     IS_OVERRIDE,
@@ -37,18 +37,27 @@ internal enum class MemberOverrideStatus {
     IS_IMPOSSIBLE
 }
 
-private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
-    val graph = Graph<ClassLikeModel>()
+internal fun ClassLikeModel.getKnownParents(context: ModelContext): List<ResolvedClassLike<out ClassLikeModel>> {
+    return context.getAllParents(this)
+}
 
-    getClassLikeIterable().forEach { classLike ->
-        getAllParents(classLike).forEach { resolvedClassLike ->
-            graph.addEdge(classLike, resolvedClassLike.classLike)
+internal fun ClassLikeModel.allParentMembers(context: ModelContext): Map<NameEntity?, List<MemberData>> {
+    val memberMap = mutableMapOf<NameEntity?, MutableList<MemberData>>()
+
+    getKnownParents(context).forEach { resolvedClassLike ->
+        resolvedClassLike.classLike.members.forEach {
+            when (it) {
+                is NamedModel -> {
+                    if (!resolvedClassLike.existsOnlyInTsStdlib(it)) {
+                        memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, resolvedClassLike.classLike))
+                    }
+                }
+            }
         }
     }
 
-    return graph
+    return memberMap
 }
-
 
 private fun <T : ClassLikeModel> ResolvedClassLike<T>.existsOnlyInTsStdlib(member: NamedModel): Boolean {
     return (fqName?.startsWith(TSLIBROOT) == true && (stdlibClassMethodsMap.containsKey(classLike.name)) && (stdlibClassMethodsMap[classLike.name]?.contains(member.name) == false))
@@ -112,10 +121,6 @@ private class ClassLikeOverrideResolver(
             open = open,
             body = null
         )
-    }
-
-    private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
-        return context.getAllParents(this)
     }
 
     private fun MethodModel.removeDefaultParamValues(override: NameEntity?): MethodModel {
@@ -236,24 +241,6 @@ private class ClassLikeOverrideResolver(
         }
     }
 
-    private fun ClassLikeModel.allParentMembers(): Map<NameEntity?, List<MemberData>> {
-        val memberMap = mutableMapOf<NameEntity?, MutableList<MemberData>>()
-
-        getKnownParents().forEach { resolvedClassLike ->
-            resolvedClassLike.classLike.members.forEach {
-                when (it) {
-                    is NamedModel -> {
-                        if (!resolvedClassLike.existsOnlyInTsStdlib(it)) {
-                            memberMap.getOrPut(it.name) { mutableListOf() }.add(MemberData(resolvedClassLike.fqName, it, resolvedClassLike.classLike))
-                        }
-                    }
-                }
-            }
-        }
-
-        return memberMap
-    }
-
     private fun MethodModel.isSpecialCase(): Boolean {
         val returnType = type
 
@@ -277,7 +264,7 @@ private class ClassLikeOverrideResolver(
     }
 
     fun resolve(): ClassLikeModel {
-        val parentMembers = classLike.allParentMembers()
+        val parentMembers = classLike.allParentMembers(context)
 
         val membersLowered = classLike.members.flatMap { member ->
             member.lowerOverrides(parentMembers)

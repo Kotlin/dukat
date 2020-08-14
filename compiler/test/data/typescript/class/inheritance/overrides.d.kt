@@ -29,7 +29,7 @@ external interface BaseEvent {
     fun getDelegateTarget(): Shape
     fun getElement(): Element
     fun <T : Shape> transform(shape: T = definedExternally): T
-    var prop: Any
+    val prop: Any
     fun queryByReturnType(query: String, parameters: Array<Any> = definedExternally): InvariantBox<Any>
     var thisIsNullable: String?
 }
@@ -49,7 +49,7 @@ external interface NumberEvent : BaseEvent {
 }
 
 external open class ParentClass {
-    open var prop: Any
+    open val prop: Any
     open fun ping(message: String)
 }
 
