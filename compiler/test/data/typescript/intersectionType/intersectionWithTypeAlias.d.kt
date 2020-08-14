@@ -29,6 +29,6 @@ external interface `T$1` {
     var scale: Number
 }
 
-external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` | Coordinates & `T$1` | Coordinates & `T$1` */, b: Coordinates /* Coordinates & `T$0` | Coordinates & `T$1` | Coordinates & `T$0` | Coordinates & `T$1` */): dynamic /* Coordinates | Coordinates */
+external fun bestCoordinates(a: Coordinates /* Coordinates & `T$0` | Coordinates & `T$1` | Coordinates & `T$1` */, b: Coordinates /* Coordinates & `T$0` | Coordinates & `T$1` | Coordinates & `T$0` | Coordinates & `T$1` */): dynamic /* Coordinates & `T$0` | Coordinates & `T$1` */
 
 external open class WithTrickyConstuctor(scales: Coordinates /* Coordinates & `T$0` */)

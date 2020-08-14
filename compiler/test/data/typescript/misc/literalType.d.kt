@@ -33,7 +33,7 @@ external interface Foo {
         set(value) = definedExternally
     var floatSeed: Number /* 1.34 | 5.66 | 7.22 */
     var stringSeed: String /* "a" | "b" | "c" */
-    var alphaNumeric: dynamic /* Number | Number | String | String */
+    var alphaNumeric: dynamic /* 3 | 20 | "3" | "20" */
         get() = definedExternally
         set(value) = definedExternally
     var alwaysTrue: Boolean
