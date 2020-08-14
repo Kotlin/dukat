@@ -208,7 +208,10 @@ internal class DocumentConverter(
 
     private fun UnionTypeDeclaration.convertMeta(): String {
         return params.joinToString(" | ") { unionMember ->
-            unionMember.process().translate()
+            when (val typeModel = unionMember.process()) {
+                is TypeValueModel -> typeModel.metaDescription ?: typeModel.translate()
+                else -> typeModel.translate()
+            }
         }
     }
 
