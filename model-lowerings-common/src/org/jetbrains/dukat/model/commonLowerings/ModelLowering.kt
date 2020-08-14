@@ -24,6 +24,6 @@ interface ComposableModelLowering : ModelLowering {
     }
 }
 
-fun SourceSetModel.lower(vararg lowerings: ModelLowering): SourceSetModel {
+fun SourceSetModel.lower(vararg lowerings: Lowering<SourceSetModel, SourceSetModel>): SourceSetModel {
     return lowerings.fold(this) { sourceSet, lowering -> lowering.lower(sourceSet) }
 }
