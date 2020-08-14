@@ -104,6 +104,7 @@ private fun MemberDeclaration.isStatic() = when (this) {
 internal sealed class TranslationContext {
     object IRRELEVANT : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
+    object PARAMETER : TranslationContext()
 }
 
 private data class Members(
@@ -117,12 +118,18 @@ data class FqNode(val node: Entity, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
+private val ANY_TYPE = TypeValueModel(value = IdentifierEntity("Any"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Any")), metaDescription = null)
 
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),
         emptyList(),
         metaDescription,
         null
+)
+
+private fun anyType(nullable: Boolean, metaDescription: String?) = ANY_TYPE.copy(
+    nullable = nullable,
+    metaDescription = metaDescription
 )
 
 // TODO: duplication, think of separate place to have this (but please don't call it utils )))
@@ -239,8 +246,30 @@ internal class DocumentConverter(
         return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
     }
 
+    private fun ParameterValueDeclaration.isNullable(): Boolean {
+        return when (this) {
+            is UnionTypeDeclaration -> nullable || params.any { it.isNullable() }
+            is TypeParamReferenceDeclaration -> true
+            else -> nullable
+        }
+    }
+
+    private fun UnionTypeDeclaration.process(context: TranslationContext): TypeModel {
+        return when (context) {
+            TranslationContext.PARAMETER -> anyType(isNullable(), convertMeta())
+            else -> dynamicType(convertMeta())
+        }
+    }
+
+    private fun TupleDeclaration.process(context: TranslationContext): TypeModel {
+        val meta = "JsTuple<${params.map { it.process(context).translate() }.joinToString(", ")}>"
+        return when (context) {
+            TranslationContext.PARAMETER -> anyType(isNullable(), meta)
+            else -> dynamicType(meta)
+        }
+    }
+
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
-        val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
             is LiteralUnionNode -> {
                 val value = when (kind) {
@@ -255,18 +284,8 @@ internal class DocumentConverter(
                         context == TranslationContext.PROPERTY(true)
                 )
             }
-            is UnionTypeDeclaration -> TypeValueModel(
-                    dynamicName,
-                    emptyList(),
-                    convertMeta(),
-                    null
-            )
-            is TupleDeclaration -> TypeValueModel(
-                    dynamicName,
-                    emptyList(),
-                    "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
-                    null
-            )
+            is UnionTypeDeclaration -> process(context)
+            is TupleDeclaration -> process(context)
             is TypeParamReferenceDeclaration -> {
                 TypeParameterReferenceModel(
                         name = value,
@@ -281,7 +300,7 @@ internal class DocumentConverter(
                 } else {
                     TypeValueModel(
                             value,
-                            params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
+                            params.map { param -> param.process(context) }.map { TypeParameterModel(it, listOf()) },
                             meta.processMeta(),
                             getFqName(),
                             nullable
@@ -291,9 +310,9 @@ internal class DocumentConverter(
             is FunctionTypeDeclaration -> {
                 FunctionTypeModel(
                         parameters = (parameters.map { param ->
-                            param.processAsLambdaParam()
+                            param.processAsLambdaParam(context)
                         }),
-                        type = type.process(),
+                        type = type.process(context),
                         metaDescription = meta.processMeta(),
                         nullable = nullable
                 )
@@ -314,7 +333,7 @@ internal class DocumentConverter(
                     }
                     else -> typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                type = typeParam.process(),
+                                type = typeParam.process(context),
                                 constraints = emptyList()
                         )
                     }
@@ -329,13 +348,7 @@ internal class DocumentConverter(
 
             }
             else -> raiseConcern("unable to process TypeNode ${this}") {
-                TypeValueModel(
-                        IdentifierEntity("dynamic"),
-                        emptyList(),
-                        null,
-                        null,
-                        false
-                )
+                dynamicType()
             }
         }
     }
@@ -518,13 +531,13 @@ internal class DocumentConverter(
     }
 
 
-    private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+    private fun ParameterDeclaration.process(): ParameterModel {
         val initializerResolved = if (initializer != null || optional) {
             TypeDeclaration(IdentifierEntity("definedExternally"), emptyList())
         } else null
 
         return ParameterModel(
-                type = type.process(context),
+                type = type.process(TranslationContext.PARAMETER),
                 name = name,
                 initializer = when {
                     initializerResolved != null -> ExpressionStatementModel(

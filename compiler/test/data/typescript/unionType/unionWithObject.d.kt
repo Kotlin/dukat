@@ -27,7 +27,7 @@ external fun toTex(input: Equation?): String
 
 external fun toTex(input: Any?): String
 
-external fun toTex(input: Array<dynamic /* Fraction? | Any? */>?): String
+external fun toTex(input: Array<Any? /* Fraction? | Any? */>?): String
 
 external open class Equation
 

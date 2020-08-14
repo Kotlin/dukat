@@ -44,7 +44,7 @@ external fun stringOrMapKey(a: MultiMap<Number, String>)
 
 external var listOfStringOrNumber: dynamic /* String | List<dynamic /* String | Number */> */
 
-external fun listOfNumberOrString(a: List<dynamic /* Number | String */>)
+external fun listOfNumberOrString(a: List<Any /* Number | String */>)
 
 external var headers: MyHeaders
 

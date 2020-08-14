@@ -1,4 +1,4 @@
-// [test] redundantTypeParams.kt
+// [test] overloadConflict.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
@@ -16,13 +16,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface MyPromiseLike<T>
+external interface A<T>
 
-external interface MyPromise<T>
+external interface B<T>
 
-external interface MyPromiseConstructor {
-    fun <T> ping(a: T)
-    fun <T> pong(): T
-    fun <Y, Z> bang(condition: (y: Y) -> Boolean): () -> Z
-    fun all(values: Any /* JsTuple<Any?, Any?> | JsTuple<Any?, Any?, Any?> */): MyPromise<dynamic /* JsTuple<T1, T2> | JsTuple<T1, T2, T3> */>
+external interface Api {
+    fun <T> check(values: Array<T>): T
+    fun <T> check(values: Array<Any /* A<T> | B<T> */>): T
 }
