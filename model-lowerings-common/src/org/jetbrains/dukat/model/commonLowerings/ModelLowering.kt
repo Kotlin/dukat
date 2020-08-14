@@ -5,7 +5,9 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
 interface ModuleModelLowering {
-    fun lower(module: ModuleModel): ModuleModel
+    fun lower(module: ModuleModel): ModuleModel {
+        return module
+    }
 }
 
 interface ModelLowering : Lowering<SourceSetModel, SourceSetModel>, ModuleModelLowering {
