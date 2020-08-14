@@ -8,6 +8,7 @@ import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
 import org.jetbrains.dukat.astModel.ModuleModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
@@ -47,14 +48,23 @@ private class RemoveDuplicateMembersLowering(private val context: ModelContext) 
         return members.distinctBy { it.asKey() }
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    private fun ObjectModel.distinctMembers() : List<MemberModel> {
+        return members.distinctBy { it.asKey() }
+    }
+
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val declaration = ownerContext.node
         return super.lowerClassModel(ownerContext.copy(node = declaration.copy(members = declaration.distinctMembers())), parentModule)
     }
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val declaration = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(members = declaration.distinctMembers())), parentModule)
+    }
+
+    override fun lowerObjectModel(ownerContext: NodeOwner<ObjectModel>, parentModule: ModuleModel): ObjectModel {
+        val declaration = ownerContext.node
+        return super.lowerObjectModel(ownerContext.copy(node = declaration.copy(members = declaration.distinctMembers())), parentModule)
     }
 }
 

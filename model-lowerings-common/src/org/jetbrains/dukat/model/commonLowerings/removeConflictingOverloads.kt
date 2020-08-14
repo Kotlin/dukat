@@ -32,12 +32,12 @@ private fun TypeModel.withoutMeta(): TypeModel {
 }
 
 private class ConflictingOverloads : TopLevelModelLowering {
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val node = ownerContext.node.copy(members = ownerContext.node.resolveMembers())
         return super.lowerInterfaceModel(ownerContext.copy(node = node), parentModule)
     }
 
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val node = ownerContext.node.copy(members = ownerContext.node.resolveMembers())
         return super.lowerClassModel(ownerContext.copy(node = node), parentModule)
     }

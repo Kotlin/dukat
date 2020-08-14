@@ -20,12 +20,12 @@ private fun ClassLikeModel.removeParentAny(): List<HeritageModel> {
 }
 
 private class RemoveParentAnyLowering : TopLevelModelLowering {
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val node = ownerContext.node
         return super.lowerClassModel(ownerContext.copy(node = node.copy(parentEntities = node.removeParentAny())), parentModule)
     }
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel? {
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val node = ownerContext.node
         return super.lowerInterfaceModel(ownerContext.copy(node = node.copy(parentEntities = node.removeParentAny())), parentModule)
     }

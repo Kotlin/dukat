@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class RearrangeConstructorsLowering : TopLevelModelLowering {
-    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel? {
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val node = ownerContext.node
         val (constructors, members) = node.members.partition { it is ConstructorModel }
 
