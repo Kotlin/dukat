@@ -15,8 +15,8 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
     return when (this) {
-        is FunctionModel -> !inline
-        is VariableModel -> !inline
+        is FunctionModel -> external
+        is VariableModel -> external
         is TypeAliasModel -> false
         else -> true
     }
