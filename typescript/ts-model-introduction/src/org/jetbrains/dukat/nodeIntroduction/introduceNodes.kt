@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
@@ -35,7 +34,6 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 
@@ -145,20 +143,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         }
     }
 
-    private fun ClassDeclaration.convert(): ClassNode {
-        return ClassNode(
-                name,
-                members.flatMap { member -> convertMemberDeclaration(member, rootIsDeclaration || hasDeclareModifier()) },
-                typeParameters.map { typeParameter ->
-                    TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
-                },
-                convertToHeritageNodes(parentEntities),
-
-                uid,
-                rootIsDeclaration || hasDeclareModifier()
-        )
-    }
-
     private fun InterfaceDeclaration.convert(): TopLevelDeclaration {
         return InterfaceNode(
                 name,
@@ -211,7 +195,10 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> declaration.convert()
-            is ClassDeclaration -> declaration.convert()
+            is ClassDeclaration -> declaration.copy(
+                members = declaration.members.flatMap { member -> convertMemberDeclaration(member, rootIsDeclaration || declaration.hasDeclareModifier()) },
+                parentEntities = convertToHeritageNodes(declaration.parentEntities)
+            )
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> declaration.convert()
             is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName)

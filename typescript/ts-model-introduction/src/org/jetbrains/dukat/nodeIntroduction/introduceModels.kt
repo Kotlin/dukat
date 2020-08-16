@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -59,6 +58,8 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -210,6 +211,11 @@ internal class DocumentConverter(
     }
 
     private fun ClassLikeNode.processMembers(): Members {
+        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
+        return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
+    }
+
+    private fun ClassLikeDeclaration.processMembers(): Members {
         val (staticNodes, ownNodes) = members.partition { it.isStatic() }
         return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
@@ -651,11 +657,12 @@ internal class DocumentConverter(
         }
     }
 
-    private fun ClassNode.convertToClassModel(): ClassModel {
+    private fun ClassDeclaration.convertToClassModel(): ClassModel {
         val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
 
+        val external = rootIsDeclaration || hasDeclareModifier()
         return ClassModel(
                 name = name,
                 members = members.ownMembers,
@@ -671,7 +678,7 @@ internal class DocumentConverter(
                 } else {
                     null
                 },
-                typeParameters = convertTypeParams(typeParameters),
+                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                 parentEntities = parentModelEntities,
                 annotations = exportQualifierMap[uid].toAnnotation(),
                 comment = null,
@@ -711,7 +718,7 @@ internal class DocumentConverter(
 
     fun TopLevelEntity.convertToModel(moduleOwner: ModuleNode): TopLevelModel? {
         return when (this) {
-            is ClassNode -> convertToClassModel()
+            is ClassDeclaration -> convertToClassModel()
             is InterfaceNode -> convertToInterfaceModel()
             is EnumDeclaration -> {
                 EnumModel(
@@ -865,6 +872,10 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
     }
 
+    fun visitClassLike(declaration: ClassLikeDeclaration, owner: ModuleNode) {
+        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
+    }
+
     fun visitTypeAliasNode(declaration: TypeAliasDeclaration, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.aliasName)))
     }
@@ -873,10 +884,12 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(IdentifierEntity(declaration.name))))
     }
 
+
     fun visitModule(node: ModuleNode) {
         node.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
                 is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
+                is ClassLikeDeclaration -> visitClassLike(topLevelNode, node)
                 is TypeAliasDeclaration -> visitTypeAliasNode(topLevelNode, node)
                 is EnumDeclaration -> visitEnumNode(topLevelNode, node)
                 is ModuleNode -> visitModule(topLevelNode)
