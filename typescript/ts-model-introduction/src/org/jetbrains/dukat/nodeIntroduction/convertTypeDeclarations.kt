@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
@@ -18,13 +16,6 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 
-private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
-    return params.all { it is StringLiteralDeclaration }
-}
-
-private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
-    return params.all { it is NumericLiteralDeclaration }
-}
 
 enum class PARAMETER_CONTEXT {
     IRRELEVANT,
@@ -95,49 +86,17 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 it.convertToNodeNullable() ?: it
             }))
         }
-        is StringLiteralDeclaration -> {
-            LiteralUnionNode(
-                    params = listOf("\"$token\""),
-                    kind = UnionLiteralKind.STRING,
-                    nullable = nullable
+        is StringLiteralDeclaration -> this
+        is NumericLiteralDeclaration -> this
+        is UnionTypeDeclaration -> copy(
+                    params = params.map { param -> param.convertToNode() },
+                    meta = metaData ?: meta
             )
-        }
-        is NumericLiteralDeclaration -> {
-            LiteralUnionNode(
-                    params = listOf(token),
-                    kind = UnionLiteralKind.NUMBER,
-                    nullable = nullable
-            )
-        }
-        is UnionTypeDeclaration ->
-            when {
-                canBeTranslatedAsStringLiteral() -> {
-                    LiteralUnionNode(
-                            params = params.mapNotNull { (it as? StringLiteralDeclaration)?.token }.map { "\"$it\"" },
-                            kind = UnionLiteralKind.STRING,
-                            nullable = nullable
-                    )
-                }
-                canBeTranslatedAsNumericLiteral() -> {
-                    LiteralUnionNode(
-                            params = params.mapNotNull { (it as? NumericLiteralDeclaration)?.token },
-                            kind = UnionLiteralKind.NUMBER,
-                            nullable = nullable
-                    )
-                }
-                else -> {
-                    copy(
-                            params = params.map { param -> param.convertToNode() },
-                            meta = metaData ?: meta
-                    )
-                }
-            }
         is TupleDeclaration -> copy(
                 params = params.map { param -> param.convertToNode() },
                 meta = metaData ?: meta
         )
         is ObjectLiteralDeclaration -> copy(members = members.flatMap { member -> convertMemberDeclaration(member, true) })
-        is LiteralUnionNode -> this
         else -> null
     }
 }

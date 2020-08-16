@@ -3,10 +3,8 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
 import org.jetbrains.dukat.ast.model.nodes.ClassNode
 import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -83,8 +81,10 @@ import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -117,6 +117,14 @@ data class FqNode(val node: Entity, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
+
+private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
+    return params.all { it is StringLiteralDeclaration }
+}
+
+private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
+    return params.all { it is NumericLiteralDeclaration }
+}
 
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),
@@ -242,25 +250,46 @@ internal class DocumentConverter(
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
-            is LiteralUnionNode -> {
-                val value = when (kind) {
-                    UnionLiteralKind.NUMBER -> IdentifierEntity("Number")
-                    else -> IdentifierEntity("String")
-                }
+            is StringLiteralDeclaration -> {
+                    TypeValueModel(
+                        value = IdentifierEntity("String"),
+                        params = emptyList(),
+                        metaDescription = "\"$token\"",
+                        fqName = KLIBROOT.appendLeft(IdentifierEntity("String")),
+                        nullable = context == TranslationContext.PROPERTY(true)
+                    )
+            }
+            is NumericLiteralDeclaration -> {
                 TypeValueModel(
-                        value,
-                        emptyList(),
-                        params.joinToString(" | "),
-                        KLIBROOT.appendLeft(value),
-                        context == TranslationContext.PROPERTY(true)
+                        value = IdentifierEntity("Number"),
+                        params = emptyList(),
+                        metaDescription = token,
+                        fqName = KLIBROOT.appendLeft(IdentifierEntity("Number")),
+                        nullable = context == TranslationContext.PROPERTY(true)
                 )
             }
-            is UnionTypeDeclaration -> TypeValueModel(
-                    dynamicName,
-                    emptyList(),
-                    convertMeta(),
-                    null
-            )
+            is UnionTypeDeclaration -> when {
+                canBeTranslatedAsStringLiteral() -> TypeValueModel(
+                        IdentifierEntity("String"),
+                        emptyList(),
+                        convertMeta(),
+                        KLIBROOT.appendLeft(IdentifierEntity("String")),
+                        context == TranslationContext.PROPERTY(true)
+                )
+                canBeTranslatedAsNumericLiteral() -> TypeValueModel(
+                        IdentifierEntity("Number"),
+                        emptyList(),
+                        convertMeta(),
+                        KLIBROOT.appendLeft(IdentifierEntity("Number")),
+                        context == TranslationContext.PROPERTY(true)
+                )
+                else -> TypeValueModel(
+                        dynamicName,
+                        emptyList(),
+                        convertMeta(),
+                        null
+                )
+            }
             is TupleDeclaration -> TypeValueModel(
                     dynamicName,
                     emptyList(),
