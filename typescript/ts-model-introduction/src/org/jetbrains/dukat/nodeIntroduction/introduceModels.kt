@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -856,7 +855,7 @@ internal class DocumentConverter(
 
 
 private class NodeConverter(
-        private val node: SourceSetNode,
+        private val node: SourceSetDeclaration,
         private val uidToNameMapper: UidMapper,
         private val exportQualifierMap: Map<String?, ExportQualifier>
 ) {
@@ -871,13 +870,14 @@ private class NodeConverter(
                     val generated = mutableListOf<SourceFileModel>()
                     val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == ModuleDeclarationKind.DECLARATION_FILE, null).convert(source.fileName, generated)
 
+                    val referencedFiles = source.root.imports.map { it.referencedFile } + source.root.references.map { it.referencedFile }
+
                     val module = SourceFileModel(
-                            name = source.name,
+                            name = null,
                             fileName = fileName,
                             root = root,
-                            referencedFiles = source.referencedFiles.map { referenceFile ->
-                                val absolutePath = rootFile.resolveSibling(referenceFile).normalize().absolutePath
-                                absolutePath
+                            referencedFiles = referencedFiles.map { referenceFile ->
+                                rootFile.resolveSibling(referenceFile).normalize().absolutePath
                             })
 
                     generated + listOf(module)
@@ -915,7 +915,7 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         }
     }
 
-    fun process(sourceSet: SourceSetNode) {
+    fun process(sourceSet: SourceSetDeclaration) {
         sourceSet.sources.forEach { source -> visitModule(source.root, null) }
     }
 }

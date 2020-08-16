@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.MemberEntity
@@ -231,20 +229,16 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
 }
 
 
-class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
-    private fun SourceFileDeclaration.introduceNodes(): SourceFileNode {
-        val references = root.imports.map { it.referencedFile } + root.references.map { it.referencedFile }
-
-        return SourceFileNode(
+class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetDeclaration> {
+    private fun SourceFileDeclaration.introduceNodes(): SourceFileDeclaration {
+        return SourceFileDeclaration(
                 fileName,
-                LowerDeclarationsToNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE).lowerPackageDeclaration(root),
-                references,
-                null
+                LowerDeclarationsToNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE).lowerPackageDeclaration(root)
         )
     }
 
-    override fun lower(source: SourceSetDeclaration): SourceSetNode {
-        return SourceSetNode(sourceName = source.sourceName, sources = source.sources.map { sourceFile ->
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return SourceSetDeclaration(sourceName = source.sourceName, sources = source.sources.map { sourceFile ->
             sourceFile.introduceNodes()
         })
     }
