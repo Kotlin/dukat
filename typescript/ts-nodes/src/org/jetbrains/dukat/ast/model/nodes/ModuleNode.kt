@@ -10,6 +10,5 @@ data class ModuleNode(
         val declarations: List<TopLevelDeclaration> = emptyList(),
 
         var uid: String,
-        val external: Boolean,
         val kind: ModuleDeclarationKind
 ) : TopLevelDeclaration

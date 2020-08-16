@@ -235,7 +235,6 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 qualifiedPackageName = fullPackageName,
                 declarations = declarations,
                 uid = documentRoot.uid,
-                external = rootIsDeclaration,
                 kind  = documentRoot.kind
         )
     }
