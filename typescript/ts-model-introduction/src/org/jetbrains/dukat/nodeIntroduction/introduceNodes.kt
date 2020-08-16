@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -9,7 +8,6 @@ import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.TopLevelEntity
-import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -188,7 +186,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         )
     }
 
-    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity, ownerPackageName: NameEntity?): TopLevelDeclaration? {
+    private fun lowerTopLevelDeclaration(declaration: TopLevelEntity): TopLevelDeclaration? {
         return when (declaration) {
             is VariableDeclaration -> lowerVariableDeclaration(declaration)
             is FunctionDeclaration -> declaration.convert()
@@ -198,7 +196,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
             )
             is InterfaceDeclaration -> declaration.convert()
             is GeneratedInterfaceDeclaration -> declaration.convert()
-            is ModuleDeclaration -> lowerPackageDeclaration(declaration, ownerPackageName)
+            is ModuleDeclaration -> lowerPackageDeclaration(declaration)
             is EnumDeclaration -> declaration
             is TypeAliasDeclaration -> declaration.convert()
             else -> null
@@ -221,22 +219,13 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration, ownerPackageName: NameEntity?): ModuleNode {
-        val name = documentRoot.name
-
-        val shortName = name.unquote()
-        val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
-
+    fun lowerPackageDeclaration(documentRoot: ModuleDeclaration): ModuleDeclaration {
         val declarations = documentRoot.declarations.mapNotNull { declaration ->
-                lowerTopLevelDeclaration(declaration, fullPackageName)
+                lowerTopLevelDeclaration(declaration)
         }
 
-        return ModuleNode(
-                packageName = name,
-                qualifiedPackageName = fullPackageName,
-                declarations = declarations,
-                uid = documentRoot.uid,
-                kind  = documentRoot.kind
+        return documentRoot.copy(
+                declarations = declarations
         )
     }
 }
@@ -248,7 +237,7 @@ class IntroduceNodes : Lowering<SourceSetDeclaration, SourceSetNode> {
 
         return SourceFileNode(
                 fileName,
-                LowerDeclarationsToNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE).lowerPackageDeclaration(root, null),
+                LowerDeclarationsToNodes(root.kind == ModuleDeclarationKind.DECLARATION_FILE).lowerPackageDeclaration(root),
                 references,
                 null
         )

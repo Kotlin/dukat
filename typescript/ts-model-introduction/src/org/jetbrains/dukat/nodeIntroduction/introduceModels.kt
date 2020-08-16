@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.Entity
@@ -72,6 +71,8 @@ import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
@@ -147,11 +148,31 @@ private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> 
 
 private fun Declaration.isOpen() = this !is ObjectLiteralDeclaration
 
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+private fun escapeName(name: String): String {
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
+}
+
+private fun NameEntity.unquote(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> copy(value = escapeName(value.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")))
+        else -> this
+    }
+}
+
 internal class DocumentConverter(
-        private val moduleNode: ModuleNode,
+        private val moduleNode: ModuleDeclaration,
         private val uidToNameMapper: UidMapper,
         private val exportQualifierMap: Map<String?, ExportQualifier>,
-        private val rootIsDeclaration: Boolean
+        private val rootIsDeclaration: Boolean,
+        private val ownerPackageName: NameEntity?
 ) {
     private val imports = mutableListOf<ImportModel>()
     private val expressionConverter = ExpressionConverter { typeNode ->
@@ -160,9 +181,13 @@ internal class DocumentConverter(
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-        val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleNode }
 
-        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        val shortName = moduleNode.name.unquote()
+        val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
+
+        val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
+
+        val declarationsMapped = (roots as List<ModuleDeclaration>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration, fullPackageName).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
             declaration.convertToModel(moduleNode)
         }
 
@@ -184,13 +209,13 @@ internal class DocumentConverter(
 
         jsModuleQualifier?.qualifier?.let { qualifier ->
             if (qualifier) {
-                annotations.add(AnnotationModel("file:JsQualifier", listOf(moduleNode.qualifiedPackageName.process { unquote(it) })))
+                annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
             }
         }
 
         return ModuleModel(
-                name = moduleNode.qualifiedPackageName,
-                shortName = moduleNode.qualifiedPackageName.rightMost(),
+                name = fullPackageName,
+                shortName = fullPackageName.rightMost(),
                 declarations = declarationsFiltered,
                 annotations = annotations,
                 submodules = submodules,
@@ -710,7 +735,7 @@ internal class DocumentConverter(
         )
     }
 
-    fun TopLevelEntity.convertToModel(moduleOwner: ModuleNode): TopLevelModel? {
+    fun TopLevelEntity.convertToModel(moduleOwner: ModuleDeclaration): TopLevelModel? {
         return when (this) {
             is ClassDeclaration -> convertToClassModel()
             is InterfaceDeclaration -> convertToInterfaceModel()
@@ -752,7 +777,7 @@ internal class DocumentConverter(
             is VariableDeclaration -> {
                 val variableType = type
 
-                val nameResolved = if (moduleOwner.packageName.isStringLiteral()) {
+                val nameResolved = if (moduleOwner.name.isStringLiteral()) {
                     (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)
@@ -844,7 +869,7 @@ private class NodeConverter(
                     val fileName = rootFile.normalize().absolutePath
 
                     val generated = mutableListOf<SourceFileModel>()
-                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == org.jetbrains.dukat.tsmodel.ModuleDeclarationKind.DECLARATION_FILE).convert(source.fileName, generated)
+                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == ModuleDeclarationKind.DECLARATION_FILE, null).convert(source.fileName, generated)
 
                     val module = SourceFileModel(
                             name = source.name,
@@ -862,31 +887,36 @@ private class NodeConverter(
 }
 
 private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
-    fun visitClassLike(declaration: ClassLikeDeclaration, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
+    fun visitClassLike(declaration: ClassLikeDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(declaration.name)))
     }
 
-    fun visitTypeAlias(declaration: TypeAliasDeclaration, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.aliasName)))
+    fun visitTypeAlias(declaration: TypeAliasDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(declaration.aliasName)))
     }
 
-    fun visitEnum(declaration: EnumDeclaration, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(IdentifierEntity(declaration.name))))
+    fun visitEnum(declaration: EnumDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(IdentifierEntity(declaration.name))))
     }
 
-    fun visitModule(node: ModuleNode) {
+    fun visitModule(node: ModuleDeclaration, ownerPackageName: NameEntity?) {
+        val name = node.name
+
+        val shortName = name.unquote()
+        val qualifiedName = ownerPackageName?.appendLeft(shortName) ?: shortName
+
         node.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
-                is ClassLikeDeclaration -> visitClassLike(topLevelNode, node)
-                is TypeAliasDeclaration -> visitTypeAlias(topLevelNode, node)
-                is EnumDeclaration -> visitEnum(topLevelNode, node)
-                is ModuleNode -> visitModule(topLevelNode)
+                is ClassLikeDeclaration -> visitClassLike(topLevelNode, qualifiedName)
+                is TypeAliasDeclaration -> visitTypeAlias(topLevelNode, qualifiedName)
+                is EnumDeclaration -> visitEnum(topLevelNode, qualifiedName)
+                is ModuleDeclaration -> visitModule(topLevelNode, qualifiedName)
             }
         }
     }
 
     fun process(sourceSet: SourceSetNode) {
-        sourceSet.sources.forEach { source -> visitModule(source.root) }
+        sourceSet.sources.forEach { source -> visitModule(source.root, null) }
     }
 }
 
