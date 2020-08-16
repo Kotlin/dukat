@@ -22,6 +22,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
@@ -157,7 +158,7 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
                 typeParameters = typeParameters,
                 parentEntities = convertToHeritageNodes(parentEntities),
                 uid = uid,
-                modifiers = emptySet(),
+                modifiers = setOf(ModifierDeclaration.DECLARE_KEYWORD),
                 definitionsInfo = emptyList()
         )
     }
