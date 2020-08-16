@@ -96,7 +96,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
                 params = params.map { param -> param.convertToNode() },
                 meta = metaData ?: meta
         )
-        is ObjectLiteralDeclaration -> copy(members = members.flatMap { member -> convertMemberDeclaration(member, true) })
+        is ObjectLiteralDeclaration -> copy(members = members.mapNotNull { member -> convertMemberDeclaration(member, true) })
         else -> null
     }
 }

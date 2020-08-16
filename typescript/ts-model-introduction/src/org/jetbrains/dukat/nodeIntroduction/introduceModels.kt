@@ -67,6 +67,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -117,6 +118,10 @@ data class FqNode(val node: Entity, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
+
+private fun MemberOwnerDeclaration.convertMembers(): List<MemberDeclaration> {
+    return members.mapNotNull { member -> convertMemberDeclaration(member, true) }
+}
 
 private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
     return params.all { it is StringLiteralDeclaration }
@@ -234,7 +239,7 @@ internal class DocumentConverter(
     }
 
     private fun ClassLikeDeclaration.processMembers(): Members {
-        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
+        val (staticNodes, ownNodes) = convertMembers().partition { it.isStatic() }
         return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 
@@ -262,7 +267,7 @@ internal class DocumentConverter(
         }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
-                typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
+                typeParams = typeArguments.map { typeArgument -> typeArgument.convertToNode().process() },
                 delegateTo = null
         )
     }
@@ -407,7 +412,7 @@ internal class DocumentConverter(
         return when (this) {
             is ConstructorDeclaration -> listOfNotNull(
                 ConstructorModel(
-                    parameters = parameters.map { param -> param.process().copy() },
+                    parameters = parameters.map { param -> param.convertToNode().process().copy() },
                     typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters))
                 ),
                 body?.let {
@@ -419,8 +424,8 @@ internal class DocumentConverter(
             is CallSignatureDeclaration -> listOf(
                 MethodModel(
                 name = IdentifierEntity("invoke"),
-                parameters = parameters.map { param -> param.process() },
-                type = type.process(),
+                parameters = parameters.map { param -> param.convertToNode().process() },
+                type = type.convertToNode().process(),
                 typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
 
                 static = false,
@@ -437,7 +442,7 @@ internal class DocumentConverter(
                 MethodModel(
                     name = IdentifierEntity("get"),
                     type = returnType.makeNullable().convertToNode().process(),
-                    parameters = parameters.map { param -> param.process() },
+                    parameters = parameters.map { param -> param.convertToNode().process() },
                     typeParameters = emptyList(),
 
                     annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
@@ -452,7 +457,7 @@ internal class DocumentConverter(
                 MethodModel(
                         name = IdentifierEntity("set"),
                         type = UNIT_TYPE,
-                        parameters = parameters.map { param -> param.process() } + ParameterModel(
+                        parameters = parameters.map { param -> param.convertToNode().process() } + ParameterModel(
                             name = "value",
                             type = unrolledReturnType.process(),
                             initializer = null,
@@ -477,9 +482,9 @@ internal class DocumentConverter(
                                     name = IdentifierEntity(name),
                                     type =  FunctionTypeModel(
                                             parameters = (parameters.map { param ->
-                                                param.processAsLambdaParam()
+                                                param.convertToNode().processAsLambdaParam()
                                             }),
-                                            type = type.process(),
+                                            type = type.convertToNode().process(),
                                             metaDescription = null,
                                             nullable = true
                                     ),
@@ -499,8 +504,8 @@ internal class DocumentConverter(
                     listOf(
                     MethodModel(
                         name = IdentifierEntity(name),
-                        type = type.process(),
-                        parameters = parameters.map { param -> param.process() },
+                        type = type.convertToNode().process(),
+                        parameters = parameters.map { param -> param.convertToNode().process() },
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         static = isStatic(),
                         override = null,
@@ -515,8 +520,8 @@ internal class DocumentConverter(
             is MethodDeclaration -> listOf(
                  MethodModel(
                     name = IdentifierEntity(name),
-                    type = type.process(),
-                    parameters = parameters.map { param -> param.process() },
+                    type = type.convertToNode().process(),
+                    parameters = parameters.map { param -> param.convertToNode().process() },
                     typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                     static = isStatic(),
                     override = null,
@@ -750,9 +755,9 @@ internal class DocumentConverter(
                 FunctionModel(
                         name = IdentifierEntity(name),
                         parameters = parameters.map { param ->
-                            param.process()
+                            param.convertToNode().process()
                         },
-                        type = type.process(),
+                        type = type.convertToNode().process(),
 
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         annotations = exportQualifierMap[uid].toAnnotation(),
@@ -835,7 +840,7 @@ internal class DocumentConverter(
                 } else {
                     TypeAliasModel(
                             name = aliasName,
-                            typeReference = typeReference.process(),
+                            typeReference = typeReference.convertToNode().process(),
                             typeParameters = convertTypeParams( typeParameters.map { typeParameter ->
                                 TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                             }, true),
