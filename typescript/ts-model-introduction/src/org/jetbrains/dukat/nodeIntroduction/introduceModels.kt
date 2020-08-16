@@ -1,7 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
@@ -67,6 +65,7 @@ import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
@@ -208,11 +207,6 @@ internal class DocumentConverter(
         return typeReference?.getFqName() ?: if (KotlinStdlibEntities.contains(value)) {
             KLIBROOT.appendLeft(value)
         } else null
-    }
-
-    private fun ClassLikeNode.processMembers(): Members {
-        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
-        return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 
     private fun ClassLikeDeclaration.processMembers(): Members {
@@ -689,7 +683,7 @@ internal class DocumentConverter(
         )
     }
 
-    private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
+    private fun InterfaceDeclaration.convertToInterfaceModel(): InterfaceModel {
         val members = processMembers()
 
         return InterfaceModel(
@@ -707,11 +701,11 @@ internal class DocumentConverter(
                 } else {
                     null
                 },
-                typeParameters = convertTypeParams(typeParameters),
+                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                 parentEntities = convertParentEntities(parentEntities),
                 annotations = mutableListOf(),
                 comment = null,
-                external = external,
+                external = rootIsDeclaration || hasDeclareModifier(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
@@ -719,7 +713,7 @@ internal class DocumentConverter(
     fun TopLevelEntity.convertToModel(moduleOwner: ModuleNode): TopLevelModel? {
         return when (this) {
             is ClassDeclaration -> convertToClassModel()
-            is InterfaceNode -> convertToInterfaceModel()
+            is InterfaceDeclaration -> convertToInterfaceModel()
             is EnumDeclaration -> {
                 EnumModel(
                         name = IdentifierEntity(name),
@@ -868,30 +862,24 @@ private class NodeConverter(
 }
 
 private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
-    fun visitClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
-    }
-
     fun visitClassLike(declaration: ClassLikeDeclaration, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
     }
 
-    fun visitTypeAliasNode(declaration: TypeAliasDeclaration, owner: ModuleNode) {
+    fun visitTypeAlias(declaration: TypeAliasDeclaration, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.aliasName)))
     }
 
-    fun visitEnumNode(declaration: EnumDeclaration, owner: ModuleNode) {
+    fun visitEnum(declaration: EnumDeclaration, owner: ModuleNode) {
         visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(IdentifierEntity(declaration.name))))
     }
-
 
     fun visitModule(node: ModuleNode) {
         node.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
-                is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
                 is ClassLikeDeclaration -> visitClassLike(topLevelNode, node)
-                is TypeAliasDeclaration -> visitTypeAliasNode(topLevelNode, node)
-                is EnumDeclaration -> visitEnumNode(topLevelNode, node)
+                is TypeAliasDeclaration -> visitTypeAlias(topLevelNode, node)
+                is EnumDeclaration -> visitEnum(topLevelNode, node)
                 is ModuleNode -> visitModule(topLevelNode)
             }
         }

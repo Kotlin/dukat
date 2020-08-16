@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.ast.model.nodes.ModuleNode
 import org.jetbrains.dukat.ast.model.nodes.SourceFileNode
 import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
@@ -143,26 +142,23 @@ private class LowerDeclarationsToNodes(private val rootIsDeclaration: Boolean) {
         }
     }
 
-    private fun InterfaceDeclaration.convert(): TopLevelDeclaration {
-        return InterfaceNode(
-                name,
-                members.flatMap { member -> convertMemberDeclaration(member, true) },
-                convertTypeParameters(typeParameters),
-                convertToHeritageNodes(parentEntities),
-                uid,
-                rootIsDeclaration || hasDeclareModifier()
+    private fun InterfaceDeclaration.convert(): InterfaceDeclaration {
+        return copy(
+                members = members.flatMap { member -> convertMemberDeclaration(member, true) },
+                parentEntities = convertToHeritageNodes(parentEntities)
         )
     }
 
 
-    private fun GeneratedInterfaceDeclaration.convert(): InterfaceNode {
-        return InterfaceNode(
-                name,
-                members.flatMap { member -> convertMemberDeclaration(member, true) },
-                convertTypeParameters(typeParameters),
-                convertToHeritageNodes(parentEntities),
-                uid,
-                true
+    private fun GeneratedInterfaceDeclaration.convert(): InterfaceDeclaration {
+        return InterfaceDeclaration(
+                name = name,
+                members = members.flatMap { member -> convertMemberDeclaration(member, true) },
+                typeParameters = typeParameters,
+                parentEntities = convertToHeritageNodes(parentEntities),
+                uid = uid,
+                modifiers = emptySet(),
+                definitionsInfo = emptyList()
         )
     }
 

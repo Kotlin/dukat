@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.ast.model
 
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
 import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -32,7 +31,6 @@ fun <T : Entity> Entity.duplicate(): T {
         is TypeDeclaration -> copy() as T
         is VariableDeclaration -> copy() as T
 
-        is InterfaceNode -> copy() as T
         else -> raiseConcern("can not copy ${this}") { this as T }
     }
 }
