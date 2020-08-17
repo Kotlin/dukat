@@ -1,4 +1,4 @@
-// [test] intersectionType.Search.kt
+// [test] dynamicType.Search.kt
 @file:JsQualifier("Search")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package Search
@@ -21,7 +21,7 @@ import org.w3c.xhr.*
 external fun ping(settings: dynamic /* typealias MetadataSettings = dynamic */)
 
 // ------------------------------------------------------------------------------------------
-// [test] intersectionType.Search.Settings.kt
+// [test] dynamicType.Search.Settings.kt
 @file:JsQualifier("Search.Settings")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package Search.Settings
