@@ -69,7 +69,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-open external class Watching {
+external open class Watching {
     open fun close(callback: () -> Unit)
     open fun invalidate()
 }
