@@ -17,21 +17,29 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 external interface ConfigurationBoolean {
+    @nativeGetter
     operator fun get(key: String): Boolean
+    @nativeSetter
     operator fun set(key: String, value: Boolean)
 }
 
 external interface ExtendeConfigurationBoolean {
+    @nativeGetter
     operator fun get(key: String): Boolean
+    @nativeSetter
     operator fun set(key: String, value: Boolean)
     var valid_field: Boolean
     var other_valid_field: String
 }
 
 external interface HeterogenousConfig {
+    @nativeGetter
     operator fun get(key: String): Any?
+    @nativeSetter
     operator fun set(key: String, value: Boolean)
+    @nativeSetter
     operator fun set(key: String, value: String)
+    @nativeSetter
     operator fun set(key: String, value: Array<Boolean>)
     var valid_field: Boolean
     var other_valid_field: String

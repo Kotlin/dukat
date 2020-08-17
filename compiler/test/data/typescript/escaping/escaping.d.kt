@@ -28,11 +28,17 @@ external fun `fun`()
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
+    @nativeGetter
     operator fun get(key: String): Any?
+    @nativeSetter
     operator fun set(key: String, value: Boolean)
+    @nativeSetter
     operator fun set(key: String, value: String)
+    @nativeSetter
     operator fun set(key: String, value: String?)
+    @nativeSetter
     operator fun set(key: String, value: Any)
+    @nativeSetter
     operator fun set(key: String, value: Number?)
     var this_one_shouldnt_be_escaped: Boolean
     var `when`: String
@@ -53,7 +59,7 @@ external interface This {
     }
 }
 
-external open class `is`<`interface`> {
+open external class `is`<`interface`> {
     open var `as`: Number
     open fun `package`(a: Any): Boolean
 
@@ -73,9 +79,9 @@ external var `_`: `___`
 
 typealias WatchHandler<T> = (param_val: T, oldVal: T) -> Unit
 
-external open class `$tring`
+open external class `$tring`
 
-external open class Foo
+open external class Foo
 
 typealias `__` = Foo
 

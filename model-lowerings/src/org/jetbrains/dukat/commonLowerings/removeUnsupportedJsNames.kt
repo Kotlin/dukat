@@ -3,6 +3,7 @@ package org.jetbrains.dukat.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -94,7 +95,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     static = false,
                     override = null,
                     operator = true,
-                    annotations = emptyList(),
+                    annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
                     open = false,
                     body = null
             )
@@ -122,7 +123,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                         static = false,
                         override = null,
                         operator = true,
-                        annotations = emptyList(),
+                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
                         open = false,
                         body = null
                 )
