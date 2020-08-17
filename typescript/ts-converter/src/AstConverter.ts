@@ -464,18 +464,14 @@ export class AstConverter {
 
         let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
         let typeReference: ReferenceEntity | null = null;
-        if (symbol) {
-          if (Array.isArray(symbol.declarations)) {
-            let declaration = symbol.declarations[0];
+        let declaration = this.getFirstDeclaration(symbol);
 
-            if (declaration) {
-              if (ts.isTypeParameterDeclaration(declaration)) {
-                return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
-              }
-
-              typeReference = this.createTypeReferenceFromSymbol(declaration);
-            }
+        if (declaration) {
+          if (ts.isTypeParameterDeclaration(declaration)) {
+            return this.astFactory.createTypeParamReferenceDeclarationAsParamValue(entity);
           }
+
+          typeReference = this.createTypeReferenceFromSymbol(declaration);
         }
 
         return this.astFactory.createTypeReferenceDeclarationAsParamValue(
@@ -746,7 +742,10 @@ export class AstConverter {
     }
 
     if (Array.isArray(symbol.declarations)) {
-      return symbol.declarations[0];
+      return symbol.declarations.filter(decl => !ts.isModuleDeclaration(decl) &&
+              !ts.isVariableDeclaration(decl) && !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
+              !ts.isFunctionLike(decl))
+          .sort()[0]
     }
 
     return null;
