@@ -77,6 +77,7 @@ import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
@@ -114,7 +115,7 @@ private data class Members(
 
 private typealias UidMapper = Map<String, FqNode>
 
-data class FqNode(val node: Entity, val fqName: NameEntity)
+data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
@@ -169,6 +170,10 @@ private fun NameEntity.unquote(): NameEntity {
         is IdentifierEntity -> copy(value = escapeName(value.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")))
         else -> this
     }
+}
+
+private fun TypeModel.isDynamic(): Boolean {
+    return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
 }
 
 internal class DocumentConverter(
@@ -272,10 +277,6 @@ internal class DocumentConverter(
         )
     }
 
-    private fun TypeModel.isDynamic(): Boolean {
-        return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
-    }
-
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
@@ -334,7 +335,7 @@ internal class DocumentConverter(
             }
             is TypeDeclaration -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
-                if ((node is TypeAliasDeclaration) && (node.typeReference is UnionTypeDeclaration)) {
+                if ((node is TypeAliasDeclaration) && (node.typeReference.convertToNode().process().isDynamic())) {
                     dynamicType("typealias ${node.aliasName} = dynamic")
                 } else {
                     TypeValueModel(
@@ -835,12 +836,13 @@ internal class DocumentConverter(
                 }
             }
             is TypeAliasDeclaration -> {
-                if (typeReference is UnionTypeDeclaration) {
+                val typeReferenceResolved = typeReference.convertToNode().process()
+                if (typeReferenceResolved.isDynamic()) {
                     null
                 } else {
                     TypeAliasModel(
                             name = aliasName,
-                            typeReference = typeReference.convertToNode().process(),
+                            typeReference = typeReferenceResolved,
                             typeParameters = convertTypeParams( typeParameters.map { typeParameter ->
                                 TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                             }, true),
