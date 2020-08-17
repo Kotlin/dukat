@@ -104,7 +104,6 @@ open class TypescriptLowerer(
                         RemoveUnsupportedJsNames(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
-                        SeparateNonExternalEntities(),
                         ModelContextAwareLowering()
                                 .lower { context, inheritanceContext ->
                                     IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
@@ -118,6 +117,7 @@ open class TypescriptLowerer(
                         CorrectStdLibTypes(),
                         RemoveDuplicateMembers(),
                         RearrangeConstructors(),
+                        SeparateNonExternalEntities(),
                         AddImports(),
                         AddStandardImportsAndAnnotations(addSuppressAnnotations)
                 )
