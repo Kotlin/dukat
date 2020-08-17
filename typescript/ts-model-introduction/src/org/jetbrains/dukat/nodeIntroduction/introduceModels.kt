@@ -119,8 +119,8 @@ data class FqNode(val node: Entity, val fqName: NameEntity)
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
 
-private fun MemberOwnerDeclaration.convertMembers(): List<MemberDeclaration> {
-    return members.mapNotNull { member -> convertMemberDeclaration(member, true) }
+private fun MemberOwnerDeclaration.convertMembers(interfaceDeclaration: Boolean): List<MemberDeclaration> {
+    return members.mapNotNull { member -> convertMemberDeclaration(member, interfaceDeclaration) }
 }
 
 private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
@@ -239,7 +239,7 @@ internal class DocumentConverter(
     }
 
     private fun ClassLikeDeclaration.processMembers(): Members {
-        val (staticNodes, ownNodes) = convertMembers().partition { it.isStatic() }
+        val (staticNodes, ownNodes) = convertMembers(rootIsDeclaration).partition { it.isStatic() }
         return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 

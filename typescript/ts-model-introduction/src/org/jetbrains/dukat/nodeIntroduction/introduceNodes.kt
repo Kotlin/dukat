@@ -38,7 +38,7 @@ fun convertMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: B
     }
 }
 
-fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyDeclaration {
+private fun convertPropertyDeclaration(declaration: PropertyDeclaration, inDeclaredDeclaration: Boolean): PropertyDeclaration {
     val parameterValueDeclaration = if (declaration.optional) declaration.type.makeNullable() else declaration.type
     return declaration.copy(
             type = parameterValueDeclaration.convertToNode(),
