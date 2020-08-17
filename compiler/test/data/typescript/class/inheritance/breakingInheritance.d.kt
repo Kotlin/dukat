@@ -1,4 +1,4 @@
-// [test] nonDeclarations.api.Tooling.nonDeclarations.kt
+// [test] nonDeclarations.api.Tooling.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package api.Tooling
 
@@ -69,7 +69,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external open class Watching {
+open external class Watching {
     open fun close(callback: () -> Unit)
     open fun invalidate()
 }

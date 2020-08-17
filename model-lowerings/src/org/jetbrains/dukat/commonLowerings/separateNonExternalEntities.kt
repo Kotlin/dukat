@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
+import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.FunctionModel
@@ -10,8 +11,6 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
-import org.jetbrains.dukat.model.commonLowerings.TopLevelModelLowering
-import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
     return when (this) {
@@ -49,44 +48,53 @@ private fun ModuleModel.canNotContainExternalEntities(): Boolean {
     }
 }
 
-class SeparateNonExternalEntities : TopLevelModelLowering {
-    private val nonDeclarationsMap = mutableMapOf<NameEntity, MutableList<TopLevelModel>>()
+class SeparateNonExternalEntities : Lowering<SourceSetModel, SourceSetModel> {
 
-    private fun ModuleModel.extractNonDeclarations(): ModuleModel {
-        return if (canNotContainExternalEntities()) {
-            copy(declarations = declarations.mapNotNull { declaration ->
-                when(declaration) {
-                    is ModuleModel -> extractNonDeclarations()
-                    else -> {
-                        if (declaration.isValidExternalDeclaration()) {
-                            declaration
-                        } else {
-                            nonDeclarationsMap.getOrPut(name) { mutableListOf() }.add(declaration)
-                            null
-                        }
-                    }
-                }
-            })
-        } else {
-            copy(declarations = declarations.map { declaration ->
-                when(declaration) {
-                    is ModuleModel -> extractNonDeclarations()
-                    else -> declaration
-                }
-            })
+    private val separatedModules = mutableMapOf<NameEntity, MutableList<ModuleModel>>()
+
+    private fun lower(moduleModel: ModuleModel): ModuleModel {
+        val canNotContainExternalEntities = moduleModel.canNotContainExternalEntities()
+        val (validDeclarations, separatedDeclarations) = moduleModel.declarations.partition {
+            if (canNotContainExternalEntities) {
+                it.isValidExternalDeclaration()
+            } else {
+                true
+            }
         }
+
+        if (separatedDeclarations.isNotEmpty()) {
+            separatedModules
+                    .getOrPut(moduleModel.name) { mutableListOf() }
+                    .add(moduleModel.copy(
+                            declarations = separatedDeclarations,
+                            annotations = mutableListOf(),
+                            submodules = emptyList()
+                    ))
+        }
+
+        return moduleModel.copy(declarations = validDeclarations, submodules = moduleModel.submodules.map { lower(it) })
     }
 
-
-    override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
-        return super.lowerRoot(moduleModel.extractNonDeclarations(), ownerContext)
+    private fun lower(sourceFile: SourceFileModel): SourceFileModel {
+        return sourceFile.copy(
+                root = lower(sourceFile.root)
+        )
     }
-
 
     override fun lower(source: SourceSetModel): SourceSetModel {
-        val sourceSet = super.lower(source)
-        val nonDeclarationFiles = generateDeclarationFiles("nonDeclarations", nonDeclarationsMap )
+        val sourceSet = source.copy(sources = source.sources.map { sourceFile -> lower(sourceFile) })
 
-        return sourceSet.copy(sources = (nonDeclarationFiles + sourceSet.sources))
+        val generatedFiles = separatedModules.flatMap { (_, modules) ->
+            modules.map { module ->
+                SourceFileModel(
+                    fileName = "nonDeclarations",
+                    root = module,
+                    name = null,
+                    referencedFiles = emptyList()
+                )
+            }
+        }
+
+        return sourceSet.copy(sources = generatedFiles + sourceSet.sources)
     }
 }
