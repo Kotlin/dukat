@@ -20,57 +20,55 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
+internal fun assertDescriptorEquals(name: String, tsPath: String) {
+    val sourceSet = CliTranslator().translate(tsPath)
+
+    val targetPath = "./build/test/data/descriptors/$name"
+    File(targetPath).deleteRecursively()
+    compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
+
+    val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
+        sourceFile.root.flattenDeclarations().map {
+            SourceFileModel(
+                sourceFile.name,
+                sourceFile.fileName,
+                it,
+                sourceFile.referencedFiles
+            )
+        }
+    })
+
+    val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
+    val expectedModuleDescriptor =
+        generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
+
+    validate(
+        DescriptorValidator.ValidationVisitor.errorTypesAllowed(),
+        outputModuleDescriptor.getPackage(FqName.ROOT)
+    )
+
+    assertEquals(
+        RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+            .serializeRecursively(
+                outputModuleDescriptor.getPackage(FqName.ROOT)
+            ),
+        RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
+            .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
+    )
+}
+
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class)
 class DescriptorTests {
 
     @DisplayName("descriptors test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("descriptorsTestSet")
-    fun withValueSource(name: String, tsPath: String, ktPath: String) {
-        assertDescriptorEquals(name, tsPath, ktPath)
-    }
-
     @Suppress("UNUSED_PARAMETER")
-    private fun assertDescriptorEquals(name: String, tsPath: String, ktPath: String) {
-        val sourceSet = translator.translate(tsPath)
-
-        val targetPath = "./build/test/data/descriptors/$name"
-        File(targetPath).deleteRecursively()
-        compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
-
-        val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
-            sourceFile.root.flattenDeclarations().map {
-                SourceFileModel(
-                        sourceFile.name,
-                        sourceFile.fileName,
-                        it,
-                        sourceFile.referencedFiles
-                )
-            }
-        })
-
-        val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
-        val expectedModuleDescriptor =
-                generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
-
-        validate(
-                DescriptorValidator.ValidationVisitor.errorTypesAllowed(),
-                outputModuleDescriptor.getPackage(FqName.ROOT)
-        )
-
-        assertEquals(
-                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                        .serializeRecursively(
-                                outputModuleDescriptor.getPackage(FqName.ROOT)
-                        ),
-                RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-                        .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
-        )
+    fun withValueSource(name: String, tsPath: String, ktPath: String) {
+        assertDescriptorEquals(name, tsPath)
     }
 
     companion object {
-        private val translator = CliTranslator()
-
         private val skippedDescriptorTests = setOf(
                 "class/inheritance/overrides",
                 "class/inheritance/overridesFromReferencedFile",
