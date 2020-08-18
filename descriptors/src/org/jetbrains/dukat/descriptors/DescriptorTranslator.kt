@@ -1074,13 +1074,13 @@ private fun expandTypeAlias(
     if (otherAlias != null) {
         return TypeProjectionImpl(
                 AbbreviatedType(
-                        expandTypeAlias(
+                        (expandTypeAlias(
                                 context,
                                 otherAlias.underlyingType,
                                 typeParameters + otherAlias.defaultType.constructor.parameters,
                                 newTypeArguments + replacement
-                        ).type as SimpleType,
-                        otherAlias.defaultType.replace(replacement)
+                        ).type as SimpleType).makeNullableAsSpecified(key.isMarkedNullable),
+                        otherAlias.defaultType.replace(replacement).makeNullableAsSpecified(key.isMarkedNullable)
                 )
         )
     }
