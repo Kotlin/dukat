@@ -338,8 +338,6 @@ private fun ReferenceClauseDeclarationProto.convert(): ReferenceClauseDeclaratio
 }
 
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
-    println("CONVERT MDP ±±±±±±±±±±±±±±±±±±±±±±±±±±!!!!!!!!! <<<<<")
-
     var export: ExportAssignmentDeclaration? = null
     val declarations = declarationsList.mapNotNull {
         if (it.hasExportAssignment()) {
