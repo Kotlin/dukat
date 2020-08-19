@@ -16,30 +16,15 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelContext
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.TopLevelModelLowering
+import org.jetbrains.dukat.model.commonLowerings.normalize
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class RemoveDuplicateMembersLowering(private val context: ModelContext) : TopLevelModelLowering {
 
-    private fun TypeModel.normalize(): TypeModel {
-        return when (this) {
-            is TypeValueModel -> {
-                val unaliased = context.unalias(this)
-                if (unaliased != this) {
-                    unaliased.normalize()
-                } else {
-                    copy(metaDescription = null, params = params.map { it.copy(type = it.type.normalize()) }, value = fqName ?: value)
-                }
-            }
-            is TypeParameterReferenceModel -> copy(metaDescription = null)
-            is FunctionTypeModel -> copy(metaDescription = null, parameters = parameters.map { it.copy(type = it.type.normalize(), name = null) })
-            else -> this
-        }
-    }
-
     private fun MemberModel.asKey(): MemberModel {
         return when (this) {
-            is MethodModel -> copy(parameters = parameters.map { it.copy(type = it.type.normalize()) })
-            is ConstructorModel -> copy(parameters = parameters.map { it.copy(type = it.type.normalize()) })
+            is MethodModel -> copy(parameters = parameters.map { it.copy(type = it.type.normalize(context)) })
+            is ConstructorModel -> copy(parameters = parameters.map { it.copy(type = it.type.normalize(context)) })
             else -> this
         }
     }
