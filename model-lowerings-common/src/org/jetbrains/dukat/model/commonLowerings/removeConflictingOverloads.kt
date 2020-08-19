@@ -55,13 +55,7 @@ private class ConflictingOverloads(private val context: ModelContext) : TopLevel
 
     private fun mergeTypeModels(a: TypeModel, b: TypeModel): TypeModel {
         return if ((a is TypeValueModel) && (b is TypeValueModel)) {
-            val metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).distinct().let {
-                if (it.isEmpty()) {
-                    null
-                } else {
-                    it.joinToString(" | ")
-                }
-            }
+            val metaDescription = listOfNotNull(a.metaDescription, b.metaDescription).distinct().joinToString(" | ").ifEmpty { null }
             a.copy(metaDescription = metaDescription, params = mergeTypeParams(a.params, b.params))
         } else if ((a is FunctionTypeModel) && (b is FunctionTypeModel)) {
             a.copy(type = mergeTypeModels(a.type, b.type), parameters = mergeLambdaParams(a.parameters, b.parameters))
