@@ -609,8 +609,10 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 null,
                 Annotations.EMPTY,
                 when {
-                    propertyModel.getter || propertyModel.setter -> Modality.OPEN
-                    parent.kind == ClassKind.INTERFACE -> Modality.ABSTRACT
+                    parent.kind == ClassKind.INTERFACE -> when {
+                        propertyModel.getter || propertyModel.setter -> Modality.OPEN
+                        else -> Modality.ABSTRACT
+                    }
                     parent.kind == ClassKind.OBJECT -> Modality.FINAL
                     propertyModel.open -> Modality.OPEN
                     else -> Modality.FINAL
