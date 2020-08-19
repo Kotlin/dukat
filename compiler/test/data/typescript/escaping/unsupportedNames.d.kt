@@ -18,14 +18,14 @@ import org.w3c.xhr.*
 
 external interface ConfigurationBoolean {
     @nativeGetter
-    operator fun get(key: String): Boolean
+    operator fun get(key: String): Boolean?
     @nativeSetter
     operator fun set(key: String, value: Boolean)
 }
 
 external interface ExtendeConfigurationBoolean {
     @nativeGetter
-    operator fun get(key: String): Boolean
+    operator fun get(key: String): Boolean?
     @nativeSetter
     operator fun set(key: String, value: Boolean)
     var valid_field: Boolean
