@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
+import org.jetbrains.kotlin.com.google.common.collect.ImmutableSet
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -119,6 +120,8 @@ fun translatePackageName(name: NameEntity): FqName {
             }
     )
 }
+
+private val KOTLIN_ANY_METHOD_NAMES = setOf("equals", "hashCode", "toString")
 
 private class DescriptorTranslator(val context: DescriptorContext) {
 
@@ -1129,13 +1132,15 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
                 )
                 val members = DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
                         .map { member -> member.substitute(substitutor) as CallableMemberDescriptor }
-                members.filter { member -> member.overriddenDescriptors.isEmpty() }.map { member ->
+                members.filterNot {
+                        member -> KOTLIN_ANY_METHOD_NAMES.contains(member.name.asString()) && member.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE
+                }.map { member ->
                     val delegatedMember = member.newCopyBuilder()
                             .setOwner(classDescriptor)
                             .setDispatchReceiverParameter(classDescriptor.thisAsReceiverParameter)
                             .setModality(if (member.modality == Modality.ABSTRACT) Modality.OPEN else member.modality)
                             .setKind(CallableMemberDescriptor.Kind.DELEGATION)
-                            .setCopyOverrides(true)
+                            .setCopyOverrides(false)
                             .build()!!
                     delegatedMember.overriddenDescriptors += member
                     delegatedMember
