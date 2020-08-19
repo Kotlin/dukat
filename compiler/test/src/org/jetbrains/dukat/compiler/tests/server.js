@@ -15,7 +15,7 @@ function ok(res) {
 function createServer(port, emitDiagnostics, sandboxDirs) {
     console.log(`starting server at port ${port} (pid = ${process.pid})`);
 
-    var server = http.createServer(function (req, res) {
+    const server = http.createServer(function (req, res) {
         if (req.method === 'GET') {
             if (req.url === '/status') {
                 ok(res);
@@ -25,22 +25,22 @@ function createServer(port, emitDiagnostics, sandboxDirs) {
             }
         }
         if (req.method === 'POST' && req.url === '/dukat') {
-            var body = [];
+            const body = [];
             req.on('data', (chunk) => {
                 body.push(chunk);
             }).on('end', function () {
-                var bodyRaw = Buffer.concat(body).toString();
-                var data = JSON.parse(bodyRaw);
+                const bodyRaw = Buffer.concat(body).toString();
+                const data = JSON.parse(bodyRaw);
 
-                var onBinaryStreamData = function (chunk) {
+                const onBinaryStreamData = function (chunk) {
                     res.write(chunk);
                 };
-                var onBinaryStreamEnd = function (chunk) {
+                const onBinaryStreamEnd = function (chunk) {
                     res.end();
                 };
 
-                let files = data.files.filter(file => {
-                    let fileIsSandboxed = sandboxDirs.some(sandboxDir => !path.relative(sandboxDir, file).startsWith(".."));
+                const files = data.files.filter(file => {
+                    const fileIsSandboxed = sandboxDirs.some(sandboxDir => !path.relative(sandboxDir, file).startsWith(".."));
                     if (!fileIsSandboxed) {
                         console.log(`skipping ${file} since it does not belong to any of sandbox locations: ${sandboxDirs}`);
                         return false;
@@ -85,7 +85,7 @@ function createServer(port, emitDiagnostics, sandboxDirs) {
 }
 
 function shutdown(cluster) {
-    let connectedWorkers = Object.values(cluster.workers).filter(it => it.connected).map(it => {
+    const connectedWorkers = Object.values(cluster.workers).filter(it => it.connected).map(it => {
         try {
             if (it.connected) {
                 it.kill();
@@ -115,12 +115,12 @@ function createCluster(port, emitDiagnostics, sandboxDirs) {
             }
         });
 
-        var cpus = os.cpus();
+        const cpus = os.cpus();
         console.log(`CPU count => ${cpus.length}`);
 
 
         cpus.forEach(_ => {
-            let worker = cluster.fork();
+            const worker = cluster.fork();
 
             worker.on('disconnect', function () {
                 console.log(`disconnecting ${worker.process.pid}`);
@@ -133,7 +133,7 @@ function createCluster(port, emitDiagnostics, sandboxDirs) {
 
 function main() {
     const projectDir = path.resolve(__dirname, "../../../../../../../..");
-    let sandboxDirs = process.argv.slice(4);
+    const sandboxDirs = process.argv.slice(4);
     sandboxDirs.push(projectDir);
 
     createCluster(process.argv[2], process.argv[3], sandboxDirs.map(it => path.resolve(it)));
