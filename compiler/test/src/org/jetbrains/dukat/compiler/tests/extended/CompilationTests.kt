@@ -60,7 +60,9 @@ abstract class CompilationTests {
                 printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
             printStream.println("")
-            printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
+            val errorCount = reportDataMap.values.map { it.errorCount }.sum()
+            printStream.println("##teamcity[testMetadata name='compilation errors' type='number' value='${errorCount}']\n")
+            printStream.println("ERRORS: $errorCount")
             val translationTimes     = reportDataMap.values.map { it.translationTime }
             printStream.println("AVG TRANSLATION TIME: ${translationTimes.average()}ms")
             val compilationTimes = reportDataMap.values.map { it.compilationTime }
