@@ -48,6 +48,9 @@ external interface `T$0` {
 external open class Foo {
     constructor(a: String)
     constructor(a: Number)
+    open fun process(a: String?)
+    open fun preprocess(a: String?)
+    open fun preprocess(a: Number?)
     open fun someMethod(): dynamic /* String | Number */
     open var foo: dynamic /* String | Number */
     open var optionalFoo: dynamic /* String | Number */
