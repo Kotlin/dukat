@@ -1,16 +1,18 @@
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
+import org.jetbrains.dukat.tsLowerings.TsLowering
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 
-interface TopLevelDeclarationLowering {
+interface TopLevelDeclarationLowering : TsLowering {
     fun lowerVariableDeclaration(declaration: VariableDeclaration, owner: NodeOwner<ModuleDeclaration>?): VariableDeclaration = declaration
     fun lowerFunctionDeclaration(declaration: FunctionDeclaration, owner: NodeOwner<ModuleDeclaration>?): FunctionDeclaration = declaration
     fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? = declaration
@@ -52,4 +54,9 @@ interface TopLevelDeclarationLowering {
         return moduleDeclaration.copy(declarations = lowerTopLevelDeclarations(moduleDeclaration.declarations, owner))
     }
 
+    override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
+        return source.copy(sources = source.sources.map { sourceFileDeclaration ->
+            sourceFileDeclaration.copy(root = lowerSourceDeclaration(sourceFileDeclaration.root, NodeOwner(sourceFileDeclaration.root, null)))
+         })
+    }
 }
