@@ -163,7 +163,7 @@ private fun ValueParameterDescriptor.convertToParameterModel(): ParameterModel {
 }
 
 private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
-    val override = (overriddenDescriptors.firstOrNull()?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity()
+    val override = overriddenDescriptors.mapNotNull {  (it?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity() }
     return MethodModel(
             name = name.toString().toNameEntity(),
             parameters = valueParameters.map { it.convertToParameterModel() },
@@ -182,7 +182,7 @@ private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
 private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
     return when (this) {
         is PropertyDescriptor -> {
-            val override = (overriddenDescriptors.firstOrNull()?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity()
+            val override = overriddenDescriptors.mapNotNull {  (it?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity() }
             PropertyModel(
                     name = IdentifierEntity(name.toString()),
                     typeParameters = typeParameters.map { it.convertToTypeParameterModel() },

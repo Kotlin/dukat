@@ -74,12 +74,10 @@ class DescriptorTests {
                 "class/inheritance/overridesFromReferencedFile",
                 "class/inheritance/overridingStdLib",
                 "class/inheritance/simple",
-                "inheritance/missingMembers/ambiguousProperties",
                 "interface/inheritance/simple",
                 "interface/inheritance/withQualifiedParent",
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
                 "misc/missedOverloads",
-                "stdlib/convertTsStdlib",
                 "typePredicate/simple"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 

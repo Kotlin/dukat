@@ -118,7 +118,7 @@ private class ClassLikeOverrideResolver(
         return context.getAllParents(this)
     }
 
-    private fun MethodModel.removeDefaultParamValues(override: NameEntity?): MethodModel {
+    private fun MethodModel.removeDefaultParamValues(override: List<NameEntity>?): MethodModel {
         return copy(override = override, parameters = parameters.map { it.copy(initializer = null) })
     }
 
@@ -131,7 +131,7 @@ private class ClassLikeOverrideResolver(
     ): List<MemberModel> {
         return when (this) {
             is MethodModel -> {
-                val matchingLambdaProperty = allSuperDeclarations[name]?.firstOrNull {
+                val matchingLambdaProperty = allSuperDeclarations[name]?.filter {
                     val parentModel = it.memberModel
                     if (parentModel is PropertyModel) {
                         val parentModelToMethod = parentModel.toMethod()
@@ -144,28 +144,28 @@ private class ClassLikeOverrideResolver(
                     } else {
                         false
                     }
-                }?.fqName
+                }?.filterIrrelevantParentMembers()?.mapNotNull { it.fqName }?.distinct()
 
-                val overridden = allSuperDeclarations[name]?.firstOrNull {
+                val overridden = allSuperDeclarations[name]?.filter {
                     (it.memberModel is MethodModel) && (with(OverrideTypeChecker(
                         context,
                         inheritanceContext,
                         classLike,
                         it.ownerModel
                     )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
-                }?.fqName ?: if (isSpecialCase()) {
-                    IdentifierEntity("Any")
+                }?.filterIrrelevantParentMembers()?.mapNotNull { it.fqName }?.distinct() ?: if (isSpecialCase()) {
+                    listOf(IdentifierEntity("Any"))
                 } else null
 
                 when {
-                    matchingLambdaProperty != null -> {
+                    !matchingLambdaProperty.isNullOrEmpty() -> {
                         listOf(toProperty().copy(override = matchingLambdaProperty))
                     }
-                    overridden != null -> {
+                    !overridden.isNullOrEmpty() -> {
                         listOf(copy(override = overridden, parameters = parameters.map { param -> param.copy(initializer = null) }))
                     }
                     else -> {
-                        val related = allSuperDeclarations[name]?.firstOrNull {
+                        val related = allSuperDeclarations[name]?.filter {
                             (it.memberModel is MethodModel) && (with(OverrideTypeChecker(
                                 context,
                                 inheritanceContext,
@@ -174,8 +174,10 @@ private class ClassLikeOverrideResolver(
                             )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_RELATED)
                         }
 
-                        if ((related != null) && (classLike.isAbstractClass() != true)) {
-                            listOf(this, (related.memberModel as MethodModel).removeDefaultParamValues(override = related.fqName))
+                        if (!related.isNullOrEmpty() && !classLike.isAbstractClass()) {
+                            listOf(this) + related.map { relatedMethod ->
+                                (relatedMethod.memberModel as MethodModel).removeDefaultParamValues(override = relatedMethod.fqName?.let { listOf(it) })
+                            }
                         } else {
                             listOf(this)
                         }
@@ -186,8 +188,8 @@ private class ClassLikeOverrideResolver(
             is PropertyModel -> {
                 val toMethod = toMethod()
 
-                val matchingMethod = toMethod?.let { method ->
-                    allSuperDeclarations[name]?.firstOrNull { parent ->
+                val matchingMethods = toMethod?.let { method ->
+                    allSuperDeclarations[name]?.filter { parent ->
                         (parent.memberModel is MethodModel) &&
                                 (with(OverrideTypeChecker(
                                     context,
@@ -195,7 +197,7 @@ private class ClassLikeOverrideResolver(
                                     classLike,
                                     parent.ownerModel
                                 )) { method.isOverriding(parent.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
-                    }?.fqName
+                    }?.filterIrrelevantParentMembers()?.mapNotNull { it.fqName }?.distinct()
                 }
 
                 val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, with(OverrideTypeChecker(
@@ -203,36 +205,72 @@ private class ClassLikeOverrideResolver(
                     inheritanceContext,
                     classLike,
                     it.ownerModel
-                )) { isOverriding(it.memberModel) }) }?.firstOrNull { (_, status) ->
+                )) { isOverriding(it.memberModel) }) }?.filter { (_, status) ->
                     (status == MemberOverrideStatus.IS_OVERRIDE) || (status == MemberOverrideStatus.IS_RELATED) || (status == MemberOverrideStatus.IS_IMPOSSIBLE)
-                }
+                }?.filterIrrelevantParentMembersWithStatus()
 
-                val memberData = overrideData?.first
-
-                if (matchingMethod != null) {
-                    listOf(toMethod.copy(override = matchingMethod, parameters = toMethod.parameters.map { param -> param.copy(initializer = null) }))
+                if (!matchingMethods.isNullOrEmpty()) {
+                    listOf(toMethod.copy(override = matchingMethods, parameters = toMethod.parameters.map { param -> param.copy(initializer = null) }))
                 } else {
-                    when (overrideData?.second) {
-                        MemberOverrideStatus.IS_OVERRIDE -> {
-                            if (with(OverrideTypeChecker(
-                                    context,
-                                    inheritanceContext,
-                                    classLike,
-                                    overrideData.first.ownerModel
-                                )) { isImpossibleOverride(memberData?.memberModel) }) {
-                                emptyList()
-                            } else {
-                                listOf(copy(override = memberData?.fqName))
+                    var shouldBeDeleted = false
+                    val overrides = overrideData?.mapNotNull { (method, status) ->
+                        when (status) {
+                            MemberOverrideStatus.IS_OVERRIDE -> {
+                                if (with(
+                                        OverrideTypeChecker(
+                                            context,
+                                            inheritanceContext,
+                                            classLike,
+                                            method.ownerModel
+                                        )
+                                    ) { isImpossibleOverride(method.memberModel) }
+                                ) {
+                                    shouldBeDeleted = true
+                                    null
+                                } else {
+                                    method.fqName
+                                }
                             }
+                            MemberOverrideStatus.IS_IMPOSSIBLE -> {
+                                shouldBeDeleted = true
+                                null
+                            }
+                            MemberOverrideStatus.IS_RELATED -> {
+                                shouldBeDeleted = true
+                                null
+                            }
+                            else -> null
                         }
-                        MemberOverrideStatus.IS_IMPOSSIBLE -> emptyList()
-                        MemberOverrideStatus.IS_RELATED -> emptyList()
-                        else -> listOf(this)
+                    }?.toList()?.distinct()
+                    if (shouldBeDeleted) {
+                        emptyList()
+                    } else {
+                        listOf(this.copy(override = overrides))
                     }
                 }
             }
             is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, inheritanceContext, this).resolve())
             else -> listOf(this)
+        }
+    }
+
+    private fun List<MemberData>.filterIrrelevantParentMembers(): List<MemberData> {
+        return filter { it.isRelevantParentMember(this) }
+    }
+
+    private fun Sequence<Pair<MemberData, MemberOverrideStatus>>.filterIrrelevantParentMembersWithStatus(): Sequence<Pair<MemberData, MemberOverrideStatus>> {
+        return filter { (member, _) -> member.isRelevantParentMember(this.map { it.first }.toList()) }
+    }
+
+    private fun MemberData.isRelevantParentMember(otherMembers: List<MemberData>): Boolean {
+        return when (memberModel) {
+            is PropertyModel -> otherMembers.none { other ->
+                other.memberModel is PropertyModel && inheritanceContext.isDescendant(other.ownerModel, ownerModel)
+            }
+            is MethodModel -> otherMembers.none { other ->
+                other.memberModel is MethodModel && inheritanceContext.isDescendant(other.ownerModel, ownerModel)
+            }
+            else -> true
         }
     }
 

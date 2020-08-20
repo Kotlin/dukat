@@ -467,30 +467,35 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 CallableMemberDescriptor.Kind.DECLARATION,
                 SourceElement.NO_SOURCE
         ) {
-            override fun getOverriddenDescriptors(): MutableCollection<out FunctionDescriptor> {
-                if (methodModel.override != null) {
-                    var overriddenMethod = context.resolveMethod(
-                            methodModel.override as NameEntity,
-                            methodModel.name
-                    )
-                    if (overriddenMethod == null) {
-                        var override = methodModel.override as NameEntity
-                        if (override.isTsStdlibPrefixed()) {
-                            override = override.shiftLeft()!!
-                        }
-                        val classInStdLib = findClassInStdlib(
-                                TypeValueModel(
-                                        value = override,
-                                        params = listOf(),
-                                        metaDescription = null,
-                                        fqName = null
-                                )
-                        )
-                        overriddenMethod = classInStdLib?.unsubstitutedMemberScope?.getContributedFunctions(
-                                Name.identifier(translateName(methodModel.name)), NoLookupLocation.FROM_BUILTINS
-                        )?.single()
+            private fun getOverriddenMethod(overrideName: NameEntity): FunctionDescriptor? {
+                val overriddenMethod = context.resolveMethod(
+                    overrideName,
+                    methodModel.name
+                )
+                if (overriddenMethod == null) {
+                    var override = overrideName
+                    if (override.isTsStdlibPrefixed()) {
+                        override = override.shiftLeft()!!
                     }
-                    return listOfNotNull(overriddenMethod).toMutableList()
+                    val classInStdLib = findClassInStdlib(
+                        TypeValueModel(
+                            value = override,
+                            params = listOf(),
+                            metaDescription = null,
+                            fqName = null
+                        )
+                    )
+                    return classInStdLib?.unsubstitutedMemberScope?.getContributedFunctions(
+                        Name.identifier(translateName(methodModel.name)), NoLookupLocation.FROM_BUILTINS
+                    )?.firstOrNull()
+                }
+                return overriddenMethod
+            }
+
+            override fun getOverriddenDescriptors(): MutableCollection<out FunctionDescriptor> {
+                val overrides = methodModel.override
+                if (overrides != null) {
+                    return overrides.mapNotNull { getOverriddenMethod(it) }.toMutableList()
                 }
                 return super.getOverriddenDescriptors()
             }
@@ -632,30 +637,35 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 false,
                 false
         ) {
-            override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> {
-                if (propertyModel.override != null) {
-                    var overriddenProperty = context.resolveProperty(
-                            propertyModel.override as NameEntity,
-                            propertyModel.name
-                    ) as PropertyDescriptor?
-                    if (overriddenProperty == null) {
-                        var override = propertyModel.override as NameEntity
-                        if (override.isTsStdlibPrefixed()) {
-                            override = override.shiftLeft()!!
-                        }
-                        val classInStdLib = findClassInStdlib(
-                                TypeValueModel(
-                                        value = override,
-                                        params = listOf(),
-                                        metaDescription = null,
-                                        fqName = null
-                                )
-                        )
-                        overriddenProperty = classInStdLib?.unsubstitutedMemberScope?.getContributedVariables(
-                                Name.identifier(translateName(propertyModel.name)), NoLookupLocation.FROM_BUILTINS
-                        )?.single()
+            private fun getOverriddenProperty(overrideName: NameEntity): PropertyDescriptor? {
+                val overriddenProperty = context.resolveProperty(
+                    overrideName,
+                    propertyModel.name
+                )
+                if (overriddenProperty == null) {
+                    var override = overrideName
+                    if (override.isTsStdlibPrefixed()) {
+                        override = override.shiftLeft()!!
                     }
-                    return listOfNotNull(overriddenProperty).toMutableList()
+                    val classInStdLib = findClassInStdlib(
+                        TypeValueModel(
+                            value = override,
+                            params = listOf(),
+                            metaDescription = null,
+                            fqName = null
+                        )
+                    )
+                    return classInStdLib?.unsubstitutedMemberScope?.getContributedVariables(
+                        Name.identifier(translateName(propertyModel.name)), NoLookupLocation.FROM_BUILTINS
+                    )?.firstOrNull()
+                }
+                return overriddenProperty
+            }
+
+            override fun getOverriddenDescriptors(): MutableCollection<out PropertyDescriptor> {
+                val overrides = propertyModel.override
+                if (overrides != null) {
+                    return overrides.mapNotNull { getOverriddenProperty(it) }.toMutableList()
                 }
                 return super.getOverriddenDescriptors()
             }
