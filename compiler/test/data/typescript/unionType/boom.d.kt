@@ -48,7 +48,7 @@ external interface S
 
 external interface T
 
-external fun foo(a: dynamic /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */, b: Number)
+external fun foo(a: Any /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */, b: Number)
 
 external fun bar(a: A, b: Number)
 
@@ -64,15 +64,15 @@ external fun bar(a: F, b: Number)
 
 external fun bar(a: G, b: Number)
 
-external fun baz(a: A, b: dynamic /* A | B | C | D | E */)
+external fun baz(a: A, b: Any /* A | B | C | D | E */)
 
-external fun baz(a: B, b: dynamic /* A | B | C | D | E */)
+external fun baz(a: B, b: Any /* A | B | C | D | E */)
 
-external fun baz(a: C, b: dynamic /* A | B | C | D | E */)
+external fun baz(a: C, b: Any /* A | B | C | D | E */)
 
-external fun baz(a: D, b: dynamic /* A | B | C | D | E */)
+external fun baz(a: D, b: Any /* A | B | C | D | E */)
 
-external fun baz(a: E, b: dynamic /* A | B | C | D | E */)
+external fun baz(a: E, b: Any /* A | B | C | D | E */)
 
 external fun boo(a: A, b: A, c: A)
 
@@ -90,4 +90,4 @@ external fun boo(a: B, b: B, c: A)
 
 external fun boo(a: B, b: B, c: B)
 
-external fun boom(c: String, a: dynamic /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */, b: dynamic /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */)
+external fun boom(c: String, a: Any /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */, b: Any /* A | B | C | D | E | F | G | H | L | M | N | O | P | R | S | T */)

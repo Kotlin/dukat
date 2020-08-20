@@ -189,6 +189,10 @@ internal class OverrideTypeChecker(
                         return params.zip(otherParameterType.params).all { (paramA, paramB) ->
                             paramA.type.isOverridingReturnType(paramB.type, this)
                         }
+                    } else if (inheritanceContext.isDescendant(classLikeA, classLikeB)) {
+                        return params.zip(otherParameterType.params).all { (paramA, paramB) ->
+                            paramA.type.isEquivalent(paramB.type)
+                        }
                     }
                 }
             } else {

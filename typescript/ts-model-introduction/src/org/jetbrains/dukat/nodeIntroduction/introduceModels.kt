@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -106,6 +105,7 @@ private fun MemberDeclaration.isStatic() = when (this) {
 internal sealed class TranslationContext {
     object IRRELEVANT : TranslationContext()
     data class PROPERTY(val optional: Boolean) : TranslationContext()
+    object PARAMETER : TranslationContext()
 }
 
 private data class Members(
@@ -119,6 +119,7 @@ data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
+private val ANY_TYPE = TypeValueModel(value = IdentifierEntity("Any"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Any")), metaDescription = null)
 
 private fun MemberOwnerDeclaration.convertMembers(interfaceDeclaration: Boolean): List<MemberDeclaration> {
     return members.mapNotNull { member -> convertMemberDeclaration(member, interfaceDeclaration) }
@@ -137,6 +138,11 @@ private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         emptyList(),
         metaDescription,
         null
+)
+
+private fun anyType(nullable: Boolean, metaDescription: String?) = ANY_TYPE.copy(
+        nullable = nullable,
+        metaDescription = metaDescription
 )
 
 // TODO: duplication, think of separate place to have this (but please don't call it utils )))
@@ -277,17 +283,36 @@ internal class DocumentConverter(
         )
     }
 
+    private fun TypeModel.isDynamic(): Boolean {
+        return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
+    }
+
+    private fun ParameterValueDeclaration.isNullable(): Boolean {
+        return when (this) {
+            is UnionTypeDeclaration -> nullable || params.any { it.isNullable() }
+            is TypeParamReferenceDeclaration -> true
+            else -> nullable
+        }
+    }
+
+    private fun TupleDeclaration.process(context: TranslationContext): TypeModel {
+        val meta = "JsTuple<${params.map { it.process(context).translate() }.joinToString(", ")}>"
+        return when (context) {
+            TranslationContext.PARAMETER -> anyType(isNullable(), meta)
+            else -> dynamicType(meta)
+        }
+    }
+
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
-        val dynamicName = IdentifierEntity("dynamic")
         return when (this) {
             is StringLiteralDeclaration -> {
-                    TypeValueModel(
+                TypeValueModel(
                         value = IdentifierEntity("String"),
                         params = emptyList(),
                         metaDescription = "\"$token\"",
                         fqName = KLIBROOT.appendLeft(IdentifierEntity("String")),
                         nullable = context == TranslationContext.PROPERTY(true)
-                    )
+                )
             }
             is NumericLiteralDeclaration -> {
                 TypeValueModel(
@@ -313,19 +338,13 @@ internal class DocumentConverter(
                         KLIBROOT.appendLeft(IdentifierEntity("Number")),
                         context == TranslationContext.PROPERTY(true)
                 )
-                else -> TypeValueModel(
-                        dynamicName,
-                        emptyList(),
-                        convertMeta(),
-                        null
-                )
+                else -> when (context) {
+                    TranslationContext.PARAMETER -> anyType(isNullable(), convertMeta())
+                    else -> dynamicType(convertMeta())
+                }
+
             }
-            is TupleDeclaration -> TypeValueModel(
-                    dynamicName,
-                    emptyList(),
-                    "JsTuple<${params.map { it.process().translate() }.joinToString(", ")}>",
-                    null
-            )
+            is TupleDeclaration -> process(context)
             is TypeParamReferenceDeclaration -> {
                 TypeParameterReferenceModel(
                         name = value,
@@ -340,7 +359,7 @@ internal class DocumentConverter(
                 } else {
                     TypeValueModel(
                             value,
-                            params.map { param -> param.process() }.map { TypeParameterModel(it, listOf()) },
+                            params.map { param -> param.process(context) }.map { TypeParameterModel(it, listOf()) },
                             meta.processMeta(),
                             getFqName(),
                             nullable
@@ -350,9 +369,9 @@ internal class DocumentConverter(
             is FunctionTypeDeclaration -> {
                 FunctionTypeModel(
                         parameters = (parameters.map { param ->
-                            param.processAsLambdaParam()
+                            param.processAsLambdaParam(context)
                         }),
-                        type = type.process(),
+                        type = type.process(context),
                         metaDescription = meta.processMeta(),
                         nullable = nullable
                 )
@@ -373,7 +392,7 @@ internal class DocumentConverter(
                     }
                     else -> typeParameters.map { typeParam ->
                         TypeParameterModel(
-                                type = typeParam.process(),
+                                type = typeParam.process(context),
                                 constraints = emptyList()
                         )
                     }
@@ -388,13 +407,7 @@ internal class DocumentConverter(
 
             }
             else -> raiseConcern("unable to process TypeNode ${this}") {
-                TypeValueModel(
-                        IdentifierEntity("dynamic"),
-                        emptyList(),
-                        null,
-                        null,
-                        false
-                )
+                dynamicType()
             }
         }
     }
@@ -412,58 +425,58 @@ internal class DocumentConverter(
         // TODO: how ClassModel end up here?
         return when (this) {
             is ConstructorDeclaration -> listOfNotNull(
-                ConstructorModel(
-                    parameters = parameters.map { param -> param.convertToNode().process().copy() },
-                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters))
-                ),
-                body?.let {
-                    InitBlockModel(
-                        body = expressionConverter.convertBlock(it)
-                    )
-                }
+                    ConstructorModel(
+                            parameters = parameters.map { param -> param.convertToNode().process().copy() },
+                            typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters))
+                    ),
+                    body?.let {
+                        InitBlockModel(
+                                body = expressionConverter.convertBlock(it)
+                        )
+                    }
             )
             is CallSignatureDeclaration -> listOf(
-                MethodModel(
-                name = IdentifierEntity("invoke"),
-                parameters = parameters.map { param -> param.convertToNode().process() },
-                type = type.convertToNode().process(),
-                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                    MethodModel(
+                            name = IdentifierEntity("invoke"),
+                            parameters = parameters.map { param -> param.convertToNode().process() },
+                            type = type.convertToNode().process(),
+                            typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
 
-                static = false,
+                            static = false,
 
-                override = null,
-                operator = true,
-                annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
+                            override = null,
+                            operator = true,
+                            annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
 
-                open = owner.isOpen(),
-                body = null
-                )
+                            open = owner.isOpen(),
+                            body = null
+                    )
             )
             is IndexSignatureDeclaration -> listOf(
-                MethodModel(
-                    name = IdentifierEntity("get"),
-                    type = returnType.makeNullable().convertToNode().process(),
-                    parameters = parameters.map { param -> param.convertToNode().process() },
-                    typeParameters = emptyList(),
+                    MethodModel(
+                            name = IdentifierEntity("get"),
+                            type = returnType.makeNullable().convertToNode().process(),
+                            parameters = parameters.map { param -> param.convertToNode().process() },
+                            typeParameters = emptyList(),
 
-                    annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
-                    open = owner.isOpen(),
-                    override = null,
+                            annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
+                            open = owner.isOpen(),
+                            override = null,
 
-                    static = false,
-                    operator = true,
-                    body = null
-                )
+                            static = false,
+                            operator = true,
+                            body = null
+                    )
             ) + returnType.convertToNode().unroll().map { unrolledReturnType ->
                 MethodModel(
                         name = IdentifierEntity("set"),
                         type = UNIT_TYPE,
                         parameters = parameters.map { param -> param.convertToNode().process() } + ParameterModel(
-                            name = "value",
-                            type = unrolledReturnType.process(),
-                            initializer = null,
-                            vararg = false,
-                            modifier = null
+                                name = "value",
+                                type = unrolledReturnType.process(),
+                                initializer = null,
+                                vararg = false,
+                                modifier = null
                         ),
                         typeParameters = emptyList(),
 
@@ -481,7 +494,7 @@ internal class DocumentConverter(
                     listOf(
                             PropertyModel(
                                     name = IdentifierEntity(name),
-                                    type =  FunctionTypeModel(
+                                    type = FunctionTypeModel(
                                             parameters = (parameters.map { param ->
                                                 param.convertToNode().processAsLambdaParam()
                                             }),
@@ -503,41 +516,41 @@ internal class DocumentConverter(
                     )
                 } else {
                     listOf(
-                    MethodModel(
-                        name = IdentifierEntity(name),
-                        type = type.convertToNode().process(),
-                        parameters = parameters.map { param -> param.convertToNode().process() },
-                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                        static = isStatic(),
-                        override = null,
-                        annotations = emptyList(),
-                        open = owner.isOpen(),
-                        body = null,
-                        operator = false
-                    ))
+                            MethodModel(
+                                    name = IdentifierEntity(name),
+                                    type = type.convertToNode().process(),
+                                    parameters = parameters.map { param -> param.convertToNode().process() },
+                                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                                    static = isStatic(),
+                                    override = null,
+                                    annotations = emptyList(),
+                                    open = owner.isOpen(),
+                                    body = null,
+                                    operator = false
+                            ))
                 }
 
             }
             is MethodDeclaration -> listOf(
-                 MethodModel(
-                    name = IdentifierEntity(name),
-                    type = type.convertToNode().process(),
-                    parameters = parameters.map { param -> param.convertToNode().process() },
-                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                    static = isStatic(),
-                    override = null,
-                    annotations = emptyList(),
-                    operator = false,
-                    open = owner.isOpen(),
-                    body = body?.let {
-                             val convertedBody = expressionConverter.convertBlock(it)
-                             if (isGenerator) {
-                                 convertedBody.wrapBodyAsLazyIterator()
-                             } else {
-                                 convertedBody
-                             }
-                         }
-                 )
+                    MethodModel(
+                            name = IdentifierEntity(name),
+                            type = type.convertToNode().process(),
+                            parameters = parameters.map { param -> param.convertToNode().process() },
+                            typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                            static = isStatic(),
+                            override = null,
+                            annotations = emptyList(),
+                            operator = false,
+                            open = owner.isOpen(),
+                            body = body?.let {
+                                val convertedBody = expressionConverter.convertBlock(it)
+                                if (isGenerator) {
+                                    convertedBody.wrapBodyAsLazyIterator()
+                                } else {
+                                    convertedBody
+                                }
+                            }
+                    )
             )
             is PropertyDeclaration -> {
                 val initializer = expressionConverter.convertExpression(initializer)
@@ -577,13 +590,13 @@ internal class DocumentConverter(
     }
 
 
-    private fun ParameterDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): ParameterModel {
+    private fun ParameterDeclaration.process(): ParameterModel {
         val initializerResolved = if (initializer != null || optional) {
             TypeDeclaration(IdentifierEntity("definedExternally"), emptyList())
         } else null
 
         return ParameterModel(
-                type = type.process(context),
+                type = type.process(TranslationContext.PARAMETER),
                 name = name,
                 initializer = when {
                     initializerResolved != null -> ExpressionStatementModel(
@@ -633,35 +646,35 @@ internal class DocumentConverter(
 
     private fun BlockStatementModel.wrapBodyAsLazyIterator(): BlockStatementModel {
         return BlockStatementModel(
-            statements = listOf(
-                ReturnStatementModel(
-                    expression = CallExpressionModel(
-                        expression = IdentifierExpressionModel(IdentifierEntity("Iterable")),
-                        arguments = listOf(
-                            LambdaExpressionModel(
-                                parameters = listOf(),
-                                body = BlockStatementModel(
-                                    listOf(
-                                        ExpressionStatementModel(
-                                            CallExpressionModel(
-                                                expression = IdentifierExpressionModel(
-                                                    IdentifierEntity("iterator")
-                                                ),
-                                                arguments = listOf(
-                                                    LambdaExpressionModel(
+                statements = listOf(
+                        ReturnStatementModel(
+                                expression = CallExpressionModel(
+                                        expression = IdentifierExpressionModel(IdentifierEntity("Iterable")),
+                                        arguments = listOf(
+                                                LambdaExpressionModel(
                                                         parameters = listOf(),
-                                                        body = this
-                                                    )
+                                                        body = BlockStatementModel(
+                                                                listOf(
+                                                                        ExpressionStatementModel(
+                                                                                CallExpressionModel(
+                                                                                        expression = IdentifierExpressionModel(
+                                                                                                IdentifierEntity("iterator")
+                                                                                        ),
+                                                                                        arguments = listOf(
+                                                                                                LambdaExpressionModel(
+                                                                                                        parameters = listOf(),
+                                                                                                        body = this
+                                                                                                )
+                                                                                        )
+                                                                                )
+                                                                        )
+                                                                )
+                                                        )
                                                 )
-                                            )
                                         )
-                                    )
                                 )
-                            )
                         )
-                    )
                 )
-            )
         )
     }
 
@@ -843,7 +856,7 @@ internal class DocumentConverter(
                     TypeAliasModel(
                             name = aliasName,
                             typeReference = typeReferenceResolved,
-                            typeParameters = convertTypeParams( typeParameters.map { typeParameter ->
+                            typeParameters = convertTypeParams(typeParameters.map { typeParameter ->
                                 TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                             }, true),
                             visibilityModifier = VisibilityModifierModel.DEFAULT,
@@ -875,7 +888,7 @@ private class NodeConverter(
                     val fileName = rootFile.normalize().absolutePath
 
                     val generated = mutableListOf<SourceFileModel>()
-                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == ModuleDeclarationKind.DECLARATION_FILE, null).convert(source.fileName, generated)
+                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap, source.root.kind == ModuleDeclarationKind.DECLARATION_FILE, null).convert(source.fileName, generated)
 
                     val referencedFiles = source.root.imports.map { it.referencedFile } + source.root.references.map { it.referencedFile }
 
@@ -928,8 +941,8 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
 }
 
 fun SourceSetDeclaration.introduceModels(moduleNameResolver: ModuleNameResolver): SourceSetModel {
-     val exportQualifierMapBuilder = ExportQualifierMapBuilder(moduleNameResolver)
-     exportQualifierMapBuilder.lower(this)
+    val exportQualifierMapBuilder = ExportQualifierMapBuilder(moduleNameResolver)
+    exportQualifierMapBuilder.lower(this)
 
     val introduceNodes = IntroduceNodes()
     val nodes = introduceNodes.lower(this)

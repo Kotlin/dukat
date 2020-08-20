@@ -24,11 +24,11 @@ external fun barKey(a: Foo)
 
 external fun barKey(a: Number)
 
-external fun barArray(a: Array<dynamic /* String | Foo | Number */>)
+external fun barArray(a: Array<Any /* String | Foo | Number */>)
 
 external interface Parent {
     @nativeInvoke
-    operator fun invoke(vararg children: dynamic /* String | Foo | Number */): Foo
+    operator fun invoke(vararg children: Any /* String | Foo | Number */): Foo
 }
 
 // ------------------------------------------------------------------------------------------

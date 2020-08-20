@@ -30,4 +30,4 @@ external fun aliasUnionFunction(a: MapLike<Number, Values<String>>)
 
 external var listOfUnionVar: Values<dynamic /* String | Number */>
 
-external fun listOfUnionFunction(a: Values<dynamic /* Number | String */>)
+external fun listOfUnionFunction(a: Values<Any /* Number | String */>)
