@@ -742,10 +742,9 @@ export class AstConverter {
     }
 
     if (Array.isArray(symbol.declarations)) {
-      return symbol.declarations.filter(decl => !ts.isModuleDeclaration(decl) &&
+      return symbol.declarations.find(decl => !ts.isModuleDeclaration(decl) &&
               !ts.isVariableDeclaration(decl) && !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
               !ts.isFunctionLike(decl))
-          .sort()[0]
     }
 
     return null;

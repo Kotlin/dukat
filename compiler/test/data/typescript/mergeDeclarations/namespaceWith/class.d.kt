@@ -1,6 +1,6 @@
 // [test] nonDeclarations.lunr.nonDeclarations.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
-package lunr
+package builders
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -20,10 +20,10 @@ import org.w3c.xhr.*
 typealias Plugin = (self: Builder, args: Any) -> Unit
 
 // ------------------------------------------------------------------------------------------
-// [test] class.lunr.kt
-@file:JsQualifier("lunr")
+// [test] class.builders.kt
+@file:JsQualifier("builders")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
-package lunr
+package builders
 
 import kotlin.js.*
 import kotlin.js.Json
