@@ -160,9 +160,6 @@ task installTopNConfig {
     }
 }
 task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec) {
-    onlyIf {
-        project.hasProperty("dukat.test.extended.topn")
-    }
     workingDir TOPN_TARGET_DIR
 }
 
