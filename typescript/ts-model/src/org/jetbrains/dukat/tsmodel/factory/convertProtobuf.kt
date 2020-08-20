@@ -338,7 +338,6 @@ private fun ReferenceClauseDeclarationProto.convert(): ReferenceClauseDeclaratio
 }
 
 fun ModuleDeclarationProto.convert(): ModuleDeclaration {
-
     var export: ExportAssignmentDeclaration? = null
     val declarations = declarationsList.mapNotNull {
         if (it.hasExportAssignment()) {

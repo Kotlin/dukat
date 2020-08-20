@@ -1,4 +1,4 @@
-// [test] nonDeclarations.api.Tooling.nonDeclarations.kt
+// [test] nonDeclarations.api.Tooling.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package api.Tooling
 

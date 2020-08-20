@@ -16,6 +16,8 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 import `when`.`interface`
+import `when`.Promise
+import `fun`.Promise as _fun_Promise
 import `__`.`___`
 
 external var `val`: Any
@@ -28,11 +30,17 @@ external fun `fun`()
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 external interface This {
+    @nativeGetter
     operator fun get(key: String): Any?
+    @nativeSetter
     operator fun set(key: String, value: Boolean)
+    @nativeSetter
     operator fun set(key: String, value: String)
+    @nativeSetter
     operator fun set(key: String, value: String?)
+    @nativeSetter
     operator fun set(key: String, value: Any)
+    @nativeSetter
     operator fun set(key: String, value: Number?)
     var this_one_shouldnt_be_escaped: Boolean
     var `when`: String
@@ -67,7 +75,7 @@ external open class `is`<`interface`> {
     }
 }
 
-external fun <T, U> When(value: Promise<T>, transform: (param_val: T) -> U): Promise<U>
+external fun <T, U> When(value: Promise<T>, transform: (param_val: T) -> U): _fun_Promise<U>
 
 external var `_`: `___`
 

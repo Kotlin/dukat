@@ -59,7 +59,7 @@ private class ImportResolver(private val packageName: NameEntity, private val im
         } else {
             val conflictingImport = resolvedImports.firstOrNull { (it.name.rightMost() == shortName) && (it.name != entityName) }
             if ((conflictingImport != null) && (entityName.isTopLevelImport())) {
-                val alias = IdentifierEntity(entityName.translate().replace(".", "_"))
+                val alias = IdentifierEntity(entityName.translate().replace(".", "_").filterNot { it == '`' })
                 resolvedImports.add(ImportModel(entityName, alias))
                 alias
             } else null

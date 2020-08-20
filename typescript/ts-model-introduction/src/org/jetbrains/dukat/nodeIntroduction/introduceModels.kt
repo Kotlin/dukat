@@ -1,14 +1,6 @@
 package org.jetbrains.dukat.nodeIntroduction
 
-import org.jetbrains.dukat.ast.model.nodes.ClassLikeNode
-import org.jetbrains.dukat.ast.model.nodes.ClassNode
-import org.jetbrains.dukat.ast.model.nodes.InterfaceNode
-import org.jetbrains.dukat.ast.model.nodes.LiteralUnionNode
-import org.jetbrains.dukat.ast.model.nodes.ModuleNode
-import org.jetbrains.dukat.ast.model.nodes.SourceSetNode
-import org.jetbrains.dukat.ast.model.nodes.UnionLiteralKind
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
-import org.jetbrains.dukat.astCommon.Entity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
 import org.jetbrains.dukat.astCommon.NameEntity
@@ -61,6 +53,8 @@ import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -68,23 +62,30 @@ import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
+import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
+import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceOriginDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
+import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
+import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ObjectLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
+import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TupleDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
@@ -114,11 +115,23 @@ private data class Members(
 
 private typealias UidMapper = Map<String, FqNode>
 
-data class FqNode(val node: Entity, val fqName: NameEntity)
+data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
 private val ANY_TYPE = TypeValueModel(value = IdentifierEntity("Any"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Any")), metaDescription = null)
+
+private fun MemberOwnerDeclaration.convertMembers(interfaceDeclaration: Boolean): List<MemberDeclaration> {
+    return members.mapNotNull { member -> convertMemberDeclaration(member, interfaceDeclaration) }
+}
+
+private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
+    return params.all { it is StringLiteralDeclaration }
+}
+
+private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
+    return params.all { it is NumericLiteralDeclaration }
+}
 
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),
@@ -146,11 +159,35 @@ private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> 
 
 private fun Declaration.isOpen() = this !is ObjectLiteralDeclaration
 
+//TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
+private fun escapeName(name: String): String {
+    return name
+            .replace("/".toRegex(), ".")
+            .replace("-".toRegex(), "_")
+            .replace("^_$".toRegex(), "`_`")
+            .replace("^class$".toRegex(), "`class`")
+            .replace("^var$".toRegex(), "`var`")
+            .replace("^val$".toRegex(), "`val`")
+            .replace("^interface$".toRegex(), "`interface`")
+}
+
+private fun NameEntity.unquote(): NameEntity {
+    return when (this) {
+        is IdentifierEntity -> copy(value = escapeName(value.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")))
+        else -> this
+    }
+}
+
+private fun TypeModel.isDynamic(): Boolean {
+    return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
+}
+
 internal class DocumentConverter(
-        private val moduleNode: ModuleNode,
+        private val moduleNode: ModuleDeclaration,
         private val uidToNameMapper: UidMapper,
         private val exportQualifierMap: Map<String?, ExportQualifier>,
-        private val rootIsDeclaration: Boolean
+        private val rootIsDeclaration: Boolean,
+        private val ownerPackageName: NameEntity?
 ) {
     private val imports = mutableListOf<ImportModel>()
     private val expressionConverter = ExpressionConverter { typeNode ->
@@ -159,9 +196,13 @@ internal class DocumentConverter(
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-        val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleNode }
 
-        val declarationsMapped = (roots as List<ModuleNode>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        val shortName = moduleNode.name.unquote()
+        val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
+
+        val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
+
+        val declarationsMapped = (roots as List<ModuleDeclaration>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration, fullPackageName).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
             declaration.convertToModel(moduleNode)
         }
 
@@ -183,13 +224,13 @@ internal class DocumentConverter(
 
         jsModuleQualifier?.qualifier?.let { qualifier ->
             if (qualifier) {
-                annotations.add(AnnotationModel("file:JsQualifier", listOf(moduleNode.qualifiedPackageName.process { unquote(it) })))
+                annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
             }
         }
 
         return ModuleModel(
-                name = moduleNode.qualifiedPackageName,
-                shortName = moduleNode.qualifiedPackageName.rightMost(),
+                name = fullPackageName,
+                shortName = fullPackageName.rightMost(),
                 declarations = declarationsFiltered,
                 annotations = annotations,
                 submodules = submodules,
@@ -208,8 +249,8 @@ internal class DocumentConverter(
         } else null
     }
 
-    private fun ClassLikeNode.processMembers(): Members {
-        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
+    private fun ClassLikeDeclaration.processMembers(): Members {
+        val (staticNodes, ownNodes) = convertMembers(rootIsDeclaration).partition { it.isStatic() }
         return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 
@@ -237,7 +278,7 @@ internal class DocumentConverter(
         }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
-                typeParams = typeArguments.map { typeArgument -> typeArgument.process() },
+                typeParams = typeArguments.map { typeArgument -> typeArgument.convertToNode().process() },
                 delegateTo = null
         )
     }
@@ -254,13 +295,6 @@ internal class DocumentConverter(
         }
     }
 
-    private fun UnionTypeDeclaration.process(context: TranslationContext): TypeModel {
-        return when (context) {
-            TranslationContext.PARAMETER -> anyType(isNullable(), convertMeta())
-            else -> dynamicType(convertMeta())
-        }
-    }
-
     private fun TupleDeclaration.process(context: TranslationContext): TypeModel {
         val meta = "JsTuple<${params.map { it.process(context).translate() }.joinToString(", ")}>"
         return when (context) {
@@ -271,20 +305,41 @@ internal class DocumentConverter(
 
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         return when (this) {
-            is LiteralUnionNode -> {
-                val value = when (kind) {
-                    UnionLiteralKind.NUMBER -> IdentifierEntity("Number")
-                    else -> IdentifierEntity("String")
-                }
+            is StringLiteralDeclaration -> {
+                    TypeValueModel(
+                        value = IdentifierEntity("String"),
+                        params = emptyList(),
+                        metaDescription = "\"$token\"",
+                        fqName = KLIBROOT.appendLeft(IdentifierEntity("String")),
+                        nullable = context == TranslationContext.PROPERTY(true)
+                    )
+            }
+            is NumericLiteralDeclaration -> {
                 TypeValueModel(
-                        value,
-                        emptyList(),
-                        params.joinToString(" | "),
-                        KLIBROOT.appendLeft(value),
-                        context == TranslationContext.PROPERTY(true)
+                        value = IdentifierEntity("Number"),
+                        params = emptyList(),
+                        metaDescription = token,
+                        fqName = KLIBROOT.appendLeft(IdentifierEntity("Number")),
+                        nullable = context == TranslationContext.PROPERTY(true)
                 )
             }
-            is UnionTypeDeclaration -> process(context)
+            is UnionTypeDeclaration -> when {
+                canBeTranslatedAsStringLiteral() -> TypeValueModel(
+                        IdentifierEntity("String"),
+                        emptyList(),
+                        convertMeta(),
+                        KLIBROOT.appendLeft(IdentifierEntity("String")),
+                        context == TranslationContext.PROPERTY(true)
+                )
+                canBeTranslatedAsNumericLiteral() -> TypeValueModel(
+                        IdentifierEntity("Number"),
+                        emptyList(),
+                        convertMeta(),
+                        KLIBROOT.appendLeft(IdentifierEntity("Number")),
+                        context == TranslationContext.PROPERTY(true)
+                )
+                else -> dynamicType()
+            }
             is TupleDeclaration -> process(context)
             is TypeParamReferenceDeclaration -> {
                 TypeParameterReferenceModel(
@@ -295,7 +350,7 @@ internal class DocumentConverter(
             }
             is TypeDeclaration -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
-                if ((node is TypeAliasDeclaration) && (node.typeReference is UnionTypeDeclaration)) {
+                if ((node is TypeAliasDeclaration) && (node.typeReference.convertToNode().process().isDynamic())) {
                     dynamicType("typealias ${node.aliasName} = dynamic")
                 } else {
                     TypeValueModel(
@@ -367,7 +422,7 @@ internal class DocumentConverter(
         return when (this) {
             is ConstructorDeclaration -> listOfNotNull(
                 ConstructorModel(
-                    parameters = parameters.map { param -> param.process().copy() },
+                    parameters = parameters.map { param -> param.convertToNode().process().copy() },
                     typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters))
                 ),
                 body?.let {
@@ -379,8 +434,8 @@ internal class DocumentConverter(
             is CallSignatureDeclaration -> listOf(
                 MethodModel(
                 name = IdentifierEntity("invoke"),
-                parameters = parameters.map { param -> param.process() },
-                type = type.process(),
+                parameters = parameters.map { param -> param.convertToNode().process() },
+                type = type.convertToNode().process(),
                 typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
 
                 static = false,
@@ -397,7 +452,7 @@ internal class DocumentConverter(
                 MethodModel(
                     name = IdentifierEntity("get"),
                     type = returnType.makeNullable().convertToNode().process(),
-                    parameters = parameters.map { param -> param.process() },
+                    parameters = parameters.map { param -> param.convertToNode().process() },
                     typeParameters = emptyList(),
 
                     annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
@@ -412,7 +467,7 @@ internal class DocumentConverter(
                 MethodModel(
                         name = IdentifierEntity("set"),
                         type = UNIT_TYPE,
-                        parameters = parameters.map { param -> param.process() } + ParameterModel(
+                        parameters = parameters.map { param -> param.convertToNode().process() } + ParameterModel(
                             name = "value",
                             type = unrolledReturnType.process(),
                             initializer = null,
@@ -437,9 +492,9 @@ internal class DocumentConverter(
                                     name = IdentifierEntity(name),
                                     type =  FunctionTypeModel(
                                             parameters = (parameters.map { param ->
-                                                param.processAsLambdaParam()
+                                                param.convertToNode().processAsLambdaParam()
                                             }),
-                                            type = type.process(),
+                                            type = type.convertToNode().process(),
                                             metaDescription = null,
                                             nullable = true
                                     ),
@@ -459,8 +514,8 @@ internal class DocumentConverter(
                     listOf(
                     MethodModel(
                         name = IdentifierEntity(name),
-                        type = type.process(),
-                        parameters = parameters.map { param -> param.process() },
+                        type = type.convertToNode().process(),
+                        parameters = parameters.map { param -> param.convertToNode().process() },
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         static = isStatic(),
                         override = null,
@@ -475,8 +530,8 @@ internal class DocumentConverter(
             is MethodDeclaration -> listOf(
                  MethodModel(
                     name = IdentifierEntity(name),
-                    type = type.process(),
-                    parameters = parameters.map { param -> param.process() },
+                    type = type.convertToNode().process(),
+                    parameters = parameters.map { param -> param.convertToNode().process() },
                     typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                     static = isStatic(),
                     override = null,
@@ -635,11 +690,12 @@ internal class DocumentConverter(
         }
     }
 
-    private fun ClassNode.convertToClassModel(): ClassModel {
+    private fun ClassDeclaration.convertToClassModel(): ClassModel {
         val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
 
+        val external = rootIsDeclaration || hasDeclareModifier()
         return ClassModel(
                 name = name,
                 members = members.ownMembers,
@@ -655,7 +711,7 @@ internal class DocumentConverter(
                 } else {
                     null
                 },
-                typeParameters = convertTypeParams(typeParameters),
+                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                 parentEntities = parentModelEntities,
                 annotations = exportQualifierMap[uid].toAnnotation(),
                 comment = null,
@@ -666,7 +722,7 @@ internal class DocumentConverter(
         )
     }
 
-    private fun InterfaceNode.convertToInterfaceModel(): InterfaceModel {
+    private fun InterfaceDeclaration.convertToInterfaceModel(): InterfaceModel {
         val members = processMembers()
 
         return InterfaceModel(
@@ -684,19 +740,19 @@ internal class DocumentConverter(
                 } else {
                     null
                 },
-                typeParameters = convertTypeParams(typeParameters),
+                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                 parentEntities = convertParentEntities(parentEntities),
                 annotations = mutableListOf(),
                 comment = null,
-                external = external,
+                external = rootIsDeclaration || hasDeclareModifier(),
                 visibilityModifier = VisibilityModifierModel.DEFAULT
         )
     }
 
-    fun TopLevelEntity.convertToModel(moduleOwner: ModuleNode): TopLevelModel? {
+    fun TopLevelEntity.convertToModel(moduleOwner: ModuleDeclaration): TopLevelModel? {
         return when (this) {
-            is ClassNode -> convertToClassModel()
-            is InterfaceNode -> convertToInterfaceModel()
+            is ClassDeclaration -> convertToClassModel()
+            is InterfaceDeclaration -> convertToInterfaceModel()
             is EnumDeclaration -> {
                 EnumModel(
                         name = IdentifierEntity(name),
@@ -709,9 +765,9 @@ internal class DocumentConverter(
                 FunctionModel(
                         name = IdentifierEntity(name),
                         parameters = parameters.map { param ->
-                            param.process()
+                            param.convertToNode().process()
                         },
-                        type = type.process(),
+                        type = type.convertToNode().process(),
 
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         annotations = exportQualifierMap[uid].toAnnotation(),
@@ -735,7 +791,7 @@ internal class DocumentConverter(
             is VariableDeclaration -> {
                 val variableType = type
 
-                val nameResolved = if (moduleOwner.packageName.isStringLiteral()) {
+                val nameResolved = if (moduleOwner.name.isStringLiteral()) {
                     (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)
@@ -789,12 +845,13 @@ internal class DocumentConverter(
                 }
             }
             is TypeAliasDeclaration -> {
-                if (typeReference is UnionTypeDeclaration) {
+                val typeReferenceResolved = typeReference.convertToNode().process()
+                if (typeReferenceResolved.isDynamic()) {
                     null
                 } else {
                     TypeAliasModel(
                             name = aliasName,
-                            typeReference = typeReference.process(),
+                            typeReference = typeReferenceResolved,
                             typeParameters = convertTypeParams( typeParameters.map { typeParameter ->
                                 TypeDeclaration(typeParameter.name, typeParameter.constraints.map { it.convertToNode() })
                             }, true),
@@ -814,7 +871,7 @@ internal class DocumentConverter(
 
 
 private class NodeConverter(
-        private val node: SourceSetNode,
+        private val node: SourceSetDeclaration,
         private val uidToNameMapper: UidMapper,
         private val exportQualifierMap: Map<String?, ExportQualifier>
 ) {
@@ -827,15 +884,16 @@ private class NodeConverter(
                     val fileName = rootFile.normalize().absolutePath
 
                     val generated = mutableListOf<SourceFileModel>()
-                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == org.jetbrains.dukat.tsmodel.ModuleDeclarationKind.DECLARATION_FILE).convert(source.fileName, generated)
+                    val root = DocumentConverter(source.root, uidToNameMapper, exportQualifierMap,  source.root.kind == ModuleDeclarationKind.DECLARATION_FILE, null).convert(source.fileName, generated)
+
+                    val referencedFiles = source.root.imports.map { it.referencedFile } + source.root.references.map { it.referencedFile }
 
                     val module = SourceFileModel(
-                            name = source.name,
+                            name = null,
                             fileName = fileName,
                             root = root,
-                            referencedFiles = source.referencedFiles.map { referenceFile ->
-                                val absolutePath = rootFile.resolveSibling(referenceFile).normalize().absolutePath
-                                absolutePath
+                            referencedFiles = referencedFiles.map { referenceFile ->
+                                rootFile.resolveSibling(referenceFile).normalize().absolutePath
                             })
 
                     generated + listOf(module)
@@ -845,31 +903,36 @@ private class NodeConverter(
 }
 
 private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
-    fun visitClassLikeNode(declaration: ClassLikeNode, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.name)))
+    fun visitClassLike(declaration: ClassLikeDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(declaration.name)))
     }
 
-    fun visitTypeAliasNode(declaration: TypeAliasDeclaration, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(declaration.aliasName)))
+    fun visitTypeAlias(declaration: TypeAliasDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(declaration.aliasName)))
     }
 
-    fun visitEnumNode(declaration: EnumDeclaration, owner: ModuleNode) {
-        visit(declaration.uid, FqNode(declaration, owner.qualifiedPackageName.appendLeft(IdentifierEntity(declaration.name))))
+    fun visitEnum(declaration: EnumDeclaration, ownerName: NameEntity) {
+        visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(IdentifierEntity(declaration.name))))
     }
 
-    fun visitModule(node: ModuleNode) {
+    fun visitModule(node: ModuleDeclaration, ownerPackageName: NameEntity?) {
+        val name = node.name
+
+        val shortName = name.unquote()
+        val qualifiedName = ownerPackageName?.appendLeft(shortName) ?: shortName
+
         node.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
-                is ClassLikeNode -> visitClassLikeNode(topLevelNode, node)
-                is TypeAliasDeclaration -> visitTypeAliasNode(topLevelNode, node)
-                is EnumDeclaration -> visitEnumNode(topLevelNode, node)
-                is ModuleNode -> visitModule(topLevelNode)
+                is ClassLikeDeclaration -> visitClassLike(topLevelNode, qualifiedName)
+                is TypeAliasDeclaration -> visitTypeAlias(topLevelNode, qualifiedName)
+                is EnumDeclaration -> visitEnum(topLevelNode, qualifiedName)
+                is ModuleDeclaration -> visitModule(topLevelNode, qualifiedName)
             }
         }
     }
 
-    fun process(sourceSet: SourceSetNode) {
-        sourceSet.sources.forEach { source -> visitModule(source.root) }
+    fun process(sourceSet: SourceSetDeclaration) {
+        sourceSet.sources.forEach { source -> visitModule(source.root, null) }
     }
 }
 

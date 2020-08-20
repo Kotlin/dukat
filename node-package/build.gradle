@@ -66,8 +66,9 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
     }
 }
 
-task buildDistrib {
-    dependsOn = [":ts-converter:webpack", installNpmDependencies, ":command-line:build"]
+task buildDistribFrontend {
+    description = "Copies js files to the node-package distrib folder"
+    dependsOn = [":ts-converter:webpack", installNpmDependencies]
 
     doLast {
         copy {
@@ -91,6 +92,14 @@ task buildDistrib {
             into "${DISTRIB_PATH}/bin"
         }
 
+    }
+}
+
+task buildDistrib {
+    description = "Copies all artefacts needed to the node-package distrib folder"
+    dependsOn = [buildDistribFrontend, ":command-line:build"]
+
+    doLast {
         copy {
             from configurations.cliBinary
             into "${DISTRIB_PATH}/build/runtime"

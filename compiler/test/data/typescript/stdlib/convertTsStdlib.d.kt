@@ -22,6 +22,8 @@ external fun processTemplate(a: Array<String>): Array<String>
 
 typealias NumArray = Array<Number>
 
+typealias SmartArray<T> = Array<T>
+
 typealias SmartNumArray<T> = Array<T>
 
 typealias MyVerySpecificException = Error

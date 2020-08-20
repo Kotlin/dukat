@@ -1,6 +1,7 @@
-// [test] nonDeclarations.something.kt
+// [test] dynamicType.Search.kt
+@file:JsQualifier("Search")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
-package something
+package Search
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -17,14 +18,13 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-typealias WithSource = String
+external fun ping(settings: dynamic /* typealias MetadataSettings = dynamic */)
 
 // ------------------------------------------------------------------------------------------
-// [test] moveAliasOutside.something.kt
-@file:JsModule("something")
-@file:JsNonModule
+// [test] dynamicType.Search.Settings.kt
+@file:JsQualifier("Search.Settings")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
-package something
+package Search.Settings
 
 import kotlin.js.*
 import kotlin.js.Json
@@ -41,4 +41,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun ping(source: WithSource)
+external open class _Impl {
+    open var cache: String
+    open var results: String
+}

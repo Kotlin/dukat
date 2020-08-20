@@ -3,6 +3,8 @@ package org.jetbrains.dukat.commonLowerings
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
 import org.jetbrains.dukat.astModel.MethodModel
@@ -10,6 +12,8 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeModel
+import org.jetbrains.dukat.astModel.TypeParameterModel
+import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
@@ -62,6 +66,16 @@ private fun resolveCommonType(members: List<MemberModel>): TypeModel {
     } ?: TypeValueModel(IdentifierEntity("Any"), emptyList(), null, null, true)
 }
 
+private fun TypeModel.makeNullable(): TypeModel {
+    return when(this) {
+        is TypeValueModel -> copy(nullable = true)
+        is FunctionTypeModel -> copy(nullable = true)
+        is TypeParameterReferenceModel -> copy(nullable = true)
+        is TypeParameterModel -> copy(nullable = true)
+        else -> this
+    }
+}
+
 private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
@@ -89,12 +103,12 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                             vararg = false,
                             modifier = null
                     )),
-                    type = commonType,
+                    type = commonType.makeNullable(),
                     typeParameters = emptyList(),
                     static = false,
                     override = null,
                     operator = true,
-                    annotations = emptyList(),
+                    annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
                     open = false,
                     body = null
             )
@@ -122,7 +136,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                         static = false,
                         override = null,
                         operator = true,
-                        annotations = emptyList(),
+                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
                         open = false,
                         body = null
                 )

@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.model.commonLowerings
 
+import org.jetbrains.dukat.astCommon.Lowering
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.EnumModel
@@ -7,6 +8,7 @@ import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
@@ -14,7 +16,7 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.panic.raiseConcern
 
-interface TopLevelModelLowering : ModelStatementLowering {
+interface TopLevelModelLowering : ModelStatementLowering, Lowering<SourceSetModel, SourceSetModel> {
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel = ownerContext.node
     fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel = ownerContext.node
 
@@ -89,5 +91,9 @@ interface TopLevelModelLowering : ModelStatementLowering {
                 declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
                 submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, NodeOwner(submodule, ownerContext)) }
         )
+    }
+
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return source.copy(sources = source.sources.map { it.copy(root = lowerRoot(it.root, NodeOwner(it.root, null))) })
     }
 }

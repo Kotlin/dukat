@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
 import org.jetbrains.dukat.commonLowerings.AddImports
 import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
+import org.jetbrains.dukat.commonLowerings.ExtractNestedInheritedInterfaces
 import org.jetbrains.dukat.commonLowerings.RemoveDuplicateMembers
 import org.jetbrains.dukat.commonLowerings.RemoveParentAny
 import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
@@ -104,7 +105,7 @@ open class TypescriptLowerer(
                         RemoveUnsupportedJsNames(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
-                        SeparateNonExternalEntities(),
+                        ExtractNestedInheritedInterfaces(),
                         ModelContextAwareLowering()
                                 .lower { context, inheritanceContext ->
                                     IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
@@ -118,6 +119,7 @@ open class TypescriptLowerer(
                         CorrectStdLibTypes(),
                         RemoveDuplicateMembers(),
                         RearrangeConstructors(),
+                        SeparateNonExternalEntities(),
                         AddImports(),
                         AddStandardImportsAndAnnotations(addSuppressAnnotations)
                 )

@@ -3,11 +3,13 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.kotlin.backend.common.output.SimpleOutputBinaryFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
+import org.jetbrains.kotlin.serialization.js.JsSerializerProtocol
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil
 import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.utils.JsMetadataVersion
@@ -40,7 +42,19 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String) {
         LanguageVersionSettingsImpl.DEFAULT,
         JsMetadataVersion.INSTANCE
     )
-    val outputFile =
+    val outputMetaJsFile =
         SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())
-    FileUtil.writeToFile(File(outputDir, outputFile.relativePath), outputFile.asByteArray())
+
+    val outputKjsmFiles = metadata.serializedPackages().map { serializedPackage ->
+        SimpleOutputBinaryFile(
+            listOf(),
+            JsSerializerProtocol.getKjsmFilePath(serializedPackage.fqName),
+            serializedPackage.bytes
+        )
+    }
+
+    FileUtil.writeToFile(File(outputDir, outputMetaJsFile.relativePath), outputMetaJsFile.asByteArray())
+    outputKjsmFiles.forEach { kjsmFile ->
+        FileUtil.writeToFile(File(outputDir, kjsmFile.relativePath), kjsmFile.asByteArray())
+    }
 }

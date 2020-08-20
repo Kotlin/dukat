@@ -167,7 +167,7 @@ task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec)
 }
 
 task prebuild {
-    dependsOn = ["testClasses", ":node-package:buildDistrib"]
+    dependsOn = ["testClasses", ":node-package:buildDistribFrontend", compileKotlin]
 }
 
 //TODO: having download and downloadDist is a shame

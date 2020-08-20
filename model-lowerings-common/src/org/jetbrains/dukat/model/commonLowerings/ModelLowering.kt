@@ -5,7 +5,9 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 
 interface ModuleModelLowering {
-    fun lower(module: ModuleModel): ModuleModel
+    fun lower(module: ModuleModel): ModuleModel {
+        return module
+    }
 }
 
 interface ModelLowering : Lowering<SourceSetModel, SourceSetModel>, ModuleModelLowering {
@@ -22,6 +24,6 @@ interface ComposableModelLowering : ModelLowering {
     }
 }
 
-fun SourceSetModel.lower(vararg lowerings: ModelLowering): SourceSetModel {
+fun SourceSetModel.lower(vararg lowerings: Lowering<SourceSetModel, SourceSetModel>): SourceSetModel {
     return lowerings.fold(this) { sourceSet, lowering -> lowering.lower(sourceSet) }
 }
