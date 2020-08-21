@@ -2,7 +2,6 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -34,7 +33,6 @@ external object foo {
 package Foo
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -82,7 +80,6 @@ external object foo {
 package Bar
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*

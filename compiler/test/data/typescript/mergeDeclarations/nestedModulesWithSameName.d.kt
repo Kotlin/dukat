@@ -4,7 +4,6 @@
 package Foo
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -32,7 +31,6 @@ external fun d(a: A, b: Any, c: B)
 package Foo.Foo
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*

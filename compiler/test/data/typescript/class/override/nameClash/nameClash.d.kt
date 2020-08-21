@@ -5,7 +5,6 @@
 package mydomain
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -34,7 +33,6 @@ external open class MyDomain : SomeDomain {
 package Core
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -62,7 +60,6 @@ external interface SomeDomain {
 package myevents
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*

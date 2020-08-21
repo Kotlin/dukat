@@ -4,7 +4,6 @@
 package Search
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -27,7 +26,6 @@ external fun ping(settings: dynamic /* typealias MetadataSettings = dynamic */)
 package Search.Settings
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*

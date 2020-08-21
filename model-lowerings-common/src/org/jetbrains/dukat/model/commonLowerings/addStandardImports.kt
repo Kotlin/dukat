@@ -36,7 +36,6 @@ class AddStandardImportsAndAnnotations(private val addSuppressAnnotations: Boole
         imports.addAll(0,
                 listOf(
                         "kotlin.js.*",
-                        "kotlin.js.Json",
                         "org.khronos.webgl.*",
                         "org.w3c.dom.*",
                         "org.w3c.dom.events.*",

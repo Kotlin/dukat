@@ -2,7 +2,6 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -46,7 +45,6 @@ external fun <__T> foo(__a: __T, _b: __C)
 package atpl
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -71,7 +69,6 @@ external fun __express(filename: String, options: Any, callback: Function<*>): A
 package __M
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
@@ -96,7 +93,6 @@ external fun __express(filename: String, options: Any, callback: Function<*>): A
 package __M.__N
 
 import kotlin.js.*
-import kotlin.js.Json
 import org.khronos.webgl.*
 import org.w3c.dom.*
 import org.w3c.dom.events.*
