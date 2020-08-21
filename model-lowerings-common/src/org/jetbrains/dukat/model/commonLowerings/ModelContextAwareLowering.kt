@@ -2,7 +2,7 @@ package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.graphs.Graph
+import org.jetbrains.dukat.toposort.Graph
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 
 private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
@@ -20,7 +20,7 @@ private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
 abstract class ModuleModelContextAwareLowering(
         internal val modelContext: ModelContext,
         internal val inheritanceContext: InheritanceContext
-) : ModuleModelLowering {}
+) : ModuleModelLowering
 
 class ModelContextAwareLowering : ComposableModelLowering {
     internal lateinit var modelContext: ModelContext

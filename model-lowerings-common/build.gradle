@@ -11,4 +11,5 @@ dependencies {
     implementation(project(":panic"))
     implementation(project(":stdlib"))
     implementation(project(":stdlib-generator"))
+    implementation(project(":toposort"))
 }

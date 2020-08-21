@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":logging"))
     implementation(project(":ownerContext"))
     implementation(project(":ts-model"))
+    implementation(project(":toposort"))
     implementation(project(":panic"))
 
 }

@@ -1,4 +1,4 @@
-package org.jetbrains.dukat.graphs
+package org.jetbrains.dukat.toposort
 
 open class Graph<V> {
     private val vertices = mutableMapOf<V, MutableSet<V>>()

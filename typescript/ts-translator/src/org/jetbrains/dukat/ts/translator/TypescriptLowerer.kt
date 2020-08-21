@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.ts.translator
 
+import IntroduceMissingConstructors
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.commonLowerings.AddExplicitGettersAndSetters
@@ -64,6 +65,7 @@ open class TypescriptLowerer(
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
                 .lower(
+                        IntroduceMissingConstructors(),
                         AddPackageName(packageName),
                         RemoveThisParameters(),
                         MergeModules(),

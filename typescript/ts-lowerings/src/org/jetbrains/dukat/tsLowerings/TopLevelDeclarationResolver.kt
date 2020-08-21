@@ -19,7 +19,7 @@ private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, T
             is ClassLikeDeclaration -> {
                 topLevelDeclarationsMap[it.uid] = it
             }
-            is  TypeAliasDeclaration -> {
+            is TypeAliasDeclaration -> {
                 topLevelDeclarationsMap[it.uid] = it
             }
             is ModuleDeclaration -> {
@@ -30,10 +30,14 @@ private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, T
     }
 }
 
-class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDeclaration) {
+class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDeclaration) : Iterable<TopLevelDeclaration> {
     @OptIn(ExperimentalStdlibApi::class)
     private val declarationMap = buildMap<String, TopLevelDeclaration> {
         sourceSetDeclaration.sources.forEach { it.root.scan(this) }
+    }
+
+    override fun iterator(): Iterator<TopLevelDeclaration> {
+        return declarationMap.values.iterator()
     }
 
     fun resolve(reference: ReferenceDeclaration?): TopLevelDeclaration? {

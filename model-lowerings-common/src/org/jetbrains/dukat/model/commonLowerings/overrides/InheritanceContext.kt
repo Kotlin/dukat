@@ -1,7 +1,7 @@
 package org.jetbrains.dukat.model.commonLowerings.overrides
 
 import org.jetbrains.dukat.astModel.ClassLikeModel
-import org.jetbrains.dukat.graphs.Graph
+import org.jetbrains.dukat.toposort.Graph
 
 class InheritanceContext(private val inheritanceGraph: Graph<ClassLikeModel>) {
     fun isDescendant(classLikeModelA: ClassLikeModel?, classLikeModelB: ClassLikeModel?): Boolean {
