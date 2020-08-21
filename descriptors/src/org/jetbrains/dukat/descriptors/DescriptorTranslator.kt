@@ -41,7 +41,6 @@ import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
-import org.jetbrains.kotlin.com.google.common.collect.ImmutableSet
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -473,16 +472,12 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     methodModel.name
                 )
                 if (overriddenMethod == null) {
-                    var override = overrideName
-                    if (override.isTsStdlibPrefixed()) {
-                        override = override.shiftLeft()!!
-                    }
                     val classInStdLib = findClass(
                         TypeValueModel(
-                            value = override,
+                            value = overrideName,
                             params = listOf(),
                             metaDescription = null,
-                            fqName = override
+                            fqName = overrideName
                         )
                     )
                     return classInStdLib?.unsubstitutedMemberScope?.getContributedFunctions(
