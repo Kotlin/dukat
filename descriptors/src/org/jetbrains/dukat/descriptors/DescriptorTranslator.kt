@@ -477,12 +477,12 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     if (override.isTsStdlibPrefixed()) {
                         override = override.shiftLeft()!!
                     }
-                    val classInStdLib = findClassInStdlib(
+                    val classInStdLib = findClass(
                         TypeValueModel(
                             value = override,
                             params = listOf(),
                             metaDescription = null,
-                            fqName = null
+                            fqName = override
                         )
                     )
                     return classInStdLib?.unsubstitutedMemberScope?.getContributedFunctions(

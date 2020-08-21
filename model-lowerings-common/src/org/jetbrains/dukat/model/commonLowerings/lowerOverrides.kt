@@ -120,7 +120,8 @@ private class ClassLikeOverrideResolver(
     }
 
     private fun MemberModel.lowerOverrides(
-            allSuperDeclarations: Map<NameEntity?, List<MemberData>>
+            allSuperDeclarations: Map<NameEntity?, List<MemberData>>,
+            parents: List<NameEntity>
     ): List<MemberModel> {
         return when (this) {
             is MethodModel -> {
@@ -147,7 +148,7 @@ private class ClassLikeOverrideResolver(
                         it.ownerModel
                     )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
                 }?.filterIrrelevantParentMembers()?.mapNotNull { it.fqName }?.distinct() ?: if (isSpecialCase()) {
-                    listOf(IdentifierEntity("Any"))
+                    parents.ifEmpty { listOf(IdentifierEntity("Any")) }
                 } else null
 
                 when {
@@ -311,7 +312,7 @@ private class ClassLikeOverrideResolver(
         val parentMembers = classLike.allParentMembers()
 
         val membersLowered = classLike.members.flatMap { member ->
-            member.lowerOverrides(parentMembers)
+            member.lowerOverrides(parentMembers, context.getParents(classLike).mapNotNull { it.fqName })
         }
 
         return when (classLike) {
