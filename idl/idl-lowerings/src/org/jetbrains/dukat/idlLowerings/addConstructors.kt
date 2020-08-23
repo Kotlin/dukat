@@ -71,7 +71,7 @@ private class ConstructorLowering : IDLLowering {
                     constructor.arguments.all { it.optional || it.defaultValue != null }
                 }
         return if (optionalConstructors.size > 1) {
-            val mainOptionalConstructor = optionalConstructors.maxBy { it.arguments.size }
+            val mainOptionalConstructor = optionalConstructors.maxByOrNull { it.arguments.size }
             requiredConstructors + optionalConstructors.map { constructor ->
                 if (constructor == mainOptionalConstructor) {
                     constructor

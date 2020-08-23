@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.moduleNameResolver
 
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import java.io.File
 
 class CommonJsNameResolver : ModuleNameResolver {
@@ -16,7 +15,9 @@ class CommonJsNameResolver : ModuleNameResolver {
         return packageJsonOwner?.let { jsonOwner ->
             val packageJsonFile = File(jsonOwner, "package.json")
             val packageJsonContent = packageJsonFile.readText()
-            val packageJson = Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true)).parse(PackageJsonModel.serializer(), packageJsonContent)
+            val packageJson = Json {
+                ignoreUnknownKeys = true
+            }.decodeFromString(PackageJsonModel.serializer(), packageJsonContent)
 
             if (packageJson.name == null) {
                 jsonOwner.name

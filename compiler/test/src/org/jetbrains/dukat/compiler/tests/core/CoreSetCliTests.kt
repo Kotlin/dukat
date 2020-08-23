@@ -1,9 +1,7 @@
 package org.jetbrains.dukat.compiler.tests.core
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -49,7 +47,6 @@ open class CoreSetCliTests {
         }
     }
 
-    @OptIn(UnstableDefault::class)
     protected fun assertContentEqualsBinary(
             descriptor: String,
             tsPath: String,
@@ -62,7 +59,10 @@ open class CoreSetCliTests {
         val dirName = "./build/tests/core/cli/${descriptor}"
         getTranslator().translate(tsPath, dirName, reportPath, "<RESOLVED_MODULE_NAME>", false, tsConfig)
 
-        val reportJson = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).parse(ReportJson.serializer(), File(reportPath).readText())
+        val reportJson = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }.decodeFromString(ReportJson.serializer(), File(reportPath).readText())
 
         val translatedOutput = reportJson.outputs.mapNotNull { output ->
             println("OUTPUT ${output}")

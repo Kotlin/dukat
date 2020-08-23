@@ -9,7 +9,7 @@ dependencies {
 gradle.taskGraph.whenReady {
     gradle.taskGraph.allTasks.each {
         if(it.project == project) {
-            it.onlyIf { gradle.kotlinVersion.startsWith("1.3.7") }
+            it.onlyIf { gradle.kotlinVersion.startsWith("1.4.0") }
         }
     }
 }

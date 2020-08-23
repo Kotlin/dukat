@@ -36,14 +36,14 @@ gradle.ext {
     //TODO: for some reason hasProperty is not working for me
     kotlinVersion = getProperty("dukatKotlinVersion")
   } catch (e) {
-    kotlinVersion = "1.3.72"
+    kotlinVersion = "1.4.0"
   }
 
   jupiterVersion = "5.6.0"
   nodeVersion = "14.7.0"
   defaultTsVersion = "3.9.5"
   defaultNpmPackageVersion = "0.5.7"
-  kotlinSerializationRuntimeVersion = "0.20.0"
+  kotlinSerializationRuntimeVersion = "1.0.0-RC"
   antlr4_version = "4.7.1"
   protobufGradlePluginVersion = "0.8.10"
   protobufImplementationVersion = "3.12.2"
@@ -57,8 +57,7 @@ include 'graphs'
 include 'model-lowerings-common'
 include 'compiler'
 include 'descriptors'
-include 'descriptors-1.3.60'
-include 'descriptors-1.3.70'
+include 'descriptors-1.4.0'
 include 'idl-declarations'
 include 'idl-lowerings'
 include 'idl-models'
@@ -89,8 +88,7 @@ include 'ts-model-introduction'
 include 'ts-translator'
 include 'ts-nodes'
 
-project(':descriptors-1.3.60').projectDir = file("$rootDir/version-specific/descriptors-1.3.60")
-project(':descriptors-1.3.70').projectDir = file("$rootDir/version-specific/descriptors-1.3.70")
+project(':descriptors-1.4.0').projectDir = file("$rootDir/version-specific/descriptors-1.4.0")
 
 project(':graphs').projectDir = file("$rootDir/abstract/graphs")
 project(':itertools').projectDir = file("$rootDir/abstract/itertools")

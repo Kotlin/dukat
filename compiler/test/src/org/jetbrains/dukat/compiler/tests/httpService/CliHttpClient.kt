@@ -3,7 +3,6 @@ package org.jetbrains.dukat.compiler.tests.httpService
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
@@ -60,7 +59,7 @@ class CliHttpClient(private val port: String) {
         connection.requestMethod = "POST"
         connection.connectTimeout = 10000
 
-        val messageRaw = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).toJson(TranslationRequest.serializer(), TranslationRequest(
+        val messageRaw = Json { prettyPrint = true; ignoreUnknownKeys = true }.encodeToJsonElement(TranslationRequest.serializer(), TranslationRequest(
                 packageName = "<ROOT>",
                 files = listOf(fileName),
                 tsConfig = tsConfig

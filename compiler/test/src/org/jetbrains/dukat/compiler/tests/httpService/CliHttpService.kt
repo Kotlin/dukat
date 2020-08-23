@@ -1,20 +1,17 @@
 package org.jetbrains.dukat.compiler.tests.httpService
 
-import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dukat.compiler.tests.NodeResolver
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 
-class CliHttpService @OptIn(UnstableDefault::class) constructor(
+class CliHttpService(
         private val serverPath: String = "./test/src/org/jetbrains/dukat/compiler/tests/server.js",
         private val nodeResolver: NodeResolver = NodeResolver("../node-package/build/env.json"),
         private val inspectNodeProcess: Boolean = false,
         private val emitDiagnostics: Boolean = false
 ) {
 
-    @OptIn(UnstableDefault::class)
     private val maxOldSpaceSize = 8192
 
-    @OptIn(UnstableDefault::class)
     fun start(
             port: String,
             vararg sandboxDirs: String
@@ -37,7 +34,6 @@ class CliHttpService @OptIn(UnstableDefault::class) constructor(
     )
 }
 
-@OptIn(UnstableDefault::class)
 fun main() {
     CliHttpService(
             serverPath = "./compiler/test/src/org/jetbrains/dukat/compiler/tests/server.js",

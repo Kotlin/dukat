@@ -128,7 +128,11 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, 
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
 
-    val reportBody = Json(JsonConfiguration.Stable.copy(prettyPrint = true, ignoreUnknownKeys = true)).stringify(Report.serializer(), report)
+    val reportBody = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+    }.encodeToString(Report.serializer(), report)
+
     try {
         println("saving report to ${reportFile.absolutePath}")
         reportFile.absoluteFile.parentFile.mkdirs()

@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests
 
-import kotlinx.serialization.UnstableDefault
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.cli.translateSourceSet
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
@@ -14,7 +13,6 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 
 val ADD_SUPPRESS_ANNOTATIONS = !(System.getProperty("dukat.test.omitSuppressAnnotations") == "true")
 
-@OptIn(UnstableDefault::class)
 open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptLowerer(CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS)): InputTranslator<String> {
 
     protected fun translateBinary(input: String, tsConfig: String?) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input, tsConfig)
