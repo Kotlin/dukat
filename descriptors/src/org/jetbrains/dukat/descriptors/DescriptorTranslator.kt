@@ -210,7 +210,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 
     private fun translateType(typeModel: TypeModel, shouldExpand: Boolean = true): KotlinType {
         if (typeModel is TypeParameterReferenceModel) {
-            return context.getTypeParameter(typeModel.name)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)!!
+            return context.getTypeParameter(typeModel.name)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
+                ?: ErrorUtils.createErrorType(translateName(typeModel.name)).makeNullableIf(typeModel.nullable)
         }
         if (typeModel is TypeValueModel) {
             val typeProjectionTypes = typeModel.params.map {
