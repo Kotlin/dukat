@@ -10,7 +10,7 @@ data class ObjectLiteralDeclaration(
         override val uid: String,
         override var nullable: Boolean = false,
         override var meta: MetaData? = null
-) : ParameterValueDeclaration, MemberDeclaration, MemberOwnerDeclaration, WithUidDeclaration
+) : ParameterValueDeclaration, MemberOwnerDeclaration, WithUidDeclaration
 
 fun ObjectLiteralDeclaration.canBeJson(): Boolean {
     if (members.size != 1) {

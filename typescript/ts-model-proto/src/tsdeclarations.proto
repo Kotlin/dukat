@@ -177,8 +177,7 @@ message MemberDeclarationProto {
         IndexSignatureDeclarationProto indexSignature = 3;
         MethodSignatureDeclarationProto methodSignature = 4;
         PropertyDeclarationProto property = 5;
-        ObjectLiteralDeclarationProto objectLiteral = 6;
-        MethodDeclarationProto method = 7;
+        MethodDeclarationProto method = 6;
     }
 }
 
