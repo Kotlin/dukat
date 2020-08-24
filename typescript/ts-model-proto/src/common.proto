@@ -1,0 +1,20 @@
+syntax = "proto3";
+package org.jetbrains.dukat.tsmodelproto;
+
+option java_multiple_files = true;
+
+message NameDeclarationProto {
+    oneof type {
+        IdentifierDeclarationProto identifier = 1;
+        QualifierDeclarationProto qualifier = 2;
+    }
+}
+
+message IdentifierDeclarationProto {
+    string value = 1;
+}
+
+message QualifierDeclarationProto {
+    NameDeclarationProto left = 1;
+    IdentifierDeclarationProto right = 3;
+}
