@@ -18,7 +18,8 @@
     ],
     "paths": {
       "typescript": ["./build/package/node_modules/typescript/lib/typescript.js"],
-      "declarations": ["../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb"],
+      "common_declarations": ["../ts-model-proto/build/generated/source/proto/main/js/common_pb"],
+      "declarations": ["../ts-model-proto/build/generated/source/proto/main/js/tsdeclarations_pb"],
       "google-protobuf": ["./build/package/node_modules/google-protobuf"]
     }
   },  

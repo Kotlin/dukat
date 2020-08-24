@@ -10,7 +10,8 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "declarations": path.resolve(__dirname, "../ts-model-proto/build/generated/source/proto/main/js/Declarations_pb")
+      "declarations": path.resolve(__dirname, "../ts-model-proto/build/generated/source/proto/main/js/tsdeclarations_pb"),
+      "common_declarations": path.resolve(__dirname, "../ts-model-proto/build/generated/source/proto/main/js/common_pb")
     }
   },
   externals: {

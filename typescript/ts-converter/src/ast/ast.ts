@@ -10,7 +10,7 @@ import {
     ExpressionDeclarationProto,
     FunctionDeclarationProto,
     HeritageClauseDeclarationProto,
-    IdentifierDeclarationProto, ImportClauseDeclarationProto,
+    ImportClauseDeclarationProto,
     ImportEqualsDeclarationProto, ImportSpecifierDeclarationProto,
     IndexSignatureDeclarationProto,
     InterfaceDeclarationProto,
@@ -18,7 +18,6 @@ import {
     MemberDeclarationProto,
     ModifierDeclarationProto,
     ModuleDeclarationProto,
-    NameDeclarationProto,
     NamespaceImportDeclarationProto,
     ParameterDeclarationProto,
     ParameterValueDeclarationProto,
@@ -35,6 +34,7 @@ import {
     TypeReferenceDeclarationProto,
     VariableDeclarationProto
 } from "declarations";
+import {IdentifierDeclarationProto, NameDeclarationProto} from "common_declarations";
 
 export type Block = BlockDeclarationProto;
 export type BindingElementDeclaration = BindingElementDeclarationProto;

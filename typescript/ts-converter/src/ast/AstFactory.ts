@@ -43,7 +43,6 @@ import {
   ForStatementDeclarationProto,
   FunctionDeclarationProto,
   HeritageClauseDeclarationProto,
-  IdentifierDeclarationProto,
   IfStatementDeclarationProto,
   ImportClauseDeclarationProto,
   ImportEqualsDeclarationProto,
@@ -57,7 +56,6 @@ import {
   MethodDeclarationProto,
   ModifierDeclarationProto,
   ModuleDeclarationProto,
-  NameDeclarationProto,
   NamedImportsDeclarationProto,
   NamespaceImportDeclarationProto,
   NumericLiteralDeclarationProto,
@@ -65,7 +63,6 @@ import {
   ParameterDeclarationProto,
   ParameterValueDeclarationProto,
   PropertyDeclarationProto,
-  QualifierDeclarationProto,
   ReferenceClauseDeclarationProto,
   ReferenceDeclarationProto,
   ReturnStatementDeclarationProto,
@@ -90,6 +87,7 @@ import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KINDMap = ModifierDeclarationProto.MODIFIER_KINDMap;
+import {IdentifierDeclarationProto, NameDeclarationProto, QualifierDeclarationProto} from "common_declarations";
 
 
 export class AstFactory {
