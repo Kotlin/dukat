@@ -105,6 +105,7 @@ import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
 import org.jetbrains.kotlin.types.createDynamicType
 import org.jetbrains.kotlin.types.replace
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 internal fun translateName(name: NameEntity): String {
@@ -118,6 +119,22 @@ fun translatePackageName(name: NameEntity): FqName {
                 else -> translateName(name)
             }
     )
+}
+
+private fun SimpleType.makeNullableIf(condition: Boolean): SimpleType {
+    return if (condition) {
+        makeNullableAsSpecified(true)
+    } else {
+        this
+    }
+}
+
+private fun KotlinType.makeNullableIf(condition: Boolean): KotlinType {
+    return if (condition) {
+        makeNullable()
+    } else {
+        this
+    }
 }
 
 private val KOTLIN_ANY_METHOD_NAMES = setOf("equals", "hashCode", "toString")
@@ -219,9 +236,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                         typeAlias.defaultType,
                                         typeParameters,
                                         newTypeArguments
-                                ).type as SimpleType).makeNullableAsSpecified(typeModel.nullable)
+                                ).type as SimpleType).makeNullableIf(typeModel.nullable)
                             } else {
-                                typeAlias.defaultType.replace(newTypeArguments).makeNullableAsSpecified(typeModel.nullable)
+                                typeAlias.defaultType.replace(newTypeArguments).makeNullableIf(typeModel.nullable)
                             }
                         } else {
                             val oldName = context.getOldName(typeModel.value)
@@ -237,7 +254,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                     createDynamicType(DefaultBuiltIns.Instance)
                                 } else {
                                     ErrorUtils.createErrorType(translateName(newTypeModel.value))
-                                            .makeNullableAsSpecified(newTypeModel.nullable)
+                                            .makeNullableIf(newTypeModel.nullable)
                                 }
                             } else {
                                 KotlinTypeFactory.simpleType(
@@ -1077,7 +1094,7 @@ private fun expandTypeAlias(
 
             TypeProjectionImpl(
                     keyArgument.projectionKind,
-                    replacementProjection.type.replaceAnnotations(keyArgument.type.annotations)
+                    replacementProjection.type.makeNullableIf(keyArgument.type.isMarkedNullable).replaceAnnotations(keyArgument.type.annotations)
             )
         }
     }
@@ -1089,8 +1106,8 @@ private fun expandTypeAlias(
                                 otherAlias.underlyingType,
                                 typeParameters + otherAlias.defaultType.constructor.parameters,
                                 newTypeArguments + replacement
-                        ).type as SimpleType).makeNullableAsSpecified(key.isMarkedNullable),
-                        otherAlias.defaultType.replace(replacement).makeNullableAsSpecified(key.isMarkedNullable)
+                        ).type as SimpleType).makeNullableIf(key.isMarkedNullable),
+                        otherAlias.defaultType.replace(replacement).makeNullableIf(key.isMarkedNullable)
                 )
         )
     }
@@ -1156,22 +1173,7 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
             DescriptorResolverUtils.resolveOverridesForNonStaticMembers(
                     classDescriptor.name,
                     classDescriptor.typeConstructor.supertypes.flatMap {
-                        val substitutor = TypeSubstitutor.create(
-                                object : TypeSubstitution() {
-                                    override fun get(key: KotlinType): TypeProjection? = if (it.arguments.isEmpty()) {
-                                        null
-                                    } else {
-                                        expandTypeAlias(
-                                                context,
-                                                key,
-                                                (it.constructor.declarationDescriptor as ClassDescriptor).declaredTypeParameters,
-                                                it.arguments
-                                        )
-                                    }
-                                }
-                        )
-                        DescriptorUtils.getAllDescriptors(it.memberScope).filterIsInstance<CallableMemberDescriptor>()
-                                .map { member -> member.substitute(substitutor) }
+                        DescriptorUtils.getAllDescriptors(it.memberScope)
                     }.filterIsInstance<CallableMemberDescriptor>(),
                     DescriptorUtils.getAllDescriptors(classDescriptor.unsubstitutedMemberScope)
                             .filterIsInstance<CallableMemberDescriptor>(),
