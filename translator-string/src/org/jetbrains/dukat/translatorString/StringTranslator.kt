@@ -80,7 +80,11 @@ import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.translator.ModelVisitor
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 
-const val FORMAT_TAB = "    "
+private const val FORMAT_TAB = "    "
+
+private const val KEYWORD_EXTERNAL = "external"
+private const val KEYWORD_INLINE = "inline"
+private const val KEYWORD_OPERATOR = "operator"
 
 private fun String?.translateMeta(): String {
     return if (this != null) {
@@ -398,7 +402,7 @@ private fun ExpressionModel.translate(): String {
                 else -> condition.translate()
             }}) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
-        is NonNullExpressionModel -> "${expression.translate()}!!"
+        is NonNullExpressionModel -> expression.translate()
         is LambdaExpressionModel -> {
             val arguments = if (parameters.isNotEmpty()) "${translateLambdaParameters(parameters)} -> " else ""
             "{ $arguments${body.statements.map { it.translateAsOneLine() }.joinToString(separator = "; ")} }"
@@ -572,8 +576,15 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         typeParams = " " + typeParams
     }
 
-    val modifier = if (inline) { "inline " } else if (external) { "$KOTLIN_EXTERNAL_KEYWORD " } else { "" }
-    val operator = if (operator) "operator " else ""
+    val modifiers = mutableListOf<String>()
+    visibilityModifier.translate()?.let { modifiers.add(it) }
+
+    val modifier = if (inline) { KEYWORD_INLINE } else if (external) { KEYWORD_EXTERNAL } else null
+    modifier?.let { modifiers.add(modifier) }
+
+    if (operator) {
+        modifiers.add(KEYWORD_OPERATOR)
+    }
 
     val body = body
 
@@ -590,7 +601,7 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
 
     output(
         FORMAT_TAB.repeat(padding) +
-                "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${operator}fun${typeParams} ${funName}(${translateParameters(
+                "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} fun${typeParams} ${funName}(${translateParameters(
                     parameters
                 )})${returnClause}${type.translateMeta()}${bodyFirstLine}"
     )
@@ -664,8 +675,7 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
     } else {
         ""
     }
-    val modifier = if (inline) "inline " else
-        if (external) "$KOTLIN_EXTERNAL_KEYWORD " else ""
+    val modifier = if (inline) KEYWORD_INLINE else if (external) KEYWORD_EXTERNAL else null
 
     val body = if (initializer != null) {
         " = ${initializer?.translate()}"
@@ -695,11 +705,17 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
     } else {
         extend?.translate() + "." + name.translate()
     }
-    return "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${modifier}${variableKeyword}${typeParams}${varName}${type}${body}"
+
+    val modifiers = mutableListOf<String>()
+
+    visibilityModifier.translate()?.let { modifiers.add(it) }
+    modifier?.let { modifiers.add(it) }
+
+    return "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} ${variableKeyword}${typeParams}${varName}${type}${body}"
 }
 
 private fun EnumModel.translate(): String {
-    val res = mutableListOf("${KOTLIN_EXTERNAL_KEYWORD} enum class ${name.translate()} {")
+    val res = mutableListOf("${KEYWORD_EXTERNAL} enum class ${name.translate()} {")
     res.add(values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
         "    ${value.value}${metaClause}"
@@ -767,7 +783,7 @@ private fun MethodModel.translateSignature(): List<String> {
         typeParams = " " + typeParams
     }
 
-    val operatorModifier = if (operator) "operator " else ""
+    val operatorModifier = if (operator) "${KEYWORD_OPERATOR} " else ""
     val annotations = annotations.map { "@${it.name}" }
 
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
@@ -845,10 +861,6 @@ private fun VisibilityModifierModel.translate(): String? {
     }
 }
 
-private fun VisibilityModifierModel.asClause(): String {
-    return translate()?.let { "$it " } ?: ""
-}
-
 private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
     val hasSecondaryConstructors = members.any { it is ConstructorModel }
@@ -856,22 +868,30 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     comment?.translate(output)
 
     val parents = translateHeritagModels(parentEntities)
-    val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
+    val modifiers = mutableListOf<String>()
+
+    visibilityModifier.translate()?.let { modifiers.add(it) }
+
+    if (external) {
+        modifiers.add(KEYWORD_EXTERNAL)
+    }
 
     val params = if (primaryConstructor == null) "" else
         if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(
             primaryConstructor.parameters
         )})"
 
-    val openClause = when (inheritanceModifier) {
+    when (inheritanceModifier) {
         InheritanceModifierModel.ABSTRACT -> "abstract"
         InheritanceModifierModel.OPEN -> "open"
-        InheritanceModifierModel.FINAL -> ""
+        InheritanceModifierModel.FINAL -> null
         InheritanceModifierModel.SEALED -> "sealed"
+    }?.let {
+        modifiers.add(it)
     }
 
     val classDeclaration =
-        "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${externalClause}${openClause} class ${name.translate()}${translateTypeParameters(
+        "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} class ${name.translate()}${translateTypeParameters(
             typeParameters
         )}${params}${parents}"
 
@@ -924,9 +944,17 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     val isBlock = hasMembers || staticMembers.isNotEmpty() || companionObject != null
     val parents = translateHeritagModels(parentEntities)
 
-    val externalClause = if (external) "${KOTLIN_EXTERNAL_KEYWORD} " else ""
+    val tokens = mutableListOf<String>()
+    visibilityModifier.translate()?.let { tokens.add(it) }
+
+    if (external) {
+        tokens.add(KEYWORD_EXTERNAL)
+    }
+
+    tokens.add("interface")
+
     output(
-        "${translateAnnotations(annotations)}${visibilityModifier.asClause()}${externalClause}interface ${name.translate()}${translateTypeParameters(
+        "${translateAnnotations(annotations)}${tokens.joinToString(" ")} ${name.translate()}${translateTypeParameters(
             typeParameters
         )}${parents}" + if (isBlock) " {" else ""
     )
@@ -934,10 +962,11 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
 
         if (companionObject != null) {
-            val parentsResolved = if (companionObject!!.parentEntities.isEmpty()) {
-                ""
+            val companionObjectParents = companionObject?.parentEntities
+            val parentsResolved = if (!companionObjectParents.isNullOrEmpty()) {
+                " : ${companionObjectParents.joinToString(", ") { it.translateAsHeritageClause() }}"
             } else {
-                " : ${companionObject!!.parentEntities.map { it.translateAsHeritageClause() }.joinToString(", ")}"
+                ""
             }
 
             if (hasMembers) {
@@ -985,8 +1014,13 @@ class StringTranslator : ModelVisitor {
 
     override fun visitObject(objectNode: ObjectModel) {
         addOutput("")
+
+        val modifiers = mutableListOf<String>()
+        objectNode.visibilityModifier.translate()?.let { modifiers.add(it) }
+        modifiers.add(KEYWORD_EXTERNAL)
+
         val objectModel =
-            "${objectNode.visibilityModifier.asClause()}${KOTLIN_EXTERNAL_KEYWORD} object ${objectNode.name.translate()}"
+            "${modifiers.joinToString(" ")} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
 
@@ -1019,7 +1053,7 @@ class StringTranslator : ModelVisitor {
         classModel.translate(0, ::addOutput)
     }
 
-    fun visitImport(import: ImportModel) {
+    private fun visitImport(import: ImportModel) {
         addOutput("import ${import.translate()}")
     }
 
