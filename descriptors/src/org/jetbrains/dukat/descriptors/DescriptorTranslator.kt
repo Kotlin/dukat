@@ -691,9 +691,6 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 null,
                 null
         )
-        typeParameters.forEach {
-            context.removeTypeParameter(IdentifierEntity(it.name.identifier))
-        }
         val getter = if (parent.kind == ClassKind.INTERFACE && propertyModel.getter) {
             PropertyGetterDescriptorImpl(
                     propertyDescriptor,
@@ -729,6 +726,9 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 getter,
                 setter
         )
+        typeParameters.forEach {
+            context.removeTypeParameter(IdentifierEntity(it.name.identifier))
+        }
         return propertyDescriptor
     }
 
