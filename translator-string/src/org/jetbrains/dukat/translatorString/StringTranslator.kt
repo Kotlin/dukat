@@ -576,14 +576,14 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         typeParams = " " + typeParams
     }
 
-    val modifiers = mutableListOf<String>()
-    visibilityModifier.translate()?.let { modifiers.add(it) }
+    val tokens = mutableListOf<String>()
+    visibilityModifier.translate()?.let { tokens.add(it) }
 
     val modifier = if (inline) { KEYWORD_INLINE } else if (external) { KEYWORD_EXTERNAL } else null
-    modifier?.let { modifiers.add(modifier) }
+    modifier?.let { tokens.add(modifier) }
 
     if (operator) {
-        modifiers.add(KEYWORD_OPERATOR)
+        tokens.add(KEYWORD_OPERATOR)
     }
 
     val body = body
@@ -599,9 +599,11 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
         extend?.translate() + "." + name.translate()
     }
 
+    tokens.add("fun")
+
     output(
         FORMAT_TAB.repeat(padding) +
-                "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} fun${typeParams} ${funName}(${translateParameters(
+                "${translateAnnotations(annotations)}${tokens.joinToString(" ")}${typeParams} ${funName}(${translateParameters(
                     parameters
                 )})${returnClause}${type.translateMeta()}${bodyFirstLine}"
     )
@@ -671,9 +673,9 @@ private fun TypeAliasModel.translate(): String {
 
 private fun VariableModel.translate(asDeclaration: Boolean = true): String {
     val variableKeyword = if (asDeclaration) {
-        if (immutable) "val " else "var "
+        if (immutable) "val" else "var"
     } else {
-        ""
+        null
     }
     val modifier = if (inline) KEYWORD_INLINE else if (external) KEYWORD_EXTERNAL else null
 
@@ -706,12 +708,17 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
         extend?.translate() + "." + name.translate()
     }
 
-    val modifiers = mutableListOf<String>()
+    val tokens = mutableListOf<String>()
 
-    visibilityModifier.translate()?.let { modifiers.add(it) }
-    modifier?.let { modifiers.add(it) }
+    visibilityModifier.translate()?.let { tokens.add(it) }
+    modifier?.let { tokens.add(it) }
 
-    return "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} ${variableKeyword}${typeParams}${varName}${type}${body}"
+    if (variableKeyword != null) {
+        tokens.add(variableKeyword)
+    }
+
+    val space = if (tokens.isEmpty()) "" else " "
+    return "${translateAnnotations(annotations)}${tokens.joinToString(" ")}$space${typeParams}${varName}${type}${body}"
 }
 
 private fun EnumModel.translate(): String {
