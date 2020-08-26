@@ -239,6 +239,12 @@ internal class DocumentConverter(
         )
     }
 
+    private fun TypeAliasDeclaration.isRedundant(typeResolved: TypeModel): Boolean {
+        return typeResolved is TypeValueModel &&
+                typeResolved.params.isEmpty() && typeParameters.isEmpty() && !typeResolved.nullable &&
+                typeResolved.value == aliasName
+    }
+
     private fun ReferenceEntity.getFqName(): NameEntity? {
         return uidToNameMapper[uid]?.fqName
     }
@@ -850,7 +856,7 @@ internal class DocumentConverter(
             }
             is TypeAliasDeclaration -> {
                 val typeReferenceResolved = typeReference.convertToNode().process()
-                if (typeReferenceResolved.isDynamic()) {
+                if (typeReferenceResolved.isDynamic() || isRedundant(typeReferenceResolved)) {
                     null
                 } else {
                     TypeAliasModel(
