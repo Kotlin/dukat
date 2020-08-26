@@ -3,7 +3,6 @@ package org.jetbrains.dukat.stdlibGenerator
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -15,6 +14,7 @@ import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
+import org.jetbrains.dukat.astModel.HeritageModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -224,13 +224,30 @@ private fun TypeParameterDescriptor.convertToTypeParameterModel(): TypeParameter
     )
 }
 
+private fun ClassDescriptor.extractParents(): List<HeritageModel> {
+    return typeConstructor.supertypes.mapNotNull {
+        val value = it.convertToTypeModel()
+        if (value is TypeValueModel) {
+            if (value.value == IdentifierEntity("Any")) {
+                null
+            } else {
+                HeritageModel(
+                        value = value,
+                        typeParams = value.params.map { it.type },
+                        delegateTo = null
+                )
+            }
+        } else null
+    }
+}
+
 private fun ClassDescriptor.convertToClassModel(): ClassModel {
     return ClassModel(
             name = IdentifierEntity(this.name.toString()),
             members = unsubstitutedMemberScope.getDescriptorsFiltered().mapNotNull { it.convertToMemberModel() },
             companionObject = null,
             typeParameters = declaredTypeParameters.map { it.convertToTypeParameterModel() },
-            parentEntities = emptyList(),
+            parentEntities = extractParents(),
             primaryConstructor = null,
             annotations = mutableListOf(),
             comment = null,
@@ -251,7 +268,7 @@ private fun ClassDescriptor.convertToInterfaceModel(): InterfaceModel {
             members = unsubstitutedMemberScope.getDescriptorsFiltered().mapNotNull { it.convertToMemberModel() },
             companionObject = null,
             typeParameters = declaredTypeParameters.map { it.convertToTypeParameterModel() },
-            parentEntities = emptyList(),
+            parentEntities = extractParents(),
             annotations = mutableListOf(),
             comment = null,
             external = isExternal,
