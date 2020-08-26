@@ -79,7 +79,7 @@ class DescriptorContext {
     }
 
     fun registerTypeAlias(name: NameEntity, descriptor: TypeAliasDescriptor) {
-        registeredTypeAliases[name] = descriptor
+        registeredTypeAliases[currentPackageName.appendLeft(name)] = descriptor
     }
 
     fun getDescriptor(name: NameEntity): ClassDescriptor? {

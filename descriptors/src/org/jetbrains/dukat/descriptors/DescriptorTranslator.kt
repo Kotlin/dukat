@@ -223,7 +223,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             }
             return context.getTypeParameter(typeModel.value)?.defaultType?.makeNullableAsSpecified(typeModel.nullable)
                     ?: LazyWrappedType(LockBasedStorageManager.NO_LOCKS) {
-                        val typeAlias = context.getTypeAlias(typeModel.value)
+                        val typeAlias = context.getTypeAlias(typeModel.fqName ?: IdentifierEntity("<ROOT>").appendLeft(typeModel.value))
                         if (typeAlias != null) {
                             val typeParameters = typeAlias.defaultType.constructor.parameters
                             val newTypeArguments = generateReplacementTypeArguments(
