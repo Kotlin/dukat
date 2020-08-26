@@ -29,6 +29,8 @@ export class DependencyBuilder {
       return;
     }
 
+    this.visitedFiles.add(source.fileName);
+
     let curDir = ts.getDirectoryPath(source.fileName);
 
     this.registerDependency(new TranslateAllSymbolsDependency(source.fileName));
@@ -47,7 +49,6 @@ export class DependencyBuilder {
     }
 
     this.visit(source);
-    this.visitedFiles.add(source.fileName);
   }
 
   constructor(
