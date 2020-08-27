@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoots
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -162,7 +163,10 @@ private fun ValueParameterDescriptor.convertToParameterModel(): ParameterModel {
     )
 }
 
-private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
+private fun FunctionDescriptor.convertToMethodModel(): MethodModel? {
+    if (kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+        return null
+    }
     val override = overriddenDescriptors.mapNotNull {  (it?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity() }
     return MethodModel(
             name = name.toString().toNameEntity(),
@@ -182,6 +186,9 @@ private fun FunctionDescriptor.convertToMethodModel(): MethodModel {
 private fun DeclarationDescriptor.convertToMemberModel(): MemberModel? {
     return when (this) {
         is PropertyDescriptor -> {
+            if (kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+                return null
+            }
             val override = overriddenDescriptors.mapNotNull {  (it?.parents?.firstOrNull() as? ClassDescriptor)?.fqNameSafe?.toString()?.toNameEntity() }
             PropertyModel(
                     name = IdentifierEntity(name.toString()),
