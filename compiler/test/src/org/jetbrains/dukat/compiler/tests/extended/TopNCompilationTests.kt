@@ -37,6 +37,7 @@ class TopNCompilationTests : CompilationTests() {
             )
 
             val allTests = minimalCore + listOf(
+                    "@aws-sdk/client-codebuild/types",
                     "@types/bluebird",
                     "@types/body-parser",
                     "@types/express",

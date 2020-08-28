@@ -8,6 +8,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "@aws-sdk/client-codebuild": "^1.0.0-alpha.1",
     "@types/async": "^3.0.3",
     "@types/bluebird": "^3.5.29",
     "@types/body-parser": "^1.17.1",
