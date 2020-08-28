@@ -55,6 +55,7 @@ import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.nodeIntroduction.introduceModels
+import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
@@ -87,6 +88,7 @@ open class TypescriptLowerer(
                         ResolveTypeAliases(),
                         PreprocessUnionTypes(),
                         SpecifyUnionType(),
+                        ProcessOptionalMethods(),
                         ProcessForOfStatements(),
                         ProcessNullabilityChecks(),
                         EscapeLiterals(),
