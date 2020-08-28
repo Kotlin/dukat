@@ -1,4 +1,4 @@
-// [test] tuple.kt
+// [test] optionalMethod.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
@@ -15,14 +15,6 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface Options {
-    var mode: dynamic /* JsTuple<String> */
-        get() = definedExternally
-        set(value) = definedExternally
-}
-
-external var foo: dynamic /* JsTuple<String, Any> */
-
-external interface State {
-    fun set(newValue: Any): dynamic /* JsTuple<`T$0`> */
+external open class B {
+    open val f: (() -> Unit)?
 }

@@ -20,9 +20,14 @@ external interface WritableStateOptions {
         get() = definedExternally
 }
 
+external interface `L$1` {
+    @nativeInvoke
+    operator fun invoke(arg: String)
+    @nativeInvoke
+    operator fun invoke(arg: Number)
+}
+
 external interface RealConflict {
-    val conflictMethod: ((arg: String) -> Unit)?
-        get() = definedExternally
-    val conflictMethod: ((arg: Number) -> Unit)?
+    val conflictMethod: `L$1`?
         get() = definedExternally
 }
