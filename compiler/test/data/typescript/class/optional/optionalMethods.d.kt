@@ -15,6 +15,16 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external interface `L$0` {
+    @nativeInvoke
+    operator fun invoke()
+    @nativeInvoke
+    operator fun invoke(x: Number)
+    @nativeInvoke
+    operator fun invoke(x: String)
+}
+
 external open class B {
     open val f: (() -> Unit)?
+    open val g: `L$0`?
 }
