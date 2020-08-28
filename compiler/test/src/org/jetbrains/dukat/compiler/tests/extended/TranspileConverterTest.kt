@@ -16,7 +16,7 @@ class TranspileConverterTest : CompilationTests() {
         sourcePath: String,
         tsConfig: String
     ) {
-        assertContentCompiles(descriptor, sourcePath, if (tsConfig.isEmpty()) null else tsConfig)
+        assertContentCompiles(descriptor, sourcePath, tsConfig.ifEmpty { null })
     }
 
     companion object  {
