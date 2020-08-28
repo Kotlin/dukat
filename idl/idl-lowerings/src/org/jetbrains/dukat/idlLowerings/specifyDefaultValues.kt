@@ -25,6 +25,9 @@ private class DefaultValueSpecifier(val sourceSet: IDLSourceSetDeclaration) : ID
         if (this.type !is IDLSingleTypeDeclaration) {
             return defaultValue
         }
+        if (this.type.nullable && defaultValue == "null") {
+            return defaultValue
+        }
         if (sourceSet.containsEnum(this.type.name)) {
             return "${this.type.name}.${processEnumMember(defaultValue!!)}"
         }
