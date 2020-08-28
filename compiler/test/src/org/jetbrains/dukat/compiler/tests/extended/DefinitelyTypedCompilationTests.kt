@@ -27,7 +27,7 @@ class DefinitelyTypedCompilationTests : CompilationTests() {
             sourcePath: String,
             tsConfig: String
     ) {
-        assertContentCompiles(descriptor, sourcePath, tsConfig)
+        assertContentCompiles(descriptor, sourcePath)
     }
 
     companion object {
