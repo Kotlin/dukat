@@ -112,3 +112,21 @@ public inline fun UndefinedMemberDictionary(str: String?, str2: String? = undefi
     o["str2"] = str2
     return o
 }
+
+public external interface NullableMemberDictionary {
+    var value1: Int? /* = 0 */
+        get() = definedExternally
+        set(value) = definedExternally
+    var value2: Int? /* = null */
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+@Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+@kotlin.internal.InlineOnly
+public inline fun NullableMemberDictionary(value1: Int? = 0, value2: Int? = null): NullableMemberDictionary {
+    val o = js("({})")
+    o["value1"] = value1
+    o["value2"] = value2
+    return o
+}
