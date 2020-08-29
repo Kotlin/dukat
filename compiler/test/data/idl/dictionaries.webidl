@@ -30,3 +30,8 @@ dictionary UndefinedMemberDictionary {
     required DOMString str;
     DOMString str2;
 };
+
+dictionary NullableMemberDictionary {
+    long? value1 = 0;
+    long? value2 = null;
+};
