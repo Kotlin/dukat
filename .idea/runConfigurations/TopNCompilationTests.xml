@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TopNCompilationTests" type="JUnit" factoryName="JUnit" singleton="false" nameIsGenerated="true">
-    <module name="dukat.compiler.test" />
+    <module name="compiler_test" />
     <useClassPathOnly />
     <extension name="coverage">
       <pattern>

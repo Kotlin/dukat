@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import {tsInternals} from "./TsInternals";
 
 import {
   Dependency,
@@ -44,15 +43,16 @@ export class DependencyBuilder {
 
     this.registerDependency(new TranslateAllSymbolsDependency(source.fileName));
 
+    let curDir = ts.getDirectoryPath(source.fileName);
     source.referencedFiles.forEach(referencedFile => {
-      let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName);
+      let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir);
       this.buildFileDependencies(normalizedPath)
     });
 
     if (source.resolvedTypeReferenceDirectiveNames instanceof Map) {
       for (let [_, referenceDirective] of source.resolvedTypeReferenceDirectiveNames) {
         if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-          this.buildFileDependencies(tsInternals.normalizePath(referenceDirective.resolvedFileName));
+          this.buildFileDependencies(referenceDirective.resolvedFileName);
         }
       }
     }
