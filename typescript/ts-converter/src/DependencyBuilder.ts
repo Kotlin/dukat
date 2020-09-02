@@ -8,12 +8,14 @@ import {
 } from "./Dependency";
 import {resolveDeclarations} from "./ExportContext";
 import {resolveModulePath} from "./resolveModulePath";
+import {createLogger} from "./Logger";
 
 export class DependencyBuilder {
   private dependencies = new Map<string, Dependency>();
   private visitedFiles = new Set<string>();
   private typeChecker = this.program.getTypeChecker();
   private checkedReferences = new Set<ts.Node>();
+  private logger = createLogger("DependencyBuilder")
 
   private registerDependency(dependency: Dependency) {
     let currentDependency = this.dependencies.get(dependency.fileName);
@@ -28,6 +30,8 @@ export class DependencyBuilder {
     let sourceFile = this.program.getSourceFile(fileName);
     if (sourceFile) {
       this.buildSourceDependencies(sourceFile);
+    } else {
+      this.logger.debug(`failed to build source for ${fileName}`);
     }
   }
 
