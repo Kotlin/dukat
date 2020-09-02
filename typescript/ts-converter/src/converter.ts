@@ -57,10 +57,7 @@ class SourceBundleBuilder {
 
     let dependencyBuilder = new DependencyBuilder(this.program);
     originalFiles.forEach(file => {
-      let sourceFile = this.program.getSourceFile(file);
-      if (sourceFile) {
-        dependencyBuilder.buildDependencies(sourceFile);
-      }
+      dependencyBuilder.buildFileDependencies(file);
     });
 
     this.dependencyBuilder = dependencyBuilder;

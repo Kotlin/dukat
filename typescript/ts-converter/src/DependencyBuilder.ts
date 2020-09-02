@@ -24,7 +24,14 @@ export class DependencyBuilder {
     }
   }
 
-  buildDependencies(source: ts.SourceFile) {
+  public buildFileDependencies(fileName: string) {
+    let sourceFile = this.program.getSourceFile(fileName);
+    if (sourceFile) {
+      this.buildSourceDependencies(sourceFile);
+    }
+  }
+
+  private buildSourceDependencies(source: ts.SourceFile) {
     if (this.visitedFiles.has(source.fileName)) {
       return;
     }
@@ -37,13 +44,13 @@ export class DependencyBuilder {
 
     source.referencedFiles.forEach(referencedFile => {
       let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir);
-      this.buildDependencies(this.program.getSourceFile(normalizedPath))
+      this.buildFileDependencies(normalizedPath)
     });
 
     if (source.resolvedTypeReferenceDirectiveNames instanceof Map) {
       for (let [_, referenceDirective] of source.resolvedTypeReferenceDirectiveNames) {
         if (referenceDirective && referenceDirective.hasOwnProperty("resolvedFileName")) {
-          this.buildDependencies(this.program.getSourceFile(tsInternals.normalizePath(referenceDirective.resolvedFileName)));
+          this.buildFileDependencies(tsInternals.normalizePath(referenceDirective.resolvedFileName));
         }
       }
     }
