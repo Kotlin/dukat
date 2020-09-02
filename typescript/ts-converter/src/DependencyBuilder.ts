@@ -42,12 +42,10 @@ export class DependencyBuilder {
 
     this.visitedFiles.add(source.fileName);
 
-    let curDir = ts.getDirectoryPath(source.fileName);
-
     this.registerDependency(new TranslateAllSymbolsDependency(source.fileName));
 
     source.referencedFiles.forEach(referencedFile => {
-      let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir);
+      let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName);
       this.buildFileDependencies(normalizedPath)
     });
 
