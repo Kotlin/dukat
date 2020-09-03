@@ -125,9 +125,9 @@ private data class TranslationKey(val fileName: String, val rootName: NameEntity
 
 fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
     val visited = mutableSetOf<TranslationKey>()
-
     return sourceSet.sources.mapNotNull { sourceFile ->
         // TODO: investigate whether it's safe to check just moduleName
+
         val sourceKey = TranslationKey(sourceFile.fileName, sourceFile.root.name, sourceFile.name)
         if (!visited.contains(sourceKey)) {
             visited.add(sourceKey)

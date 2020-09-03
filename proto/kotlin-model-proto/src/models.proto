@@ -1,0 +1,141 @@
+syntax = "proto3";
+package org.jetbrains.dukat.protobuf.kotlin;
+
+option java_multiple_files = true;
+
+import "common.proto";
+
+message TypeModelProto {
+    oneof type {
+        TypeValueModelProto typeValue = 1;
+        TypeParameterReferenceModelProto typeParameterReference = 2;
+        TypeParameterModelProto typeParameter = 3;
+        FunctionTypeModelProto functionType = 4;
+    }
+}
+
+message MemberModelProto {
+    oneof type {
+        PropertyModelProto propertyModel = 1;
+        MethodModelProto methodModel = 2;
+    }
+}
+
+message PropertyModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+    TypeModelProto type = 2;
+    bool immutable = 3;
+    repeated org.jetbrains.dukat.tsmodelproto.NameDeclarationProto override = 4;
+    bool open = 5;
+}
+
+message MethodModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+    TypeModelProto type = 2;
+    repeated ParameterModelProto params = 3;
+    repeated org.jetbrains.dukat.tsmodelproto.NameDeclarationProto override = 4;
+    bool open = 5;
+}
+
+message ParameterModelProto {
+    string name = 1;
+    TypeModelProto type = 2;
+}
+
+message TypeValueModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto value = 1;
+    repeated TypeParameterModelProto params = 2;
+    string metaDescription = 3;
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto fqName = 4;
+    bool nullable = 5;
+}
+
+message TypeParameterReferenceModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+    string metaDescription = 2;
+    bool nullable = 3;
+}
+
+message TypeParameterModelProto {
+    TypeModelProto type = 1;
+    repeated TypeModelProto constraints = 2;
+    VarianceModelProto variance = 3;
+}
+
+message FunctionTypeModelProto {
+        TypeModelProto type = 1;
+        string metaDescription = 2;
+        repeated ParameterModelProto params = 3;
+        bool nullable = 4;
+}
+
+message VarianceModelProto {
+    enum VARIANCE_KIND {
+        INVARIANT = 0;
+        COVARIANT = 1;
+        CONTRAVARIANT = 2;
+    }
+
+    VARIANCE_KIND variance = 1;
+}
+
+message InheritanceModifierModelProto {
+    enum INHERITANCE_KIND {
+        ABSTRACT = 0;
+        FINAL = 1;
+        OPEN = 2;
+        SEALED = 3;
+    }
+    INHERITANCE_KIND inheritance = 1;
+}
+
+message TopLevelModelProto {
+    oneof type {
+        VariableModelProto variableModel = 1;
+        ClassModelProto classModel = 2;
+        InterfaceModelProto interfaceModel = 3;
+    }
+}
+
+message VariableModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+    TypeValueModelProto type = 2;
+}
+
+message ClassModelProto {
+ org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+ repeated MemberModelProto members = 2;
+ repeated TypeParameterModelProto typeParameters = 3;
+ repeated HeritageModelProto parents = 4;
+ bool external = 5;
+ InheritanceModifierModelProto inheritanceModifier = 6;
+}
+
+message InterfaceModelProto {
+ org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+ repeated MemberModelProto members = 2;
+ repeated TypeParameterModelProto typeParameters = 3;
+ repeated HeritageModelProto parents = 4;
+ bool external = 5;
+}
+
+message HeritageModelProto {
+  TypeValueModelProto value = 1;
+  repeated TypeModelProto typeParams = 2;
+}
+
+message SourceSetModelProto {
+    repeated SourceFileModelProto sourceFiles = 1;
+}
+
+message SourceFileModelProto {
+    string fileName = 1;
+    ModuleModelProto root = 2;
+    repeated string referencedFiles = 3;
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 4;
+}
+
+message ModuleModelProto {
+    org.jetbrains.dukat.tsmodelproto.NameDeclarationProto name = 1;
+    repeated TopLevelModelProto declarations = 2;
+}

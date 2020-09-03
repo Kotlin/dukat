@@ -1,0 +1,52 @@
+
+plugins {
+    id "java"
+    id "kotlin"
+    id "com.google.protobuf"
+}
+
+def targetMainDir = "${project.buildDir}/generated/source/proto/main"
+
+dependencies {
+    implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
+    compile(project(":ts-model-proto"))
+
+
+    testImplementation(project(":ast-model"))
+    testImplementation(project(":ast-common"))
+    testImplementation(project(":translator"))
+    testImplementation(project(":translator-string"))
+    testImplementation(project(":stdlib-generator"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-annotations-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+
+    // without this dependency one won't see "Click to see difference" in IDEA
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}")
+}
+
+sourceSets {
+    generated {
+        java.srcDir("$targetMainDir/java")
+    }
+
+    main {
+        proto {
+            srcDirs = ["src"]
+        }
+
+        java {
+            srcDirs = ["$targetMainDir/java"]
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${gradle.protobufImplementationVersion}"
+    }
+}
+

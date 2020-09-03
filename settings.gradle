@@ -67,8 +67,10 @@ include 'itertools'
 include 'js-module-statistics'
 include 'js-translator'
 include 'js-type-analysis'
+include 'kotlin-model-proto'
 include 'logging'
 include 'model-lowerings'
+include 'model-serialization'
 include 'module-name-resolver'
 include 'node-distrib'
 include 'node-package'
@@ -102,6 +104,8 @@ project(':idl-reference-resolver').projectDir = file("$rootDir/idl/idl-reference
 
 project(':js-translator').projectDir = file("$rootDir/javascript/js-translator")
 project(':js-type-analysis').projectDir = file("$rootDir/javascript/js-type-analysis")
+
+project(':kotlin-model-proto').projectDir = file("$rootDir/proto/kotlin-model-proto")
 
 project(':ts-ast-declarations').projectDir = file("$rootDir/typescript/ts-ast-declarations")
 project(':ts-converter').projectDir = file("$rootDir/typescript/ts-converter")

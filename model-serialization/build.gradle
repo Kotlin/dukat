@@ -1,0 +1,48 @@
+plugins {
+    id "java"
+    id "kotlin"
+}
+
+
+dependencies {
+    implementation("com.google.protobuf:protobuf-java:${gradle.protobufImplementationVersion}")
+    implementation(project(":ts-model-proto"))
+    implementation(project(":kotlin-model-proto"))
+    implementation(project(":stdlib-generator"))
+
+
+    implementation(project(":ast-model"))
+    implementation(project(":ast-common"))
+
+    testImplementation(project(":translator"))
+    testImplementation(project(":translator-string"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-annotations-common")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+
+    // without this dependency one won't see "Click to see difference" in IDEA
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${gradle.jupiterVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${gradle.jupiterVersion}")
+}
+
+
+task serializedStdLib(type: JavaExec) {
+    dependsOn = [":stdlib-generator:buildDistrib"]
+
+    def inputJar = "${project(":stdlib-generator").buildDir}/libs/kotlin-stdlib-js.jar"
+    inputs.file(inputJar)
+
+    def outputBinary = "${project.buildDir}/stdlib.dukat"
+    outputs.file(outputBinary)
+
+    group = "Execution"
+    description = "Serialize and save kotlin stdlib"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.jetbrains.dukat.model.serialization.StdlibSerializerKt"
+    args  = [inputJar, outputBinary]
+}
+
+test.dependsOn(serializedStdLib)
+test.inputs.file("./test/resources/code.out.kt")
