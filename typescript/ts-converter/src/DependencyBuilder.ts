@@ -26,6 +26,12 @@ export class DependencyBuilder {
   }
 
   public buildFileDependencies(fileName: string) {
+    if (this.visitedFiles.has(fileName)) {
+      return;
+    }
+
+    this.visitedFiles.add(fileName);
+
     let sourceFile = this.program.getSourceFile(fileName);
     if (sourceFile) {
       this.buildSourceDependencies(sourceFile);
@@ -35,12 +41,6 @@ export class DependencyBuilder {
   }
 
   private buildSourceDependencies(source: ts.SourceFile) {
-    if (this.visitedFiles.has(source.fileName)) {
-      return;
-    }
-
-    this.visitedFiles.add(source.fileName);
-
     this.registerDependency(new TranslateAllSymbolsDependency(source.fileName));
 
     let curDir = ts.getDirectoryPath(source.fileName);
@@ -48,6 +48,7 @@ export class DependencyBuilder {
       let normalizedPath = ts.getNormalizedAbsolutePath(referencedFile.fileName, curDir);
       this.buildFileDependencies(normalizedPath)
     });
+
 
     if (source.resolvedTypeReferenceDirectiveNames instanceof Map) {
       for (let [_, referenceDirective] of source.resolvedTypeReferenceDirectiveNames) {
@@ -112,9 +113,9 @@ export class DependencyBuilder {
           });
         }
       } else {
-        let resolvedModuleName = resolveModulePath(node.moduleSpecifier);
-        if (resolvedModuleName) {
-          this.registerDependency(new TranslateAllSymbolsDependency(resolvedModuleName));
+        let resolvedModulePath = resolveModulePath(node.moduleSpecifier);
+        if (resolvedModulePath) {
+          this.buildFileDependencies(resolvedModulePath);
         }
       }
     } else if (ts.isCallExpression(node)) {
