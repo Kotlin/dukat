@@ -10,6 +10,8 @@ import org.jetbrains.dukat.commonLowerings.ExtractNestedInheritedInterfaces
 import org.jetbrains.dukat.commonLowerings.RemoveDuplicateMembers
 import org.jetbrains.dukat.commonLowerings.RemoveParentAny
 import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
+import org.jetbrains.dukat.commonLowerings.RemoveUnusedGeneratedInterfaces
+import org.jetbrains.dukat.commonLowerings.ReplaceSimpleGeneratedInterfacesWithLambdas
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
@@ -55,6 +57,7 @@ import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.nodeIntroduction.introduceModels
+import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
@@ -87,6 +90,7 @@ open class TypescriptLowerer(
                         ResolveTypeAliases(),
                         PreprocessUnionTypes(),
                         SpecifyUnionType(),
+                        ProcessOptionalMethods(),
                         ProcessForOfStatements(),
                         ProcessNullabilityChecks(),
                         EscapeLiterals(),
@@ -120,6 +124,8 @@ open class TypescriptLowerer(
                         RemoveDuplicateMembers(),
                         RearrangeConstructors(),
                         SeparateNonExternalEntities(),
+                        ReplaceSimpleGeneratedInterfacesWithLambdas(),
+                        RemoveUnusedGeneratedInterfaces(),
                         AddImports(),
                         AddStandardImportsAndAnnotations(addSuppressAnnotations)
                 )

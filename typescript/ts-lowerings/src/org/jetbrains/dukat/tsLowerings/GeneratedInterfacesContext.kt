@@ -13,6 +13,7 @@ import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.NamedMethodLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.PropertyDeclaration
 import org.jetbrains.dukat.tsmodel.ReferenceDeclaration
@@ -212,6 +213,20 @@ class GeneratedInterfacesContext {
         return null
     }
 
+    private fun GeneratedInterfaceDeclaration.createReferenceToThisOrIdentical(generatedTypeParameters: List<TypeParamReferenceDeclaration>, ownerUid: String): GeneratedInterfaceReferenceDeclaration {
+        val identicalInterface = findIdenticalInterface(this)
+        return if (identicalInterface == null) {
+            myGeneratedInterfaces[name] = this
+            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters, ReferenceDeclaration(uid))
+
+            registeredGeneratedInterfaces.getOrPut(ownerUid) { mutableListOf() }.add(this)
+
+            referenceNode
+        } else {
+            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, generatedTypeParameters, ReferenceDeclaration(identicalInterface.uid))
+        }
+    }
+
     internal fun registerObjectLiteralDeclaration(declaration: ObjectLiteralDeclaration, uid: String): GeneratedInterfaceReferenceDeclaration {
         val typeParams = LinkedHashSet<TypeParamReferenceDeclaration>()
 
@@ -259,18 +274,34 @@ class GeneratedInterfacesContext {
                         uid = generatedUid
                 )
 
+        return interfaceNode.createReferenceToThisOrIdentical(generatedTypeParameters, uid)
+    }
 
-        val identicalInterface = findIdenticalInterface(interfaceNode)
-        return if (identicalInterface == null) {
-            myGeneratedInterfaces[name] = interfaceNode
-            val referenceNode = GeneratedInterfaceReferenceDeclaration(name, generatedTypeParameters, ReferenceDeclaration(interfaceNode.uid))
+    internal fun registerFunInterface(methods: List<NamedMethodLikeDeclaration>, ownerUid: String): GeneratedInterfaceReferenceDeclaration {
 
-            registeredGeneratedInterfaces.getOrPut(uid) { mutableListOf() }.add(interfaceNode)
+        val generatedTypeParams = methods.flatMap { method ->
+            method.parameters.flatMap { it.type.findTypeParameterDeclaration() } +
+                    method.type.findTypeParameterDeclaration()
+        }.distinct()
 
-            referenceNode
-        } else {
-            GeneratedInterfaceReferenceDeclaration(identicalInterface.name, generatedTypeParameters, ReferenceDeclaration(identicalInterface.uid))
-        }
+        val funInterface = GeneratedInterfaceDeclaration(
+            name = IdentifierEntity("`L$${myGeneratedInterfaces.size}`"),
+            members = methods.map {
+                CallSignatureDeclaration(
+                    parameters = it.parameters,
+                    typeParameters = it.typeParameters,
+                    type = it.type
+                )
+            },
+            typeParameters = generatedTypeParams.map {
+                TypeParameterDeclaration(it.value, listOf(), null)
+            },
+            parentEntities = listOf(),
+            definitionsInfo = emptyList(),
+            uid = "${ownerUid}_${myGeneratedInterfaces.size}_GENERATED"
+        )
+
+        return funInterface.createReferenceToThisOrIdentical(generatedTypeParams, ownerUid)
     }
 
     private fun <T> T.resolveGeneratedInterfaces(): List<TopLevelDeclaration> where T : WithUidDeclaration, T : TopLevelDeclaration {

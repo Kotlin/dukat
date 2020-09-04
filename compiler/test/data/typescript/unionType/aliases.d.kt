@@ -34,10 +34,6 @@ external interface Parent {
     operator fun invoke(vararg children: Any /* String | Foo | Number */): Foo
 }
 
-external interface `T$0` {
-    fun ping(): Boolean
-}
-
 external interface Argv<T> {
     fun <O> command(handler: (args: Array<O> /* Array<O> & `T$0` */) -> Unit = definedExternally): Argv<T>
 }

@@ -8,5 +8,7 @@ enum class ModifierDeclaration : Entity {
     EXPORT_KEYWORD,
     DEFAULT_KEYWORD,
 
-    SYNTH_EXPORT_ASSIGNMENT
+    SYNTH_EXPORT_ASSIGNMENT,
+
+    SYNTH_IMMUTABLE
 }

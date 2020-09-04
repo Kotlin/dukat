@@ -9,3 +9,12 @@ interface ClassLikeDeclaration : TopLevelDeclaration, MemberOwnerDeclaration, Me
     override val members: List<MemberDeclaration>
     val parentEntities: List<HeritageClauseDeclaration>
 }
+
+fun ClassLikeDeclaration.copy(newMembers: List<MemberDeclaration>): ClassLikeDeclaration {
+    return when (this) {
+        is ClassDeclaration -> copy(members = newMembers)
+        is InterfaceDeclaration -> copy(members = newMembers)
+        is GeneratedInterfaceDeclaration -> copy(members = newMembers)
+        else -> this
+    }
+}

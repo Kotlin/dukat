@@ -496,46 +496,20 @@ internal class DocumentConverter(
                 )
             }
             is MethodSignatureDeclaration -> {
-                return if (optional) {
-                    listOf(
-                            PropertyModel(
-                                    name = IdentifierEntity(name),
-                                    type = FunctionTypeModel(
-                                            parameters = (parameters.map { param ->
-                                                param.convertToNode().processAsLambdaParam()
-                                            }),
-                                            type = type.convertToNode().process(),
-                                            metaDescription = null,
-                                            nullable = true
-                                    ),
-                                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                                    static = false,
-                                    override = null,
-                                    immutable = true,
-                                    getter = true,
-                                    setter = false,
-                                    initializer = null,
-                                    explicitlyDeclaredType = true,
-                                    open = owner.isOpen(),
-                                    lateinit = false
-                            )
+                listOf(
+                    MethodModel(
+                        name = IdentifierEntity(name),
+                        type = type.convertToNode().process(),
+                        parameters = parameters.map { param -> param.convertToNode().process() },
+                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                        static = isStatic(),
+                        override = null,
+                        annotations = emptyList(),
+                        open = owner.isOpen(),
+                        body = null,
+                        operator = false
                     )
-                } else {
-                    listOf(
-                            MethodModel(
-                                    name = IdentifierEntity(name),
-                                    type = type.convertToNode().process(),
-                                    parameters = parameters.map { param -> param.convertToNode().process() },
-                                    typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                                    static = isStatic(),
-                                    override = null,
-                                    annotations = emptyList(),
-                                    open = owner.isOpen(),
-                                    body = null,
-                                    operator = false
-                            ))
-                }
-
+                )
             }
             is MethodDeclaration -> listOf(
                     MethodModel(
@@ -561,7 +535,7 @@ internal class DocumentConverter(
             is PropertyDeclaration -> {
                 val initializer = expressionConverter.convertExpression(initializer)
 
-                val immutable = false
+                val immutable = modifiers.contains(ModifierDeclaration.SYNTH_IMMUTABLE)
 
                 listOf(PropertyModel(
                         name = IdentifierEntity(name),
@@ -572,7 +546,7 @@ internal class DocumentConverter(
                         immutable = immutable,
                         initializer = initializer,
                         getter = optional,
-                        setter = optional, // TODO: it's actually wrong
+                        setter = optional && !immutable, // TODO: it's actually wrong
                         open = owner.isOpen(),
                         explicitlyDeclaredType = explicitlyDeclaredType,
                         lateinit = !rootIsDeclaration && immutable && (initializer == null)

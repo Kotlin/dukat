@@ -10,7 +10,6 @@ data class MethodDeclaration(
         override val typeParameters: List<TypeParameterDeclaration>,
         override val modifiers: Set<ModifierDeclaration>,
         val body: BlockDeclaration?,
-        val optional: Boolean,
+        override val optional: Boolean,
         val isGenerator: Boolean
-) : StatementDeclaration, WithModifiersDeclaration,
-        ExpressionDeclaration, FunctionLikeDeclaration, CallableMemberDeclaration, NamedMemberDeclaration, MemberDeclaration
+) : StatementDeclaration, ExpressionDeclaration, NamedMethodLikeDeclaration, CallableMemberDeclaration, MemberDeclaration

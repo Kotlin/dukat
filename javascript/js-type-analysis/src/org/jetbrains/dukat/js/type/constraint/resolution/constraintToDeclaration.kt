@@ -108,7 +108,7 @@ private fun FunctionConstraint.toMemberDeclarations(name: String, isStatic: Bool
                 typeParameters = emptyList(),
                 modifiers = modifiers,
                 body = null,
-                optional = true,
+                optional = false,
                 isGenerator = false
         )
 }
