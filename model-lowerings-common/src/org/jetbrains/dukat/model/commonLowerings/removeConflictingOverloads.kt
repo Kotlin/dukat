@@ -19,7 +19,6 @@ import org.jetbrains.dukat.astModel.TypeModel
 import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 
@@ -179,10 +178,12 @@ private class ConflictingOverloads(private val context: ModelContext) : TopLevel
 }
 
 class RemoveConflictingOverloads : ModelLowering {
-
     override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.transform {
-            ConflictingOverloads(ModelContext(source)).lowerRoot(it, NodeOwner(it, null))
-        }
+        val modelContext = ModelContext(source)
+
+        return source.copy(sources = source.sources.map { sourceFile ->
+            val root = sourceFile.root
+            sourceFile.copy(root = ConflictingOverloads(modelContext).lowerRoot(root, NodeOwner(root, null)))
+        })
     }
 }

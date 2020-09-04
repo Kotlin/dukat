@@ -14,7 +14,6 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
-import org.jetbrains.dukat.astModel.transform
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
 private class ModifyVisibility(private val visibility: VisibilityModifierModel) : ModelWithOwnerLowering {
@@ -57,4 +56,9 @@ private fun ModuleModel.resolveTopLevelVisibility(visibilityModifierResolver: Vi
     return ModifyVisibility(visibilityModifierResolver.resolve()).lowerRoot(this, NodeOwner(this, null))
 }
 
-fun SourceSetModel.resolveTopLevelVisibility(visibilityModifierResolver: VisibilityModifierResolver): SourceSetModel = transform { it.resolveTopLevelVisibility(visibilityModifierResolver) }
+fun SourceSetModel.resolveTopLevelVisibility(visibilityModifierResolver: VisibilityModifierResolver): SourceSetModel {
+    return copy(sources = sources.map { sourceFile ->
+        val root = sourceFile.root
+        sourceFile.copy(root = root.resolveTopLevelVisibility(visibilityModifierResolver))
+    })
+}
