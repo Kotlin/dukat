@@ -26,21 +26,20 @@ class GeneratedInterfaceReferenceCollector : ModelWithOwnerTypeLowering {
     }
 }
 
-class GeneratedInterfaceRemover(private val context: GeneratedInterfaceReferenceCollector) : ModelWithOwnerTypeLowering {
+class RemoveUnusedGeneratedInterfaces : ModelWithOwnerTypeLowering {
+    private lateinit var collector: GeneratedInterfaceReferenceCollector
+
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         return moduleModel.copy(
-            declarations = moduleModel.declarations.filterNot {
-                it is InterfaceModel && it.name.isGenerated() && context.isUnused(it.name)
-            }
+                declarations = moduleModel.declarations.filterNot {
+                    it is InterfaceModel && it.name.isGenerated() && collector.isUnused(it.name)
+                }
         )
     }
-}
 
-
-class RemoveUnusedGeneratedInterfaces : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        val collector = GeneratedInterfaceReferenceCollector()
+        collector = GeneratedInterfaceReferenceCollector()
         collector.lower(source)
-        return GeneratedInterfaceRemover(collector).lower(source)
+        return super.lower(source)
     }
 }

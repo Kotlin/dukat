@@ -63,17 +63,17 @@ private class GeneratedInterfaceCollector : ModelWithOwnerTypeLowering {
     }
 }
 
-private class GeneratedInterfaceReplacementLowering(private val context: GeneratedInterfaceCollector) : ModelWithOwnerTypeLowering {
+class ReplaceSimpleGeneratedInterfacesWithLambdas : ModelWithOwnerTypeLowering {
+    private lateinit var collector: GeneratedInterfaceCollector
+
     override fun lowerTypeModel(ownerContext: NodeOwner<TypeModel>): TypeModel {
         val type = super.lowerTypeModel(ownerContext)
-        return context.getNewType(type)
+        return collector.getNewType(type)
     }
-}
 
-class ReplaceSimpleGeneratedInterfacesWithLambdas : ModelLowering {
     override fun lower(source: SourceSetModel): SourceSetModel {
-        val collector = GeneratedInterfaceCollector()
+        collector = GeneratedInterfaceCollector()
         collector.lower(source)
-        return GeneratedInterfaceReplacementLowering(collector).lower(source)
+        return super.lower(source)
     }
 }
