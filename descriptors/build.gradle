@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
+    implementation(project(":logging"))
     implementation(project(":panic"))
     implementation(project(":stdlib"))
     implementation(project(":translator"))

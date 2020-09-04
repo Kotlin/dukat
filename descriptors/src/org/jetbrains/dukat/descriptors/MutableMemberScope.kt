@@ -1,14 +1,18 @@
 package org.jetbrains.dukat.descriptors
 
+import org.jetbrains.dukat.logger.Logging
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScopeImpl
 import org.jetbrains.kotlin.utils.Printer
+
+internal val logger = Logging.logger("descriptors")
 
 class MutableMemberScope(private val members: MutableList<DeclarationDescriptor>) : MemberScopeImpl() {
 
@@ -34,6 +38,9 @@ class MutableMemberScope(private val members: MutableList<DeclarationDescriptor>
     }
 
     fun removeMembers(membersToRemove: List<DeclarationDescriptor>) {
+        membersToRemove.forEach {
+            logger.warn("Failed to translate ${it.fqNameSafe}, skipping")
+        }
         members -= membersToRemove
     }
 

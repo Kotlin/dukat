@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
@@ -83,6 +84,9 @@ open class CustomClassDescriptor(
     }
 
     fun removeConstructors(constructorsToRemove: List<ClassConstructorDescriptor>) {
+        constructorsToRemove.forEach {
+            logger.warn("Failed to translate ${it.fqNameSafe}, skipping")
+        }
         filteredOutConstructors += constructorsToRemove
     }
 }
