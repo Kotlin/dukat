@@ -339,7 +339,7 @@ private class OverrideResolver(private val context: ModelContext, private val in
     }
 }
 
-class LowerOverrides(modelContext: ModelContext, inheritanceContext: InheritanceContext) : ModuleModelContextAwareLowering(modelContext, inheritanceContext) {
+class LowerOverrides(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
         return OverrideResolver(modelContext, inheritanceContext).lowerOverrides(module)
     }

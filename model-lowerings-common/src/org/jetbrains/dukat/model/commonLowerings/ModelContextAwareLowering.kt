@@ -17,21 +17,16 @@ private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
     return graph
 }
 
-abstract class ModuleModelContextAwareLowering(
-        internal val modelContext: ModelContext,
-        internal val inheritanceContext: InheritanceContext
-) : ModuleModelLowering
-
 class ModelContextAwareLowering : ComposableModelLowering {
     internal lateinit var modelContext: ModelContext
     internal lateinit var inheritanceContext: InheritanceContext
-    private val factories = mutableListOf<(ModelContext, InheritanceContext) -> ModuleModelLowering>()
+    private val factories = mutableListOf<(ModelContext, InheritanceContext) -> ModelLowering>()
 
-    override val lowerings: List<ModuleModelLowering>
+    override val lowerings: List<ModelLowering>
         get() = factories.map { factory -> factory(modelContext, inheritanceContext) }
 
 
-    fun lower(factory: (ModelContext, InheritanceContext) -> ModuleModelLowering): ModelContextAwareLowering {
+    fun lower(factory: (ModelContext, InheritanceContext) -> ModelLowering): ModelContextAwareLowering {
         factories.add(factory)
         return this
     }

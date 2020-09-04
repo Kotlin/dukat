@@ -40,7 +40,7 @@ private class AmbiguousInterfaceLowering(private val modelContext: ModelContext,
     }
 }
 
-class IntroduceAmbiguousInterfaceMembers(modelContext: ModelContext, inheritanceContext: InheritanceContext) : ModuleModelContextAwareLowering(modelContext, inheritanceContext) {
+class IntroduceAmbiguousInterfaceMembers(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
         return AmbiguousInterfaceLowering(modelContext, inheritanceContext).lowerRoot(module, NodeOwner(module, null))
     }
