@@ -29,7 +29,7 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String) {
 
     val moduleDescriptor = flattenedSourceSet.translateToDescriptors()
 
-    val name = File(flattenedSourceSet.sources.first().fileName).nameWithoutExtension
+    val name = File(flattenedSourceSet.sources.firstOrNull()?.fileName ?: "index.d.ts").nameWithoutExtension
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
