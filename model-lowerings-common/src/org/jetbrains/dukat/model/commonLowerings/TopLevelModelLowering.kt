@@ -16,7 +16,7 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.panic.raiseConcern
 
-interface TopLevelModelLowering : ModelStatementLowering, Lowering<SourceSetModel, SourceSetModel> {
+interface TopLevelModelLowering : ModelStatementLowering, ModelLowering {
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel = ownerContext.node
     fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel = ownerContext.node
 
@@ -93,7 +93,7 @@ interface TopLevelModelLowering : ModelStatementLowering, Lowering<SourceSetMode
         )
     }
 
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return source.copy(sources = source.sources.map { it.copy(root = lowerRoot(it.root, NodeOwner(it.root, null))) })
+    override fun lower(module: ModuleModel): ModuleModel {
+        return lowerRoot(module, NodeOwner(module, null))
     }
 }
