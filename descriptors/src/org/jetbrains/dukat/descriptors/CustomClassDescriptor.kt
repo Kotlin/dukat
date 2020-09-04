@@ -2,6 +2,7 @@ package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.kotlin.backend.common.SimpleMemberScope
+import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -50,6 +51,8 @@ open class CustomClassDescriptor(
 
     var staticEnumScope: MemberScope? = null
 
+    private val filteredOutConstructors = mutableListOf<ClassConstructorDescriptor>()
+
     override fun getStaticScope(): MemberScope = staticEnumScope ?: SimpleMemberScope(listOf())
 
     override fun isCompanionObject(): Boolean {
@@ -68,4 +71,18 @@ open class CustomClassDescriptor(
         return typeConstructor
     }
 
+    override fun getConstructors(): Collection<ClassConstructorDescriptor> {
+        return super.getConstructors() - filteredOutConstructors
+    }
+
+    override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
+        if (filteredOutConstructors.contains(super.getUnsubstitutedPrimaryConstructor())) {
+            return null
+        }
+        return super.getUnsubstitutedPrimaryConstructor()
+    }
+
+    fun removeConstructors(constructorsToRemove: List<ClassConstructorDescriptor>) {
+        filteredOutConstructors += constructorsToRemove
+    }
 }

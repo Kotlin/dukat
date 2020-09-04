@@ -12,7 +12,7 @@ class DefinitelyTypedDescriptorTests : CompilationTests() {
     @MethodSource("descriptorCompilationSet")
     @EnabledIfSystemProperty(named = "dukat.test.extended", matches = "true")
     override fun runTests(descriptor: String, sourcePath: String, tsConfig: String) {
-        assertDescriptorEquals(descriptor, sourcePath)
+        assertDescriptorEquals(descriptor, sourcePath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     companion object {

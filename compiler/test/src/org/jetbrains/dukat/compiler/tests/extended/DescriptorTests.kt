@@ -20,8 +20,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
-internal fun assertDescriptorEquals(name: String, tsPath: String) {
-    val sourceSet = CliTranslator().translate(tsPath)
+internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: String?) {
+    val sourceSet = CliTranslator().translate(tsPath, tsConfig)
 
     val targetPath = "./build/test/data/descriptors/$name"
     File(targetPath).deleteRecursively()
@@ -64,8 +64,8 @@ class DescriptorTests {
     @ParameterizedTest(name = "{0}")
     @MethodSource("descriptorsTestSet")
     @Suppress("UNUSED_PARAMETER")
-    fun withValueSource(name: String, tsPath: String, ktPath: String) {
-        assertDescriptorEquals(name, tsPath)
+    fun withValueSource(name: String, tsPath: String, ktPath: String, tsConfig: String) {
+        assertDescriptorEquals(name, tsPath, if (tsConfig.isEmpty()) null else tsConfig)
     }
 
     companion object {

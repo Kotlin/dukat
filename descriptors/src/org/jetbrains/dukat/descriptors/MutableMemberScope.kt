@@ -33,6 +33,10 @@ class MutableMemberScope(private val members: MutableList<DeclarationDescriptor>
         members += newMembers
     }
 
+    fun removeMembers(membersToRemove: List<DeclarationDescriptor>) {
+        members -= membersToRemove
+    }
+
     override fun printScopeStructure(p: Printer) {}
 
 }

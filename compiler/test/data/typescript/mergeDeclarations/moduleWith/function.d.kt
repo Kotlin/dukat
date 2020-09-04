@@ -64,7 +64,8 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
+import Fiber_
 
-external var current: Fiber
+external var current: Fiber_
 
 external fun yield(value: Any = definedExternally): Any

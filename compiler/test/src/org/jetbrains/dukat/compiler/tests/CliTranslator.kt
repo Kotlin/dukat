@@ -26,6 +26,15 @@ open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptL
     }
 
     open fun translate(
+        data: String,
+        tsConfig: String?
+    ): SourceSetModel {
+        val binData = translateBinary(data, tsConfig)
+        val translator = JsRuntimeByteArrayTranslator(translator)
+        return translator.translate(binData)
+    }
+
+    open fun translate(
             input: String,
             dirName: String,
             reportPath: String? = null,

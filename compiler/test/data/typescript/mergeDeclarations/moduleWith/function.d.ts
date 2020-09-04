@@ -12,7 +12,7 @@ declare module "fibers" {
     function Fiber(fn: Function): Fiber_;
 
     module Fiber {
-        export var current: Fiber;
+        export var current: Fiber_;
         export function yield(value?: any): any
     }
 

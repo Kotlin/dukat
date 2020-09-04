@@ -1221,12 +1221,14 @@ fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
                 )
         )
         moduleDescriptor.initialize(provider)
-        sources.forEach { sourceFile ->
+        val memberScopes = sources.flatMap { sourceFile ->
             moduleDescriptor.getPackage(translatePackageName(sourceFile.root.name))
-                    .fragments.forEach { it.getMemberScope() }
+                    .fragments.map { it.getMemberScope() }
         }
 
         context.initializeConstraints()
+
+        memberScopes.forEach { (it as MutableMemberScope).removeErrorDescriptors() }
 
         context.getAllClassDescriptors().forEach { addFakeOverrides(context, it) }
     } finally {
