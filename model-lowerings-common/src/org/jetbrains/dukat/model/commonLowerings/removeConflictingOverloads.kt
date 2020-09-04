@@ -178,12 +178,14 @@ private class ConflictingOverloads(private val context: ModelContext) : TopLevel
 }
 
 class RemoveConflictingOverloads : ModelLowering {
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        val modelContext = ModelContext(source)
+    private lateinit var modelContext: ModelContext
 
-        return source.copy(sources = source.sources.map { sourceFile ->
-            val root = sourceFile.root
-            sourceFile.copy(root = ConflictingOverloads(modelContext).lowerRoot(root, NodeOwner(root, null)))
-        })
+    override fun lower(module: ModuleModel): ModuleModel {
+        return ConflictingOverloads(modelContext).lowerRoot(module, NodeOwner(module, null))
+    }
+
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        modelContext = ModelContext(source)
+        return super.lower(source)
     }
 }
