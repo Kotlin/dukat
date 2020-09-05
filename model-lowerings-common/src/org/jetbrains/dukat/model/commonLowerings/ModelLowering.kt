@@ -12,11 +12,11 @@ interface ModelLowering : Lowering<SourceSetModel, SourceSetModel> {
     }
 }
 
-interface ComposableModelLowering : ModelLowering {
+interface ComposableModelLowering : Lowering<SourceSetModel, SourceSetModel> {
     val lowerings: List<ModelLowering>
 
-    override fun lower(module: ModuleModel): ModuleModel {
-        return lowerings.fold(module) { m, lowering -> lowering.lower(m)  }
+    override fun lower(source: SourceSetModel): SourceSetModel {
+        return lowerings.fold(source) { m, lowering -> lowering.lower(m)  }
     }
 }
 
