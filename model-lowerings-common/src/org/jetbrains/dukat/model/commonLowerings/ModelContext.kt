@@ -87,14 +87,10 @@ class ModelContext(sourceSetModel: SourceSetModel) {
     fun unalias(typeModel: TypeModel, paramSubstitutions: Map<NameEntity, TypeModel> = mapOf()): TypeModel {
         val typeResolved = when (typeModel) {
             is TypeValueModel -> myAliases[typeModel.fqName]?.typeReference?.let { typeReference ->
-                if (typeReference is TypeValueModel) {
-                    unalias(typeReference, paramSubstitutions)
-                } else {
-                    typeReference
-                }
-            } ?: typeModel
-            else -> typeModel
-        }
+                unalias(typeReference, paramSubstitutions)
+            }
+            else -> null
+        } ?: typeModel
 
         val newParamSubstitutions = when (typeModel) {
             is TypeValueModel -> {
@@ -102,10 +98,10 @@ class ModelContext(sourceSetModel: SourceSetModel) {
                     (it.type as? TypeValueModel)?.value
                 }
                 val actualParams = typeModel.params.map { it.type }
-                aliasParamNames?.zip(actualParams)?.toMap() ?: emptyMap()
+                aliasParamNames?.zip(actualParams)?.toMap()
             }
-            else -> emptyMap()
-        }
+            else -> null
+        } ?: emptyMap()
 
         return when (typeResolved) {
             is TypeValueModel -> {
