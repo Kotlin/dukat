@@ -56,6 +56,7 @@ import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.nodeIntroduction.introduceModels
+import org.jetbrains.dukat.tsLowerings.ProcessConstructorInterfaces
 import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 
 open class TypescriptLowerer(
@@ -69,6 +70,7 @@ open class TypescriptLowerer(
                         IntroduceMissingConstructors(),
                         AddPackageName(packageName),
                         RemoveThisParameters(),
+                        ProcessConstructorInterfaces(),
                         MergeModules(),
                         MergeClassLikes(),
                         IntroduceSyntheticExportModifiers(),

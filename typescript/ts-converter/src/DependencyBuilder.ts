@@ -71,7 +71,7 @@ export class DependencyBuilder {
 
     for (let declaration of declarations) {
       if (this.checkedReferences.has(declaration)) {
-        return;
+        continue;
       }
       this.checkedReferences.add(declaration);
       let sourceFile = declaration.getSourceFile();
@@ -103,7 +103,7 @@ export class DependencyBuilder {
       this.checkReferences(node.type)
     } else if (ts.isHeritageClause(node)) {
       for (let type of node.types) {
-        this.checkReferences(type);
+        this.checkReferences(type.expression);
       }
     } else if (ts.isExportDeclaration(node)) {
       if (node.exportClause) {
