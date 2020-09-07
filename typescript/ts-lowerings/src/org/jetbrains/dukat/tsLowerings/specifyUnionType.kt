@@ -16,6 +16,7 @@ import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ImportEqualsDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.CallableMemberDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -66,6 +67,7 @@ private fun CallableMemberDeclaration.copyWithParams(params: List<ParameterDecla
         is CallSignatureDeclaration -> copy(parameters = params)
         is IndexSignatureDeclaration -> copy(parameters = params)
         is MethodDeclaration -> copy(parameters = params)
+        is ConstructSignatureDeclaration -> copy(parameters = params)
         else -> raiseConcern("can not update params for ${this}") { this }
     }
 }

@@ -617,6 +617,12 @@ export class AstConverter {
         member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
         this.convertTypeParams(member.typeParameters)
       )
+    } else if (ts.isConstructSignatureDeclaration(member)) {
+      return this.astFactory.createConstructSignatureDeclaration(
+          this.convertParameterDeclarations(member.parameters),
+          member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+          this.convertTypeParams(member.typeParameters)
+      )
     }
 
     return null;
