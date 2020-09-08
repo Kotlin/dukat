@@ -447,7 +447,11 @@ export class AstConverter {
       if (type.kind == ts.SyntaxKind.VoidKeyword) {
         return this.createTypeDeclaration("Unit")
       } else if (ts.isArrayTypeNode(type)) {
-        return this.createTypeDeclaration("@@ArraySugar", [this.convertType(type.elementType)])
+        return this.astFactory.createTypeReferenceDeclarationAsParamValue(
+          this.astFactory.createIdentifierDeclarationAsNameEntity("Array"),
+          [this.convertType(type.elementType)],
+          this.createTypeReferenceFromSymbol(type)
+        );
       } else if (ts.isUnionTypeNode(type)) {
         let params = type.types
           .map(argumentType => this.convertType(argumentType));

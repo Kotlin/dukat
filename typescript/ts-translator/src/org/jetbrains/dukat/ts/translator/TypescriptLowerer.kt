@@ -30,7 +30,6 @@ import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
-import org.jetbrains.dukat.tsLowerings.DesugarArrayDeclarations
 import org.jetbrains.dukat.tsLowerings.EscapeLiterals
 import org.jetbrains.dukat.tsLowerings.FilterOutNonDeclarations
 import org.jetbrains.dukat.tsLowerings.FixImpossibleInheritance
@@ -81,7 +80,6 @@ open class TypescriptLowerer(
                         ConvertKeyOfsAndLookups(),
                         LowerPrimitives(),
                         GenerateInterfaceReferences(),
-                        DesugarArrayDeclarations(),
                         FixImpossibleInheritance(),
                         LowerPartialOf(),
                         ResolveLoops(),
