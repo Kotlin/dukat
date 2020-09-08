@@ -28,10 +28,10 @@ dependencies {
 }
 
 
-task serializedStdLib(type: JavaExec) {
+task serializeStdLib(type: JavaExec) {
     dependsOn = [":stdlib-generator:buildDistrib"]
 
-    def inputJar = "${project(":stdlib-generator").buildDir}/libs/kotlin-stdlib-js.jar"
+    def inputJar = project(":stdlib-generator").getTasksByName("buildDistrib", true).outputs.files.singleFile[0]
     inputs.file(inputJar)
 
     def outputBinary = "${project.buildDir}/stdlib.dukat"
@@ -44,5 +44,5 @@ task serializedStdLib(type: JavaExec) {
     args  = [inputJar, outputBinary]
 }
 
-test.dependsOn(serializedStdLib)
+test.dependsOn(serializeStdLib)
 test.inputs.file("./test/resources/code.out.kt")

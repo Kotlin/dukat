@@ -22,6 +22,7 @@ dependencies {
 }
 
 task buildDistrib {
+    outputs.file("${project.buildDir}/libs/kotlin-stdlib-js.jar")
     doLast {
         copy {
             from configurations.kotlinStdLib
