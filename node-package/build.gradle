@@ -92,6 +92,11 @@ task buildFrontend {
             into "${DISTRIB_PATH}/bin"
         }
 
+        copy {
+            from project(":model-serialization").getTasksByName("serializeStdLib", true).outputs.files.singleFile[0]
+            into "${DISTRIB_PATH}/resources"
+        }
+
     }
 }
 

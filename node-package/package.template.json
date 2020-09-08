@@ -10,6 +10,7 @@
     "build/runtime/kotlin-stdlib-js.jar",
     "bin/dukat-cli.js",
     "lib/converter.js",
+    "resources/stdlib.dukat",
     "d.ts.libs/*",
     "kotlin-stdlib-js/*.meta.js",
     "README.md"
