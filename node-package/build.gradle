@@ -68,7 +68,7 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
 
 task buildFrontend {
     description = "Copies js files to the node-package distrib folder"
-    dependsOn = [":ts-converter:webpack", installNpmDependencies]
+    dependsOn = [":ts-converter:webpack", ":model-serialization:serializeStdLib", installNpmDependencies]
 
     doLast {
         copy {
