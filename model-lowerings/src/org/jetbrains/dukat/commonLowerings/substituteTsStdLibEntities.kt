@@ -19,10 +19,11 @@ import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isKotlinStdlibPrefixed
 import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 
 private fun TypeValueModel.isLibReference(): Boolean {
-    return fqName?.isTsStdlibPrefixed() == true
+    return fqName?.isTsStdlibPrefixed() == true || fqName?.isKotlinStdlibPrefixed() == true
 }
 
 private fun HeritageModel.isLibReference(): Boolean {

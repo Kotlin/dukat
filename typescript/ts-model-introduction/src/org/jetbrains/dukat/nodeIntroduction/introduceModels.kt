@@ -245,14 +245,14 @@ internal class DocumentConverter(
                 typeResolved.value == aliasName
     }
 
-    private fun ReferenceEntity.getFqName(): NameEntity? {
-        return uidToNameMapper[uid]?.fqName
+    private fun ReferenceEntity?.getFqName(ownerName: NameEntity): NameEntity? {
+        return this?.let { uidToNameMapper[uid]?.fqName } ?: if (KotlinStdlibEntities.contains(ownerName)) {
+            KLIBROOT.appendLeft(ownerName)
+        } else null
     }
 
     private fun TypeDeclaration.getFqName(): NameEntity? {
-        return typeReference?.getFqName() ?: if (KotlinStdlibEntities.contains(value)) {
-            KLIBROOT.appendLeft(value)
-        } else null
+        return typeReference.getFqName(value)
     }
 
     private fun ClassLikeDeclaration.processMembers(): Members {
@@ -272,7 +272,7 @@ internal class DocumentConverter(
     private fun HeritageClauseDeclaration.convertToModel(): HeritageModel {
         val isNamedImport = typeReference?.origin == ReferenceOriginDeclaration.NAMED_IMPORT
         if (isNamedImport) {
-            typeReference?.getFqName()?.let { resolvedName ->
+            typeReference.getFqName(name)?.let { resolvedName ->
                 imports.add(ImportModel(resolvedName, name.rightMost()))
             }
         }
@@ -280,7 +280,7 @@ internal class DocumentConverter(
         val fqName = if (isNamedImport) {
             name
         } else {
-            typeReference?.getFqName()
+            typeReference.getFqName(name)
         }
         return HeritageModel(
                 value = TypeValueModel(name, emptyList(), null, fqName),
@@ -407,7 +407,7 @@ internal class DocumentConverter(
                         name,
                         typeParams,
                         meta?.processMeta(),
-                        typeReference?.getFqName(),
+                        typeReference.getFqName(name),
                         nullable
                 )
 
