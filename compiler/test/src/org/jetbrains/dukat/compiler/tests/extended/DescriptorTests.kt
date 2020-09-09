@@ -83,7 +83,7 @@ class DescriptorTests {
 
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
-            return MethodSourceSourceFiles("./test/data/typescript/", D_TS_DECLARATION_EXTENSION)
+            return MethodSourceSourceFiles("./test/data/typescript/node_modules", D_TS_DECLARATION_EXTENSION)
                 .fileSetWithDescriptors().filter { !skippedDescriptorTests.contains(it.first()) }.toTypedArray()
         }
     }
