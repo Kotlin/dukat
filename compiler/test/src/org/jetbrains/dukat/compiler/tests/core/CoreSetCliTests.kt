@@ -8,8 +8,6 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
-import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
@@ -59,7 +57,7 @@ open class CoreSetCliTests {
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        getTranslator().convert(tsPath, CommonJsNameResolver(), tsConfig, dirName, false, reportPath)
+        getTranslator().convert(tsPath, tsConfig, dirName, false, reportPath)
 
         val reportJson = Json {
             prettyPrint = true

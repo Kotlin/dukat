@@ -3,8 +3,6 @@ package org.jetbrains.dukat.compiler.tests
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.cli.translateWithBodyBinaryBundle
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
 
 class CliBodyTranslator : CliTranslator() {
@@ -18,7 +16,6 @@ class CliBodyTranslator : CliTranslator() {
 
     override fun convert(
             input: String,
-            moduleNameResolver: ModuleNameResolver,
             tsConfig: String?,
             dirName: String?,
             withDescriptors: Boolean,
@@ -26,6 +23,6 @@ class CliBodyTranslator : CliTranslator() {
     ) {
         val binData = translateBinary(input, tsConfig)
 
-        translateWithBodyBinaryBundle(binData, dirName, moduleNameResolver, null, reportPath)
+        translateWithBodyBinaryBundle(binData, dirName, CommonJsNameResolver(), null, reportPath)
     }
 }

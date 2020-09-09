@@ -1,6 +1,5 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
-import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +19,7 @@ class DescriptorCompilationTests : CompilationTests() {
         println("file:///${targetDir.normalize().absolutePath}")
 
         targetDir.deleteRecursively()
-        getTranslator().convert(sourcePath, ConstNameResolver(targetPath), withDescriptors = true)
+        getTranslator().convert(sourcePath, withDescriptors = true)
     }
 
     companion object {

@@ -3,7 +3,6 @@ package org.jetbrains.dukat.compiler.tests.extended
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.CompileMessageCollector
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
-import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
@@ -122,7 +121,7 @@ abstract class CompilationTests {
         targetDir.deleteRecursively()
 
         val translationStarted = System.currentTimeMillis()
-        getTranslator().convert(sourcePath, CommonJsNameResolver(), tsConfig, targetPath, false, null)
+        getTranslator().convert(sourcePath, tsConfig, targetPath, false, null)
         reportDataMap.getReportFor(descriptor).translationTime = System.currentTimeMillis() - translationStarted
 
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"
