@@ -6,6 +6,7 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
+import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.ts.translator.ECMAScriptLowerer
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
@@ -13,45 +14,44 @@ import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 
 val ADD_SUPPRESS_ANNOTATIONS = !(System.getProperty("dukat.test.omitSuppressAnnotations") == "true")
 
-open class CliTranslator(private val translator: ECMAScriptLowerer = TypescriptLowerer(CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS)): InputTranslator<String> {
+open class CliTranslator : InputTranslator<String> {
 
     protected fun translateBinary(input: String, tsConfig: String?) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input, tsConfig)
 
     override fun translate(
         data: String
     ): SourceSetModel {
-        val binData = translateBinary(data, null)
-        val translator = JsRuntimeByteArrayTranslator(translator)
-        return translator.translate(binData)
+        return translate(data, null)
     }
 
     open fun translate(
         data: String,
         tsConfig: String?
     ): SourceSetModel {
-        val binData = translateBinary(data, tsConfig)
-        val translator = JsRuntimeByteArrayTranslator(translator)
+        return translate(data, CommonJsNameResolver(), tsConfig)
+    }
+
+    private fun translate(
+            input: String,
+            moduleNameResolver: ModuleNameResolver,
+            tsConfig: String? = null
+    ): SourceSetModel {
+        val binData = translateBinary(input, tsConfig)
+
+        val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null, ADD_SUPPRESS_ANNOTATIONS))
         return translator.translate(binData)
     }
 
-    open fun translate(
+
+    open fun convert(
             input: String,
-            dirName: String,
-            reportPath: String? = null,
-            moduleName: String? = null,
+            moduleNameResolver: ModuleNameResolver,
+            tsConfig: String? = null,
+            dirName: String? = null,
             withDescriptors: Boolean = false,
-            tsConfig: String? = null
+            reportPath: String? = null
     ) {
-
-        val binData = translateBinary(input, tsConfig)
-
-        val moduleNameResolver = if (moduleName == null) {
-            CommonJsNameResolver()
-        } else {
-            ConstNameResolver(moduleName)
-        }
-
-        val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null, ADD_SUPPRESS_ANNOTATIONS))
-        translateSourceSet(translator.translate(binData), dirName, reportPath, withDescriptors)
+        val sourceSet = translate(input, moduleNameResolver, tsConfig)
+        translateSourceSet(sourceSet, dirName, reportPath, withDescriptors)
     }
 }

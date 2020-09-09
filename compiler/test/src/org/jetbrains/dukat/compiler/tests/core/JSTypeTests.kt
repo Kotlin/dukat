@@ -1,17 +1,20 @@
 package org.jetbrains.dukat.compiler.tests.core
 
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,7 +32,13 @@ class JSTypeTests : OutputTests() {
         assertContentEqualsBinary(name, jsPath, ktPath)
     }
 
-    override fun getTranslator(): InputTranslator<String> = CliTranslator(JavaScriptLowerer(ConstNameResolver()))
+    override fun getTranslator(): InputTranslator<String> = object : CliTranslator() {
+        override fun translate(data: String): SourceSetModel {
+            val binData = translateBinary(data, null)
+            val translator = JsRuntimeByteArrayTranslator(JavaScriptLowerer(ConstNameResolver()))
+            return translator.translate(binData)
+        }
+    }
 
     companion object {
         @JvmStatic
