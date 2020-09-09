@@ -38,7 +38,7 @@ open class CliTranslator : InputTranslator<String> {
     ): SourceSetModel {
         val binData = translateBinary(input, tsConfig)
 
-        val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleNameResolver, null, ADD_SUPPRESS_ANNOTATIONS))
+        val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS))
         return translator.translate(binData)
     }
 
