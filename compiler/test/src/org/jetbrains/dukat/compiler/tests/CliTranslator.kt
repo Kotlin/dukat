@@ -1,11 +1,12 @@
 package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.cli.translateSourceSet
+import org.jetbrains.dukat.cli.compileUnits
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
+import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 
@@ -36,10 +37,9 @@ open class CliTranslator : InputTranslator<String> {
             input: String,
             tsConfig: String? = null,
             dirName: String = "./",
-            withDescriptors: Boolean = false,
             reportPath: String? = null
     ) {
         val sourceSet = translate(input, tsConfig)
-        translateSourceSet(sourceSet, dirName, reportPath, withDescriptors)
+        compileUnits(translateSourceSet(sourceSet), dirName, reportPath)
     }
 }

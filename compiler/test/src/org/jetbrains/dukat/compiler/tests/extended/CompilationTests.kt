@@ -121,7 +121,7 @@ abstract class CompilationTests {
         targetDir.deleteRecursively()
 
         val translationStarted = System.currentTimeMillis()
-        getTranslator().convert(sourcePath, tsConfig, targetPath, false, null)
+        getTranslator().convert(sourcePath, tsConfig, targetPath, null)
         reportDataMap.getReportFor(descriptor).translationTime = System.currentTimeMillis() - translationStarted
 
         val outSource = "${targetPath}/$START_TIMESTAMP/${descriptor}.js"

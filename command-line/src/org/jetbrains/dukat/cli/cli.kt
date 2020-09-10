@@ -2,7 +2,6 @@ package org.jetbrains.dukat.cli
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -12,10 +11,8 @@ import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
-import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
 import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
@@ -25,7 +22,7 @@ import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
 import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
@@ -46,47 +43,7 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
     }
 }
 
-fun translateSourceSet(
-        sourceSet: SourceSetModel,
-        outDir: String,
-        pathToReport: String?,
-        generateDescriptors: Boolean
-) {
-    if (!generateDescriptors) {
-        compileUnits(translateModule(sourceSet), outDir, pathToReport)
-    } else {
-        writeDescriptorsToFile(sourceSet, outDir)
-    }
-}
-
-fun translateWithBodyBinaryBundle(
-    input: ByteArray,
-    outDir: String,
-    moduleNameResolver: ModuleNameResolver,
-    packageName: NameEntity?,
-    pathToReport: String?
-) {
-    val translator = createJsByteArrayWithBodyTranslator(moduleNameResolver, packageName)
-    val translatedUnits = translateModule(input, translator)
-    compileUnits(translatedUnits, outDir, pathToReport)
-}
-
-private fun compile(
-        filenames: List<String>,
-        outDir: String,
-        translator: InputTranslator<String>,
-        pathToReport: String?
-) {
-    val translatedUnits: List<TranslationUnitResult> = filenames.flatMap { filename ->
-        val sourceFile = File(filename)
-
-        translateModule(sourceFile.absolutePath, translator)
-    }
-
-    compileUnits(translatedUnits, outDir, pathToReport)
-}
-
-fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String, pathToReport: String?) {
+fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String, pathToReport: String?): Iterable<String> {
     val dirFile = File(outDir)
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()
@@ -122,6 +79,8 @@ fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String, p
     if (buildReport) {
         saveReport(pathToReport!!, Report(output))
     }
+
+    return output
 }
 
 private fun saveReport(reportPath: String, report: Report): Boolean {
@@ -253,7 +212,7 @@ private fun process(args: List<String>): CliOptions? {
             }
 
             else -> when {
-                arg.equals("-") -> sources.add("-")
+                arg == "-" -> sources.add("-")
                 arg.endsWith(D_TS_DECLARATION_EXTENSION) || arg.endsWith(TS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
@@ -305,51 +264,36 @@ fun main(vararg args: String) {
             exitProcess(1)
         }
 
-        val isDTsTranslation = options.sources.all { it.endsWith(D_TS_DECLARATION_EXTENSION) }
-        val isTsTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
-        val isJsTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
+        val isTypescriptDeclarationTranslation = options.sources.all { it.endsWith(D_TS_DECLARATION_EXTENSION) }
+        val isTypescriptTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
+        val isJavascriptTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation =
                 options.sources.all { it.endsWith(IDL_DECLARATION_EXTENSION) || it.endsWith(WEBIDL_DECLARATION_EXTENSION) }
 
-        when {
-            isDTsTranslation -> {
+        val sourceSet = when {
+            isTypescriptDeclarationTranslation -> {
                 val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName, true))
-                val sourceSet = translator.translate(System.`in`.readBytes())
-                translateSourceSet(
-                        sourceSet,
-                        options.outDir,
-                        options.reportPath,
-                        options.generateDescriptors
-                )
+                translator.translate(System.`in`.readBytes())
             }
 
-            isJsTranslation -> {
+            isJavascriptTranslation -> {
                 val translator = JsRuntimeByteArrayTranslator(JavaScriptLowerer(moduleResolver))
-                val sourceSet = translator.translate(System.`in`.readBytes())
-                translateSourceSet(
-                        sourceSet,
-                        options.outDir,
-                        options.reportPath,
-                        options.generateDescriptors
-                )
+                translator.translate(System.`in`.readBytes())
+            }
+
+            isTypescriptTranslation -> {
+                val translator = createJsByteArrayWithBodyTranslator(moduleResolver, options.basePackageName)
+                translator.translate(System.`in`.readBytes())
             }
 
             isIdlTranslation -> {
-                compile(
-                        options.sources,
-                        options.outDir,
-                        IdlInputTranslator(DirectoryReferencesResolver()),
-                        options.reportPath
-                )
-            }
-
-            isTsTranslation -> {
-                translateWithBodyBinaryBundle(
-                    System.`in`.readBytes(),
-                    options.outDir,
-                    moduleResolver,
-                    options.basePackageName,
-                    options.reportPath
+                val files = options.sources.map { File(it).absolutePath }
+                val idlTranslator = IdlInputTranslator(DirectoryReferencesResolver())
+                SourceSetModel(
+                        sourceName = files,
+                        sources = files.flatMap { filename ->
+                            idlTranslator.translate(File(filename).absolutePath).sources
+                        }.distinct()
                 )
             }
 
@@ -357,6 +301,12 @@ fun main(vararg args: String) {
                 printError("in a single pass you can either pass only *.d.ts files or *.idl files")
                 exitProcess(1)
             }
+        }
+
+        if (options.generateDescriptors) {
+            writeDescriptorsToFile(sourceSet, options.outDir)
+        } else {
+            compileUnits(translateSourceSet(sourceSet), options.outDir, options.reportPath)
         }
     }
 }

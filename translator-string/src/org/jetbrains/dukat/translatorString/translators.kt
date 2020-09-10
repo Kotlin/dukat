@@ -111,7 +111,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     return name
 }
 
-fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
+private fun translateSourceFile(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
     val docRoot = sourceFile.root
     val clashMap: MutableMap<String, Int> = mutableMapOf()
     return docRoot.flattenDeclarations().map { module ->
@@ -123,7 +123,7 @@ fun translateModule(sourceFile: SourceFileModel): List<ModuleTranslationUnit> {
 
 private data class TranslationKey(val fileName: String, val rootName: NameEntity, val name: NameEntity?)
 
-fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
+fun translateSourceSet(sourceSet: SourceSetModel): List<TranslationUnitResult> {
     val visited = mutableSetOf<TranslationKey>()
     return sourceSet.sources.mapNotNull { sourceFile ->
         // TODO: investigate whether it's safe to check just moduleName
@@ -131,18 +131,18 @@ fun translateModule(sourceSet: SourceSetModel): List<TranslationUnitResult> {
         val sourceKey = TranslationKey(sourceFile.fileName, sourceFile.root.name, sourceFile.name)
         if (!visited.contains(sourceKey)) {
             visited.add(sourceKey)
-            translateModule(sourceFile)
+            translateSourceFile(sourceFile)
         } else {
             null
         }
     }.flatten()
 }
 
-fun translateModule(data: ByteArray, translator: InputTranslator<ByteArray>): List<TranslationUnitResult> {
-    return translateModule(translator.translate(data))
+fun translateByteArray(data: ByteArray, translator: InputTranslator<ByteArray>): List<TranslationUnitResult> {
+    return translateSourceSet(translator.translate(data))
 }
 
-fun translateModule(fileName: String, translator: InputTranslator<String>): List<TranslationUnitResult> {
+fun translateFile(fileName: String, translator: InputTranslator<String>): List<TranslationUnitResult> {
     if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(D_TS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
@@ -157,5 +157,5 @@ fun translateModule(fileName: String, translator: InputTranslator<String>): List
     val sourceSet =
             translator.translate(fileName)
 
-    return translateModule(sourceSet)
+    return translateSourceSet(sourceSet)
 }

@@ -11,7 +11,7 @@ import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorCompara
 import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
 import org.jetbrains.dukat.descriptors.translateToDescriptors
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.kotlin.name.FqName
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,7 +25,7 @@ internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: Stri
 
     val targetPath = "./build/test/data/descriptors/$name"
     File(targetPath).deleteRecursively()
-    compileUnits(translateModule(sourceSet), "./build/test/data/descriptors/$name", null)
+    compileUnits(translateSourceSet(sourceSet), "./build/test/data/descriptors/$name", null)
 
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {

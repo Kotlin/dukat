@@ -57,7 +57,7 @@ open class CoreSetCliTests {
 
         val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        getTranslator().convert(tsPath, tsConfig, dirName, false, reportPath)
+        getTranslator().convert(tsPath, tsConfig, dirName, reportPath)
 
         val reportJson = Json {
             prettyPrint = true

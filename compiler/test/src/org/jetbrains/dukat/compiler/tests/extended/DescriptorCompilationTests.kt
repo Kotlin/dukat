@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.params.ParameterizedTest
@@ -19,7 +20,9 @@ class DescriptorCompilationTests : CompilationTests() {
         println("file:///${targetDir.normalize().absolutePath}")
 
         targetDir.deleteRecursively()
-        getTranslator().convert(sourcePath, withDescriptors = true)
+
+        val sourceSet = getTranslator().translate(sourcePath)
+        writeDescriptorsToFile(sourceSet, targetDir.absolutePath)
     }
 
     companion object {

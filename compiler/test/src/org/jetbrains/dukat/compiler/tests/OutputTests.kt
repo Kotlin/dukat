@@ -4,7 +4,7 @@ import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translator.TranslationUnitResult
-import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.translatorString.translateFile
 import org.junit.jupiter.api.BeforeAll
 import java.io.File
 import kotlin.test.assertEquals
@@ -44,7 +44,7 @@ abstract class OutputTests {
     }
 
     private fun output(fileName: String, translator: InputTranslator<String>): String {
-        return concatenate(fileName, translateModule(fileName, translator))
+        return concatenate(fileName, translateFile(fileName, translator))
     }
 
 

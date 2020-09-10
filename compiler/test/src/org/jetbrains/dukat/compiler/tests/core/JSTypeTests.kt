@@ -7,13 +7,12 @@ import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsEnded
 import org.jetbrains.dukat.compiler.tests.extended.CliTestsStarted
 import org.jetbrains.dukat.js.translator.JavaScriptLowerer
-import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.translateModule
+import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -63,7 +62,7 @@ class JSTypeTests : OutputTests() {
 
         val targetShortName = "${descriptor}.d.kt"
 
-        val modules = translateModule(getTranslator().translate(tsPath))
+        val modules = translateSourceSet(getTranslator().translate(tsPath))
         val translated = concatenate(tsPath, modules)
 
         assertEquals(
