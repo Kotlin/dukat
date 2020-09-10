@@ -35,7 +35,7 @@ open class CliTranslator : InputTranslator<String> {
     open fun convert(
             input: String,
             tsConfig: String? = null,
-            dirName: String? = null,
+            dirName: String = "./",
             withDescriptors: Boolean = false,
             reportPath: String? = null
     ) {

@@ -48,21 +48,20 @@ private fun TranslationUnitResult.resolveAsError(source: String): String {
 
 fun translateSourceSet(
         sourceSet: SourceSetModel,
-        outDir: String?,
+        outDir: String,
         pathToReport: String?,
         generateDescriptors: Boolean
 ) {
     if (!generateDescriptors) {
-        val translatedUnits = translateModule(sourceSet)
-        compileUnits(translatedUnits, outDir, pathToReport)
+        compileUnits(translateModule(sourceSet), outDir, pathToReport)
     } else {
-        writeDescriptorsToFile(sourceSet, outDir ?: "./")
+        writeDescriptorsToFile(sourceSet, outDir)
     }
 }
 
 fun translateWithBodyBinaryBundle(
     input: ByteArray,
-    outDir: String?,
+    outDir: String,
     moduleNameResolver: ModuleNameResolver,
     packageName: NameEntity?,
     pathToReport: String?
@@ -74,7 +73,7 @@ fun translateWithBodyBinaryBundle(
 
 private fun compile(
         filenames: List<String>,
-        outDir: String?,
+        outDir: String,
         translator: InputTranslator<String>,
         pathToReport: String?
 ) {
@@ -87,8 +86,8 @@ private fun compile(
     compileUnits(translatedUnits, outDir, pathToReport)
 }
 
-fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String?, pathToReport: String?) {
-    val dirFile = File(outDir ?: "./")
+fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String, pathToReport: String?) {
+    val dirFile = File(outDir)
     if (translatedUnits.isNotEmpty()) {
         dirFile.mkdirs()
     }
@@ -170,7 +169,7 @@ where possible options include:
 
 private data class CliOptions(
         val sources: List<String>,
-        val outDir: String?,
+        val outDir: String,
         val basePackageName: NameEntity?,
         val jsModuleName: String?,
         val reportPath: String?,
@@ -281,7 +280,7 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
-    return CliOptions(sources, outDir, basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
+    return CliOptions(sources, outDir ?: "./", basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
 }
 
 fun main(vararg args: String) {

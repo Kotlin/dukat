@@ -17,7 +17,7 @@ class CliBodyTranslator : CliTranslator() {
     override fun convert(
             input: String,
             tsConfig: String?,
-            dirName: String?,
+            dirName: String,
             withDescriptors: Boolean,
             reportPath: String?
     ) {
