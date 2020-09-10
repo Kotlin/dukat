@@ -3,12 +3,16 @@ package org.jetbrains.dukat.compiler.tests.core
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
 import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
-import org.jetbrains.dukat.idlReferenceResolver.EmptyReferencesResolver
+import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+
+private class EmptyReferencesResolver : IdlReferencesResolver {
+    override fun resolveReferences(fileName: String): List<String> = listOf()
+}
 
 class IdlTests : OutputTests() {
 
