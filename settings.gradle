@@ -39,7 +39,7 @@ gradle.ext {
     kotlinVersion = "1.4.0"
   }
 
-  jupiterVersion = "5.6.0"
+  jupiterVersion = "5.7.0"
   nodeVersion = "14.7.0"
   defaultTsVersion = "3.9.5"
   defaultNpmPackageVersion = "0.5.7"
