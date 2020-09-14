@@ -122,7 +122,7 @@ task nodeEnv(type: Exec, dependsOn: [execConfig, ":node-distrib:config"]) {
 
 
 task npmPack(type: Exec) {
-    dependsOn = [":command-line:build", buildDistrib]
+    dependsOn = [buildDistrib]
     workingDir DISTRIB_PATH
 }
 
