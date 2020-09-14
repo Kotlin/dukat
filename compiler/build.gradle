@@ -154,6 +154,16 @@ task prepareTopNPackage(type: Copy) {
     rename { String fileName -> fileName.replace(".template", "") }
 }
 
+task npmLsConfig {
+    doLast {
+        npmLs.commandLine project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "ls"
+    }
+}
+
+task npmLs(dependsOn: [npmLsConfig], type: Exec) {
+    workingDir TOPN_TARGET_DIR
+}
+
 task installTopNConfig {
     doLast {
         installTopN.commandLine  project(":node-distrib").config.nodePath, project(":node-distrib").config.npmPath, "ci"
@@ -161,6 +171,7 @@ task installTopNConfig {
 }
 task installTopN(dependsOn: [prepareTopNPackage, installTopNConfig], type: Exec) {
     workingDir TOPN_TARGET_DIR
+    finalizedBy npmLs
 }
 
 task prebuild {
