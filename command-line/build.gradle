@@ -13,7 +13,7 @@ configurations {
 
 
 dependencies {
-  implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationRuntimeVersion}"
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationRuntimeVersion}")
 
   implementation(project(":ast-common"))
   implementation(project(":ast-model"))

@@ -4,11 +4,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
-import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.compiler.translator.IdlInputTranslator
+import org.jetbrains.dukat.compiler.translator.translateIdlSources
 import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
-import org.jetbrains.dukat.idlReferenceResolver.DirectoryReferencesResolver
-import org.jetbrains.dukat.js.translator.JavaScriptLowerer
+import org.jetbrains.dukat.js.translator.translateJsSources
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
@@ -22,10 +20,10 @@ import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.WEBIDL_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.compileUnits
 import org.jetbrains.dukat.translatorString.translateSourceSet
-import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
-import org.jetbrains.dukat.ts.translator.TypescriptLowerer
-import org.jetbrains.dukat.ts.translator.createJsByteArrayWithBodyTranslator
+import org.jetbrains.dukat.ts.translator.translateTypescriptDeclarations
+import org.jetbrains.dukat.ts.translator.translateTypescriptSources
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -33,55 +31,7 @@ import kotlin.system.exitProcess
 val PACKAGE_DIR = System.getProperty("dukat.cli.internal.packagedir")
 
 @Serializable
-private data class Report(val outputs: List<String>)
-
-private fun TranslationUnitResult.resolveAsError(source: String): String {
-    return when (this) {
-        is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.ts extension can be processed"
-        is TranslationErrorFileNotFound -> "file not found: ${fileName}"
-        else -> "failed to translate ${source} for unknown reason"
-    }
-}
-
-fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String, pathToReport: String?): Iterable<String> {
-    val dirFile = File(outDir)
-    if (translatedUnits.isNotEmpty()) {
-        dirFile.mkdirs()
-    }
-
-    val buildReport = pathToReport !== null
-
-    val output = mutableListOf<String>()
-
-    translatedUnits.forEach { translationUnitResult ->
-        if (translationUnitResult is ModuleTranslationUnit) {
-            val targetName = "${translationUnitResult.name}.kt"
-
-            val resolvedTarget = dirFile.resolve(targetName)
-
-            println(resolvedTarget.name)
-
-            if (buildReport) {
-                output.add(resolvedTarget.name)
-            }
-
-            resolvedTarget.writeText(translationUnitResult.content)
-        } else {
-            val fileName = when (translationUnitResult) {
-                is TranslationErrorInvalidFile -> translationUnitResult.fileName
-                is TranslationErrorFileNotFound -> translationUnitResult.fileName
-                is ModuleTranslationUnit -> translationUnitResult.fileName
-            }
-            println("ERROR: ${translationUnitResult.resolveAsError(fileName)}")
-        }
-    }
-
-    if (buildReport) {
-        saveReport(pathToReport!!, Report(output))
-    }
-
-    return output
-}
+private data class Report(val outputs: Iterable<String>)
 
 private fun saveReport(reportPath: String, report: Report): Boolean {
     val reportFile = File(reportPath)
@@ -239,7 +189,8 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
-    return CliOptions(sources, outDir ?: "./", basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
+    return CliOptions(sources, outDir
+            ?: "./", basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
 }
 
 fun main(vararg args: String) {
@@ -272,29 +223,19 @@ fun main(vararg args: String) {
 
         val sourceSet = when {
             isTypescriptDeclarationTranslation -> {
-                val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(moduleResolver, options.basePackageName, true))
-                translator.translate(System.`in`.readBytes())
+                translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName)
             }
 
             isJavascriptTranslation -> {
-                val translator = JsRuntimeByteArrayTranslator(JavaScriptLowerer(moduleResolver))
-                translator.translate(System.`in`.readBytes())
+                translateJsSources(System.`in`.readBytes(), moduleResolver)
             }
 
             isTypescriptTranslation -> {
-                val translator = createJsByteArrayWithBodyTranslator(moduleResolver, options.basePackageName)
-                translator.translate(System.`in`.readBytes())
+                translateTypescriptSources(System.`in`.readBytes(), moduleResolver, options.basePackageName)
             }
 
             isIdlTranslation -> {
-                val files = options.sources.map { File(it).absolutePath }
-                val idlTranslator = IdlInputTranslator(DirectoryReferencesResolver())
-                SourceSetModel(
-                        sourceName = files,
-                        sources = files.flatMap { filename ->
-                            idlTranslator.translate(File(filename).absolutePath).sources
-                        }.distinct()
-                )
+                translateIdlSources(options.sources)
             }
 
             else -> {
@@ -306,7 +247,10 @@ fun main(vararg args: String) {
         if (options.generateDescriptors) {
             writeDescriptorsToFile(sourceSet, options.outDir)
         } else {
-            compileUnits(translateSourceSet(sourceSet), options.outDir, options.reportPath)
+            val reportOutput = compileUnits(translateSourceSet(sourceSet), options.outDir)
+            if (options.reportPath != null) {
+                saveReport(options.reportPath, Report(reportOutput))
+            }
         }
     }
 }

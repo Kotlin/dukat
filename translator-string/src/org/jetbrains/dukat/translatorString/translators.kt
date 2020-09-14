@@ -159,3 +159,44 @@ fun translateFile(fileName: String, translator: InputTranslator<String>): List<T
 
     return translateSourceSet(sourceSet)
 }
+
+
+private fun TranslationUnitResult.resolveAsError(source: String): String {
+    return when (this) {
+        is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.ts extension can be processed"
+        is TranslationErrorFileNotFound -> "file not found: ${fileName}"
+        else -> "failed to translate ${source} for unknown reason"
+    }
+}
+
+fun compileUnits(translatedUnits: List<TranslationUnitResult>, outDir: String): Iterable<String> {
+    val dirFile = File(outDir)
+    if (translatedUnits.isNotEmpty()) {
+        dirFile.mkdirs()
+    }
+
+    val output = mutableListOf<String>()
+
+    translatedUnits.forEach { translationUnitResult ->
+        if (translationUnitResult is ModuleTranslationUnit) {
+            val targetName = "${translationUnitResult.name}.kt"
+
+            val resolvedTarget = dirFile.resolve(targetName)
+
+            println(resolvedTarget.name)
+
+            output.add(resolvedTarget.name)
+
+            resolvedTarget.writeText(translationUnitResult.content)
+        } else {
+            val fileName = when (translationUnitResult) {
+                is TranslationErrorInvalidFile -> translationUnitResult.fileName
+                is TranslationErrorFileNotFound -> translationUnitResult.fileName
+                is ModuleTranslationUnit -> translationUnitResult.fileName
+            }
+            println("ERROR: ${translationUnitResult.resolveAsError(fileName)}")
+        }
+    }
+
+    return output
+}

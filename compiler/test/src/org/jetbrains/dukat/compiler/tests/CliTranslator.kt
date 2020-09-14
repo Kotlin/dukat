@@ -1,12 +1,11 @@
 package org.jetbrains.dukat.compiler.tests
 
 import org.jetbrains.dukat.astModel.SourceSetModel
-import org.jetbrains.dukat.cli.compileUnits
 import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.httpService.CliHttpClient
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
-import org.jetbrains.dukat.translatorString.translateByteArray
+import org.jetbrains.dukat.translatorString.compileUnits
 import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
 import org.jetbrains.dukat.ts.translator.TypescriptLowerer
@@ -36,10 +35,9 @@ open class CliTranslator : InputTranslator<String> {
     open fun convert(
             input: String,
             tsConfig: String? = null,
-            dirName: String = "./",
-            reportPath: String? = null
-    ) {
+            dirName: String = "./"
+    ): Iterable<String> {
         val sourceSet = translate(input, tsConfig)
-        compileUnits(translateSourceSet(sourceSet), dirName, reportPath)
+        return compileUnits(translateSourceSet(sourceSet), dirName)
     }
 }

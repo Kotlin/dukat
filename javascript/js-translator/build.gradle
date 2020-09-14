@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
     implementation(project(":js-type-analysis"))
+    implementation(project(":translator"))
     implementation(project(":ts-lowerings"))
     implementation(project(":ts-model"))
     implementation(project(":ts-translator"))

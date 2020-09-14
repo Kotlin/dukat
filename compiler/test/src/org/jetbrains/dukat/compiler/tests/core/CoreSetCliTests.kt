@@ -55,16 +55,10 @@ open class CoreSetCliTests {
     ) {
         println("\nSOURCE:\t${tsPath.toFileUriScheme()}\nTARGET:\t${ktPath.toFileUriScheme()}")
 
-        val reportPath = "./build/reports/core/cli/${descriptor}.json"
         val dirName = "./build/tests/core/cli/${descriptor}"
-        getTranslator().convert(tsPath, tsConfig, dirName, reportPath)
+        val reportOutput = getTranslator().convert(tsPath, tsConfig, dirName)
 
-        val reportJson = Json {
-            prettyPrint = true
-            ignoreUnknownKeys = true
-        }.decodeFromString(ReportJson.serializer(), File(reportPath).readText())
-
-        val translatedOutput = reportJson.outputs.mapNotNull { output ->
+        val translatedOutput = reportOutput.mapNotNull { output ->
             println("OUTPUT ${output}")
             val targetFile = File(dirName, output)
 
@@ -75,7 +69,6 @@ open class CoreSetCliTests {
             }
         }
 
-        println("CLI TESTS ${reportJson.outputs.size} => ${translatedOutput.size}")
         val translated = translatedOutput.joinToString(OutputTests.SEPARATOR) { file ->
             "// [test] ${file.name}" + System.getProperty("line.separator") + file.readText()
         }
