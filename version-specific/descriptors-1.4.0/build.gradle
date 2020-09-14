@@ -5,11 +5,3 @@ plugins {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable:$gradle.kotlinVersion"
 }
-
-gradle.taskGraph.whenReady {
-    gradle.taskGraph.allTasks.each {
-        if(it.project == project) {
-            it.onlyIf { gradle.kotlinVersion.startsWith("1.4.0") }
-        }
-    }
-}
