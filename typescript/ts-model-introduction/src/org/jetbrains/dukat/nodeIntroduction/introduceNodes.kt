@@ -6,6 +6,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -34,6 +35,7 @@ fun convertMemberDeclaration(declaration: MemberEntity, inDeclaredDeclaration: B
         is PropertyDeclaration -> convertPropertyDeclaration(declaration, inDeclaredDeclaration)
         is IndexSignatureDeclaration -> declaration
         is ConstructorDeclaration -> declaration
+        is ConstructSignatureDeclaration -> null
         else -> raiseConcern("unknown member declaration ${declaration::class.java}") { null }
     }
 }

@@ -11,6 +11,7 @@ import org.jetbrains.dukat.tsmodel.BreakStatementDeclaration
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
@@ -112,6 +113,7 @@ import org.jetbrains.dukat.tsmodelproto.CallSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.CaseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConditionalExpressionDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ConstructSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ContinueStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.DefinitionInfoDeclarationProto
@@ -509,6 +511,14 @@ fun CallSignatureDeclarationProto.convert(): CallSignatureDeclaration {
     )
 }
 
+fun ConstructSignatureDeclarationProto.convert(): ConstructSignatureDeclaration {
+    return ConstructSignatureDeclaration(
+        parametersList.map { it.convert() },
+        type.convert(),
+        typeParametersList.map { it.convert() }
+    )
+}
+
 fun MemberDeclarationProto.convert(): MemberDeclaration {
     return when {
         hasConstructorDeclaration() -> constructorDeclaration.convert()
@@ -517,6 +527,7 @@ fun MemberDeclarationProto.convert(): MemberDeclaration {
         hasIndexSignature() -> indexSignature.convert()
         hasCallSignature() -> callSignature.convert()
         hasMethod() -> method.convert()
+        hasConstructSignature() -> constructSignature.convert()
         else -> throw Exception("unknown MemberEntityProto: ${this}")
     }
 }

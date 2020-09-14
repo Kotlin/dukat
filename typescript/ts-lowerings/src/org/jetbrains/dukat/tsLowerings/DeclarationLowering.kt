@@ -7,6 +7,7 @@ import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
@@ -68,6 +69,16 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         )
     }
 
+    fun lowerConstructSignatureDeclaration(declaration: ConstructSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): ConstructSignatureDeclaration {
+        return declaration.copy(
+            type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
+            parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
+            typeParameters = declaration.typeParameters.map { typeParameter ->
+                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
+            }
+        )
+    }
+
     fun lowerIndexSignatureDeclaration(declaration: IndexSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): IndexSignatureDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { indexType -> lowerParameterDeclaration(indexType, owner.wrap(declaration)) },
@@ -84,6 +95,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration, newOwner)
             is MethodDeclaration -> lowerMethodDeclaration(declaration, newOwner)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration, newOwner)
+            is ConstructSignatureDeclaration -> lowerConstructSignatureDeclaration(declaration, newOwner)
             is IndexSignatureDeclaration -> lowerIndexSignatureDeclaration(declaration, newOwner)
             else -> {
                 logger.debug("[${this}] skipping ${declaration}")

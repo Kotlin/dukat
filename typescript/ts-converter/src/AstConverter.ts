@@ -468,7 +468,7 @@ export class AstConverter {
 
         let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
         let typeReference: ReferenceEntity | null = null;
-        let declaration = this.getFirstDeclaration(symbol);
+        let declaration = this.getFirstDeclaration(symbol, params.length);
 
         if (declaration) {
           if (ts.isTypeParameterDeclaration(declaration)) {
@@ -617,6 +617,12 @@ export class AstConverter {
         member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
         this.convertTypeParams(member.typeParameters)
       )
+    } else if (ts.isConstructSignatureDeclaration(member)) {
+      return this.astFactory.createConstructSignatureDeclaration(
+          this.convertParameterDeclarations(member.parameters),
+          member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+          this.convertTypeParams(member.typeParameters)
+      )
     }
 
     return null;
@@ -740,15 +746,18 @@ export class AstConverter {
     return this.astFactory.createQualifiedNameEntity(convertedExpression, name);
   }
 
-  private getFirstDeclaration(symbol: ts.Symbol | null): ts.Declaration | null {
+  private getFirstDeclaration(symbol: ts.Symbol | null, typeParamsNum: number): ts.Declaration | null {
     if (symbol == null) {
       return null;
     }
 
     if (Array.isArray(symbol.declarations)) {
       return symbol.declarations.find(decl => !ts.isModuleDeclaration(decl) &&
-              !ts.isVariableDeclaration(decl) && !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
-              !ts.isFunctionLike(decl))
+              !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
+              !ts.isFunctionLike(decl) && !(ts.isInterfaceDeclaration(decl) && decl.typeParameters && decl.typeParameters.filter(
+                  param => !param.default
+          ).length > typeParamsNum)
+      )
     }
 
     return null;
@@ -781,7 +790,7 @@ export class AstConverter {
           }
 
           let symbol = this.typeChecker.getSymbolAtLocation(type.expression);
-          let declaration = this.getFirstDeclaration(symbol);
+          let declaration = this.getFirstDeclaration(symbol, typeArguments.length);
 
           // class can implement itself, but in overwhelming majority of cases this was not the intention of the declaration author - see https://stackoverflow.com/questions/62418219/class-implementing-itself-instead-of-inheriting-an-eponymous-interface-in-outer
           if (declaration != parent) {

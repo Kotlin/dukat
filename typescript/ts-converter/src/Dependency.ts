@@ -45,7 +45,7 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
     symbols.forEach(node => {
       let parent = node.parent;
       while (parent) {
-        if (ts.isModuleDeclaration(parent)) {
+        if (ts.isModuleDeclaration(parent) || ts.isVariableStatement(parent)) {
           parentUids.add(parent);
         }
         parent = parent.parent;
@@ -78,7 +78,7 @@ export class TranslateSubsetOfSymbolsDependency implements Dependency {
       return true;
     }
 
-    if (ts.isModuleDeclaration(node) && this.parentUids.has(node)) {
+    if ((ts.isModuleDeclaration(node) || ts.isVariableStatement(node)) && this.parentUids.has(node)) {
       return true;
     }
 

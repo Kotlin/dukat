@@ -14,7 +14,7 @@ function resolveName(node: ts.Node): string | null {
   return null;
 }
 
-export function resolveDeclarations(node: ts.Identifier, typeChecker: ts.TypeChecker): Array<ts.Node> {
+export function resolveDeclarations(node: ts.Node, typeChecker: ts.TypeChecker): Array<ts.Node> {
   let symbolAtLocation = typeChecker.getSymbolAtLocation(node);
   if (symbolAtLocation) {
 

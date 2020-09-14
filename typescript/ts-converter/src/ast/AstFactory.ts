@@ -33,6 +33,7 @@ import {
   CaseDeclarationProto,
   ClassDeclarationProto,
   ConstructorDeclarationProto,
+  ConstructSignatureDeclarationProto,
   ContinueStatementDeclarationProto,
   DefinitionInfoDeclarationProto,
   EnumDeclarationProto,
@@ -140,6 +141,17 @@ export class AstFactory {
 
     let memberProto = new MemberDeclarationProto();
     memberProto.setCallsignature(callSignature);
+    return memberProto;
+  }
+
+  createConstructSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
+    let callSignature = new ConstructSignatureDeclarationProto();
+    callSignature.setParametersList(parameters);
+    callSignature.setType(type);
+    callSignature.setTypeparametersList(typeParams);
+
+    let memberProto = new MemberDeclarationProto();
+    memberProto.setConstructsignature(callSignature);
     return memberProto;
   }
 
