@@ -60,6 +60,7 @@ import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
 import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
+import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
@@ -120,10 +121,6 @@ data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
 private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
 private val ANY_TYPE = TypeValueModel(value = IdentifierEntity("Any"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Any")), metaDescription = null)
-
-private fun MemberOwnerDeclaration.convertMembers(interfaceDeclaration: Boolean): List<MemberDeclaration> {
-    return members.mapNotNull { member -> convertMemberDeclaration(member, interfaceDeclaration) }
-}
 
 private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
     return params.all { it is StringLiteralDeclaration }
@@ -256,7 +253,7 @@ internal class DocumentConverter(
     }
 
     private fun ClassLikeDeclaration.processMembers(): Members {
-        val (staticNodes, ownNodes) = convertMembers(rootIsDeclaration).partition { it.isStatic() }
+        val (staticNodes, ownNodes) = members.partition { it.isStatic() }
         return Members(ownNodes.flatMap { it.process(this) }, staticNodes.flatMap { it.process(this) })
     }
 
@@ -537,9 +534,11 @@ internal class DocumentConverter(
 
                 val immutable = modifiers.contains(ModifierDeclaration.SYNTH_IMMUTABLE)
 
+                val typeResolved = if (optional) type.makeNullable() else type
+
                 listOf(PropertyModel(
                         name = IdentifierEntity(name),
-                        type = type.process(TranslationContext.PROPERTY(optional)),
+                        type = typeResolved.convertToNode().process(TranslationContext.PROPERTY(optional)),
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                         static = isStatic(),
                         override = null,
@@ -548,7 +547,7 @@ internal class DocumentConverter(
                         getter = optional,
                         setter = optional && !immutable, // TODO: it's actually wrong
                         open = owner.isOpen(),
-                        explicitlyDeclaredType = explicitlyDeclaredType,
+                        explicitlyDeclaredType = rootIsDeclaration || explicitlyDeclaredType,
                         lateinit = !rootIsDeclaration && immutable && (initializer == null)
                 ))
             }
@@ -737,6 +736,15 @@ internal class DocumentConverter(
         return when (this) {
             is ClassDeclaration -> convertToClassModel()
             is InterfaceDeclaration -> convertToInterfaceModel()
+            is GeneratedInterfaceDeclaration -> InterfaceDeclaration(
+                    name = name,
+                    members = members,
+                    typeParameters = typeParameters,
+                    parentEntities = parentEntities,
+                    uid = uid,
+                    modifiers = setOf(ModifierDeclaration.DECLARE_KEYWORD),
+                    definitionsInfo = emptyList()
+            ).convertToInterfaceModel()
             is EnumDeclaration -> {
                 EnumModel(
                         name = IdentifierEntity(name),
@@ -781,6 +789,7 @@ internal class DocumentConverter(
                     IdentifierEntity(name)
                 }
 
+                val explicitlyDeclaredTypeResolved = rootIsDeclaration || explicitlyDeclaredType
                 return if (variableType is ObjectLiteralDeclaration) {
                     if (variableType.canBeJson()) {
                         VariableModel(
@@ -797,7 +806,7 @@ internal class DocumentConverter(
                                 extend = null,
                                 visibilityModifier = VisibilityModifierModel.DEFAULT,
                                 comment = null,
-                                explicitlyDeclaredType = explicitlyDeclaredType
+                                explicitlyDeclaredType = explicitlyDeclaredTypeResolved
                         )
                     } else {
                         ObjectModel(
@@ -824,7 +833,7 @@ internal class DocumentConverter(
                             extend = null,
                             visibilityModifier = VisibilityModifierModel.DEFAULT,
                             comment = null,
-                            explicitlyDeclaredType = explicitlyDeclaredType
+                            explicitlyDeclaredType = explicitlyDeclaredTypeResolved
                     )
                 }
             }
