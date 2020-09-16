@@ -8,7 +8,6 @@ import org.jetbrains.dukat.astCommon.ReferenceEntity
 import org.jetbrains.dukat.astCommon.SimpleMetaData
 import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
-import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astModel.AnnotationModel
@@ -783,7 +782,7 @@ internal class DocumentConverter(
             is VariableDeclaration -> {
                 val variableType = type
 
-                val nameResolved = if (moduleOwner.name.isStringLiteral()) {
+                val nameResolved = if (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
                     (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)

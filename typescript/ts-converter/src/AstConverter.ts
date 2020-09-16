@@ -1078,7 +1078,6 @@ export class AstConverter {
   private resolveAmbientModuleName(moduleDeclaration: ts.ModuleDeclaration): string {
     if (ts.isNonGlobalAmbientModule(moduleDeclaration) && ts.isExternalModuleAugmentation(moduleDeclaration)) {
       let moduleSymbol = this.typeChecker.getSymbolAtLocation(moduleDeclaration.name);
-
       if (moduleSymbol && Array.isArray(moduleSymbol.declarations)) {
         let firstDeclaration = moduleSymbol.declarations[0];
         if (firstDeclaration && firstDeclaration.name) {
@@ -1114,7 +1113,8 @@ export class AstConverter {
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), (parentModule.flags & ts.NodeFlags.Namespace) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE);
+      let kind = (parentModule.flags & ts.NodeFlags.Namespace) || !ts.isNonGlobalAmbientModule(parentModule) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE;
+      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), kind);
     }
 
     return null;

@@ -37,13 +37,6 @@ fun NameEntity.appendRight(qualifiedNode: NameEntity): QualifierEntity {
     return qualifiedNode + this
 }
 
-fun NameEntity.isStringLiteral(): Boolean {
-    return when (this) {
-        is IdentifierEntity -> value.matches("^[\"\'].*[\"\']$".toRegex())
-        else -> false
-    }
-}
-
 fun NameEntity.shiftRight(): NameEntity? {
     return when (this) {
         is IdentifierEntity -> null

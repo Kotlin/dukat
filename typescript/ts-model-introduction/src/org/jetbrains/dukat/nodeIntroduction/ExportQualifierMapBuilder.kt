@@ -3,7 +3,6 @@ package org.jetbrains.dukat.nodeIntroduction
 import MergeableDeclaration
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.isStringLiteral
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.tsmodel.ExportQualifier
@@ -11,6 +10,7 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
+import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 
@@ -46,7 +46,7 @@ private abstract class ExportQualifierBuilder(
         if (nested) {
             val jsModule = exportQualifierMap[docRoot.uid]
             if (jsModule == null) {
-                assignExports[docRoot.uid] = if (docRoot.name.isStringLiteral()) {
+                assignExports[docRoot.uid] = if (docRoot.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
                     JsModule(name = docRoot.name)
                 } else {
                     JsModule(
@@ -107,7 +107,7 @@ class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolv
 
             object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
                 override fun ModuleDeclaration.getModuleName(): NameEntity? {
-                    return if (name.isStringLiteral()) {
+                    return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
                         name.process { it.unquote() }
                     } else {
                         moduleNameResolver.resolveName(sourceFileNode.fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
