@@ -1078,11 +1078,8 @@ export class AstConverter {
   private resolveAmbientModuleName(moduleDeclaration: ts.ModuleDeclaration): string {
     if (ts.isNonGlobalAmbientModule(moduleDeclaration) && ts.isExternalModuleAugmentation(moduleDeclaration)) {
       let moduleSymbol = this.typeChecker.getSymbolAtLocation(moduleDeclaration.name);
-      if (moduleSymbol && Array.isArray(moduleSymbol.declarations)) {
-        let firstDeclaration = moduleSymbol.declarations[0];
-        if (firstDeclaration && firstDeclaration.name) {
-          return firstDeclaration.name.getText() || moduleDeclaration.name.getText();
-        }
+      if (moduleSymbol?.valueDeclaration && ts.isSourceFile(moduleSymbol?.valueDeclaration)) {
+        return moduleSymbol?.valueDeclaration?.fileName;
       }
     }
 

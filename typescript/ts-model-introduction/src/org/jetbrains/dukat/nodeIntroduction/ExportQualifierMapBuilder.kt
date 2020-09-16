@@ -47,7 +47,7 @@ private abstract class ExportQualifierBuilder(
             val jsModule = exportQualifierMap[docRoot.uid]
             if (jsModule == null) {
                 assignExports[docRoot.uid] = if (docRoot.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                    JsModule(name = docRoot.name)
+                    JsModule(name = docRoot.getModuleName() ?: docRoot.name)
                 } else {
                     JsModule(
                             name = null,
@@ -108,7 +108,14 @@ class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolv
             object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
                 override fun ModuleDeclaration.getModuleName(): NameEntity? {
                     return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                        name.process { it.unquote() }
+                        val nameValue = name.toString()
+                        if (nameValue.startsWith("/")) {
+                            moduleNameResolver.resolveName(nameValue)?.let { resolvedName ->
+                                IdentifierEntity(resolvedName)
+                            }
+                        } else {
+                            name.process { it.unquote() }
+                        }
                     } else {
                         moduleNameResolver.resolveName(sourceFileNode.fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
                     }

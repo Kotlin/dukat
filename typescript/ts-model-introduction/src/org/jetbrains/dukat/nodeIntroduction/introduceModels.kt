@@ -66,7 +66,6 @@ import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
-import org.jetbrains.dukat.tsmodel.MemberOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
 import org.jetbrains.dukat.tsmodel.MethodSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ModifierDeclaration
@@ -174,10 +173,6 @@ private fun NameEntity.unquote(): NameEntity {
     }
 }
 
-private fun TypeModel.isDynamic(): Boolean {
-    return (this is TypeValueModel) && (value == IdentifierEntity("dynamic"))
-}
-
 internal class DocumentConverter(
         private val moduleNode: ModuleDeclaration,
         private val uidToNameMapper: UidMapper,
@@ -192,8 +187,17 @@ internal class DocumentConverter(
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
+        val shortName = if (moduleNode.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
+            val nameValue = moduleNode.name.toString()
+            if (nameValue.startsWith("/")) {
+                IdentifierEntity(File(nameValue).nameWithoutExtension)
+            } else {
+                moduleNode.name.unquote()
+            }
+        } else {
+            moduleNode.name.unquote()
+        }
 
-        val shortName = moduleNode.name.unquote()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
@@ -210,8 +214,7 @@ internal class DocumentConverter(
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        val exportQualifier = exportQualifierMap[moduleNode.uid]
-        val jsModuleQualifier = exportQualifier as? JsModule
+        val jsModuleQualifier = exportQualifierMap[moduleNode.uid] as? JsModule
 
         jsModuleQualifier?.name?.let { qualifier ->
             annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
