@@ -195,7 +195,7 @@ internal class DocumentConverter(
                 moduleNode.name.unquote()
             }
         } else {
-            moduleNode.name.unquote()
+            moduleNode.name
         }
 
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
