@@ -21,27 +21,6 @@ private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
     }
 }
 
-private fun generateDeclarationFiles(id: String, declarationsBucket: Map<NameEntity, List<TopLevelModel>>): List<SourceFileModel> {
-    return declarationsBucket.map { (packageName, aliases) ->
-        SourceFileModel(
-                fileName = "nonDeclarations",
-                root = ModuleModel(
-                        name = packageName,
-                        shortName = packageName.rightMost(),
-                        declarations = aliases,
-                        annotations = mutableListOf(),
-                        submodules = emptyList(),
-                        imports = mutableListOf(),
-                        comment = null
-                ),
-                name = IdentifierEntity(id),
-                referencedFiles = emptyList()
-        )
-
-    }
-}
-
-
 private fun ModuleModel.canNotContainExternalEntities(): Boolean {
     return annotations.any {
         (it.name == "file:JsQualifier") || (it.name == "file:JsModule")
