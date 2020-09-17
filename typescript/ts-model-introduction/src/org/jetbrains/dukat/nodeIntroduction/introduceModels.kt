@@ -783,7 +783,7 @@ internal class DocumentConverter(
                 )
             }
             is VariableDeclaration -> {
-                val variableType = type
+                val variableType = type.convertToNode()
 
                 val nameResolved = if (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
                     (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
@@ -823,7 +823,7 @@ internal class DocumentConverter(
                 } else {
                     VariableModel(
                             name = nameResolved,
-                            type = type.process(),
+                            type = variableType.process(),
                             annotations = exportQualifierMap[uid].toAnnotation(),
                             immutable = exportQualifierMap[uid] is JsModule,
                             inline = false,
@@ -935,14 +935,11 @@ fun SourceSetDeclaration.introduceModels(moduleNameResolver: ModuleNameResolver)
     val exportQualifierMapBuilder = ExportQualifierMapBuilder(moduleNameResolver)
     exportQualifierMapBuilder.lower(this)
 
-    val introduceNodes = IntroduceNodes()
-    val nodes = introduceNodes.lower(this)
-
     val uidToFqNameMapper: MutableMap<String, FqNode> = mutableMapOf()
     ReferenceVisitor { uid, fqModel ->
         uidToFqNameMapper[uid] = fqModel
-    }.process(nodes)
+    }.process(this)
 
-    return NodeConverter(nodes, uidToFqNameMapper, exportQualifierMapBuilder.exportQualifierMap).convert()
+    return NodeConverter(this, uidToFqNameMapper, exportQualifierMapBuilder.exportQualifierMap).convert()
 
 }
