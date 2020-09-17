@@ -173,6 +173,10 @@ private fun NameEntity.unquote(): NameEntity {
     }
 }
 
+private fun TopLevelModel.isUnqualifiable(): Boolean {
+    return (this is InterfaceModel) || (this is TypeAliasModel)
+}
+
 internal class DocumentConverter(
         private val moduleNode: ModuleDeclaration,
         private val uidToNameMapper: UidMapper,
@@ -202,9 +206,12 @@ internal class DocumentConverter(
 
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
 
-        val declarationsMapped = (roots as List<ModuleDeclaration>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration, fullPackageName).convert(sourceFileName, generated) } + topDeclarations.mapNotNull { declaration ->
+        val topLevelModels = topDeclarations.mapNotNull { declaration ->
             declaration.convertToModel(moduleNode)
         }
+
+
+        val declarationsMapped = (roots as List<ModuleDeclaration>).map { DocumentConverter(it, uidToNameMapper, exportQualifierMap, rootIsDeclaration, fullPackageName).convert(sourceFileName, generated) } + topLevelModels
 
         val declarationsFiltered = mutableListOf<TopLevelModel>()
         val submodules = mutableListOf<ModuleModel>()
@@ -214,16 +221,18 @@ internal class DocumentConverter(
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        val jsModuleQualifier = exportQualifierMap[moduleNode.uid] as? JsModule
+        if (topLevelModels.any { ! it.isUnqualifiable() } ) {
+            val jsModuleQualifier = exportQualifierMap[moduleNode.uid] as? JsModule
 
-        jsModuleQualifier?.name?.let { qualifier ->
-            annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
-            annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
-        }
+            jsModuleQualifier?.name?.let { qualifier ->
+                annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
+                annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+            }
 
-        jsModuleQualifier?.qualifier?.let { qualifier ->
-            if (qualifier) {
-                annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
+            jsModuleQualifier?.qualifier?.let { qualifier ->
+                if (qualifier) {
+                    annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
+                }
             }
         }
 
