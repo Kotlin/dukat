@@ -89,7 +89,7 @@ private fun TypeValueModelProto.convert(): TypeValueModel {
             value.convert(),
             emptyList(),
             null,
-            null
+            if (hasFqName()) { fqName.convert() } else null
     )
 }
 
