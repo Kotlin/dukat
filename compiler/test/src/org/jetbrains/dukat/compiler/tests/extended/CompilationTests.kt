@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
+import org.jetbrains.kotlin.psi.psiUtil.forEachDescendantOfTypeVisitor
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -18,13 +19,14 @@ private class TestsEnded : AfterAllCallback {
     override fun afterAll(context: ExtensionContext?) {
         val buildNumber = System.getenv("BUILD_NUMBER") ?: ""
         val projectName = System.getenv("TEAMCITY_BUILDCONF_NAME")?.replace(" ", "_") ?: ""
+        CompilationTests.commonReport("build/reports/compilation_total_${context?.displayName}_${projectName}_${buildNumber}.txt")
         CompilationTests.report("build/reports/compilation_${context?.displayName}_${projectName}_${buildNumber}.txt")
     }
 }
 
-private data class ReportData(var errorCount: Int, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode, var errorMessage: String?)
+private data class ReportData(val errors: MutableList<String>, var translationTime: Long, var compilationTime: Long, var compilationResult: ExitCode)
 private fun MutableMap<String, ReportData>.getReportFor(reportName: String): ReportData {
-    return getOrPut(reportName) { ReportData(0, 0, 0, ExitCode.OK, null) }
+    return getOrPut(reportName) { ReportData(mutableListOf(), 0, 0, ExitCode.OK) }
 }
 
 private class TiedPrintStream(private val mainStream: PrintStream, private val secondStream: PrintStream) : PrintStream(mainStream) {
@@ -46,21 +48,35 @@ abstract class CompilationTests {
 
         private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
-        fun report(fileName: String?) {
-            val printStream = if (fileName == null) { System.out } else { TiedPrintStream(PrintStream(fileName), System.out) }
+        fun commonReport(fileName: String) {
+            val printStream = TiedPrintStream(PrintStream(fileName), System.out)
+            val messages = reportDataMap.values.flatMap { reportData ->
+                reportData.errors.map { it.substringBefore("file:") }
+            }.groupingBy { it }.eachCount()
+
+            printStream.println("---------")
+            val formatString = "%6d - %s"
+            messages.toList().sortedByDescending { (_, v) -> v }.forEach { (message, count) ->
+                println(java.lang.String.format(formatString, count, message))
+            }
+            printStream.println("---------")
+
+        }
+
+        fun report(fileName: String) {
+            val printStream = TiedPrintStream(PrintStream(fileName), System.out)
             val passed = reportDataMap.values.count { it.compilationResult == ExitCode.OK }
             val total = reportDataMap.values.size
             printStream.println("COMPILATION REPORT ${passed}/${total}")
             val namePadding = reportDataMap.keys.maxByOrNull { it.length }?.length ?: 24
             printStream.println(java.lang.String.format("%-${namePadding}s\t%-17s\t%-6s\t%-7s\t%-5s", "name", "result", "trans.", "comp.", "error"))
             val formatString = "%-${namePadding}s\t%-17s\t%6s\t%7s\t%5d"
-            reportDataMap.toList().sortedByDescending { it.second.errorCount }.forEach { (key, reportData) ->
-                val errorCount = reportData.errorCount
-                @Suppress("UNUSED_VARIABLE") val errorMessage = reportData.errorMessage?.let { it.substringBefore("\n") } ?: ""
+            reportDataMap.toList().sortedByDescending { it.second.errors.size }.forEach { (key, reportData) ->
+                val errorCount = reportData.errors.size
                 printStream.println(java.lang.String.format(formatString, key, reportData.compilationResult, "${reportData.translationTime}ms", "${reportData.compilationTime}ms", errorCount))
             }
             printStream.println("")
-            printStream.println("ERRORS: ${reportDataMap.values.map { it.errorCount }.sum()}")
+            printStream.println("ERRORS: ${reportDataMap.values.map { it.errors.size }.sum()}")
             val translationTimes     = reportDataMap.values.map { it.translationTime }
             printStream.println("AVG TRANSLATION TIME: ${translationTimes.average()}ms")
             val compilationTimes = reportDataMap.values.map { it.compilationTime }
@@ -90,11 +106,10 @@ abstract class CompilationTests {
 
         options.freeArgs = sources
 
-        val messageCollector = CompileMessageCollector { errorMessage, _, _ ->
+        val messageCollector = CompileMessageCollector { errorMessage, severity, _ ->
             val report = reportDataMap.getReportFor(descriptor)
-            report.errorCount += 1
-            if (report.errorMessage == null) {
-                report.errorMessage = errorMessage
+            if (severity.isError) {
+                report.errors.add(errorMessage)
             }
         }
 

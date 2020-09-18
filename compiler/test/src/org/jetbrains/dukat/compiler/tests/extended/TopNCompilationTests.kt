@@ -43,7 +43,6 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/express",
                     "@types/fs-extra",
                     "@types/jquery",
-                    "@types/node",
                     "@types/react",
                     "@types/react-dom",
                     "@types/request",
