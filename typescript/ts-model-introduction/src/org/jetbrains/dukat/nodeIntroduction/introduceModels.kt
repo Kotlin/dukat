@@ -116,9 +116,13 @@ private typealias UidMapper = Map<String, FqNode>
 
 data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 
-private val UNIT_TYPE = TypeValueModel(value = IdentifierEntity("Unit"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Unit")), metaDescription = null)
-private val JSON_TYPE = TypeValueModel(value = IdentifierEntity("Json"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Json")), metaDescription = null)
-private val ANY_TYPE = TypeValueModel(value = IdentifierEntity("Any"), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity("Any")), metaDescription = null)
+private fun createKlibType(name: String, metaDescription: String? = null): TypeValueModel {
+    return TypeValueModel(value = IdentifierEntity(name), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity(name)), metaDescription = metaDescription)
+}
+
+private val UNIT_TYPE = createKlibType("Unit")
+private val JSON_TYPE = createKlibType("Json")
+private val ANY_TYPE = createKlibType("Any")
 
 private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
     return params.all { it is StringLiteralDeclaration }
@@ -320,38 +324,14 @@ internal class DocumentConverter(
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         return when (this) {
             is StringLiteralDeclaration -> {
-                TypeValueModel(
-                        value = IdentifierEntity("String"),
-                        params = emptyList(),
-                        metaDescription = "\"$token\"",
-                        fqName = KLIBROOT.appendLeft(IdentifierEntity("String")),
-                        nullable = context == TranslationContext.PROPERTY(true)
-                )
+                createKlibType("String", "\"$token\"")
             }
             is NumericLiteralDeclaration -> {
-                TypeValueModel(
-                        value = IdentifierEntity("Number"),
-                        params = emptyList(),
-                        metaDescription = token,
-                        fqName = KLIBROOT.appendLeft(IdentifierEntity("Number")),
-                        nullable = context == TranslationContext.PROPERTY(true)
-                )
+                createKlibType("Number", token)
             }
             is UnionTypeDeclaration -> when {
-                canBeTranslatedAsStringLiteral() -> TypeValueModel(
-                        IdentifierEntity("String"),
-                        emptyList(),
-                        convertMeta(),
-                        KLIBROOT.appendLeft(IdentifierEntity("String")),
-                        context == TranslationContext.PROPERTY(true)
-                )
-                canBeTranslatedAsNumericLiteral() -> TypeValueModel(
-                        IdentifierEntity("Number"),
-                        emptyList(),
-                        convertMeta(),
-                        KLIBROOT.appendLeft(IdentifierEntity("Number")),
-                        context == TranslationContext.PROPERTY(true)
-                )
+                canBeTranslatedAsStringLiteral() -> createKlibType("String", convertMeta())
+                canBeTranslatedAsNumericLiteral() -> createKlibType("Number", convertMeta())
                 else -> when (context) {
                     TranslationContext.PARAMETER -> anyType(isNullable(), convertMeta())
                     else -> dynamicType(convertMeta())
