@@ -116,8 +116,8 @@ private typealias UidMapper = Map<String, FqNode>
 
 data class FqNode(val node: TopLevelDeclaration, val fqName: NameEntity)
 
-private fun createKlibType(name: String, metaDescription: String? = null): TypeValueModel {
-    return TypeValueModel(value = IdentifierEntity(name), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity(name)), metaDescription = metaDescription)
+private fun createKlibType(name: String, nullable: Boolean = false, metaDescription: String? = null): TypeValueModel {
+    return TypeValueModel(value = IdentifierEntity(name), params = emptyList(), fqName = KLIBROOT.appendLeft(IdentifierEntity(name)), metaDescription = metaDescription, nullable = nullable)
 }
 
 private val UNIT_TYPE = createKlibType("Unit")
@@ -324,14 +324,14 @@ internal class DocumentConverter(
     fun ParameterValueDeclaration.process(context: TranslationContext = TranslationContext.IRRELEVANT): TypeModel {
         return when (this) {
             is StringLiteralDeclaration -> {
-                createKlibType("String", "\"$token\"")
+                createKlibType("String", context == TranslationContext.PROPERTY(true), "\"$token\"")
             }
             is NumericLiteralDeclaration -> {
-                createKlibType("Number", token)
+                createKlibType("Number", context == TranslationContext.PROPERTY(true), token)
             }
             is UnionTypeDeclaration -> when {
-                canBeTranslatedAsStringLiteral() -> createKlibType("String", convertMeta())
-                canBeTranslatedAsNumericLiteral() -> createKlibType("Number", convertMeta())
+                canBeTranslatedAsStringLiteral() -> createKlibType("String", context == TranslationContext.PROPERTY(true), convertMeta())
+                canBeTranslatedAsNumericLiteral() -> createKlibType("Number", context == TranslationContext.PROPERTY(true), convertMeta())
                 else -> when (context) {
                     TranslationContext.PARAMETER -> anyType(isNullable(), convertMeta())
                     else -> dynamicType(convertMeta())
