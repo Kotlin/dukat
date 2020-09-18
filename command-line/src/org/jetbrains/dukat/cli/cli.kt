@@ -223,7 +223,8 @@ fun main(vararg args: String) {
 
         val sourceSet = when {
             isTypescriptDeclarationTranslation -> {
-                translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName, true)
+                val stdLibPath = File(PACKAGE_DIR, "resources/stdlib.dukat").absolutePath
+                translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName, true, stdLibPath)
             }
 
             isJavascriptTranslation -> {

@@ -14,6 +14,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.NamedModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
+import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.toposort.Graph
@@ -340,6 +341,7 @@ private class OverrideResolver(private val context: ModelContext, private val in
 }
 
 class LowerOverrides(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelLowering {
+
     override fun lower(module: ModuleModel): ModuleModel {
         return OverrideResolver(modelContext, inheritanceContext).lowerOverrides(module)
     }

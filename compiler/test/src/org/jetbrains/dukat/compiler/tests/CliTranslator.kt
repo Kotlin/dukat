@@ -12,6 +12,8 @@ import org.jetbrains.dukat.ts.translator.translateTypescriptDeclarations
 val ADD_SUPPRESS_ANNOTATIONS = !(System.getProperty("dukat.test.omitSuppressAnnotations") == "true")
 
 open class CliTranslator : InputTranslator<String> {
+    private val kotlinStdLibPath = "../node-package/build/distrib/resources/stdlib.dukat"
+
     protected fun translateBinary(input: String, tsConfig: String?) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input, tsConfig)
 
     override fun translate(
@@ -25,7 +27,7 @@ open class CliTranslator : InputTranslator<String> {
             tsConfig: String? = null
     ): SourceSetModel {
         val binData = translateBinary(input, tsConfig)
-        return translateTypescriptDeclarations(binData, CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS)
+        return translateTypescriptDeclarations(binData, CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS, kotlinStdLibPath)
     }
 
     open fun convert(

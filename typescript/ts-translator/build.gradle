@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":logging"))
     implementation(project(":model-lowerings"))
     implementation(project(":model-lowerings-common"))
+    implementation(project(":model-serialization"))
     implementation(project(":module-name-resolver"))
     implementation(project(":stdlib"))
     implementation(project(":translator"))

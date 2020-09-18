@@ -27,7 +27,9 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
 import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
 import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
+import org.jetbrains.dukat.model.serialization.readSourceSetFromFile
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
+import org.jetbrains.dukat.nodeIntroduction.introduceModels
 import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
 import org.jetbrains.dukat.tsLowerings.EscapeLiterals
@@ -44,6 +46,7 @@ import org.jetbrains.dukat.tsLowerings.MoveAliasesFromMergeableModules
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
 import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
 import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
+import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ResolveCollections
@@ -55,14 +58,14 @@ import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.nodeIntroduction.introduceModels
-import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 
 open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
         private val packageName: NameEntity?,
-        private val addSuppressAnnotations: Boolean
+        private val addSuppressAnnotations: Boolean,
+        private val kotlinStdLib: SourceSetModel? = null
 ) : ECMAScriptLowerer {
+
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
                 .lower(
