@@ -57,7 +57,7 @@ abstract class CompilationTests {
             printStream.println("---------")
             val formatString = "%6d - %s"
             messages.toList().sortedByDescending { (_, v) -> v }.forEach { (message, count) ->
-                println(java.lang.String.format(formatString, count, message))
+                printStream.println(java.lang.String.format(formatString, count, message))
             }
             printStream.println("---------")
 
