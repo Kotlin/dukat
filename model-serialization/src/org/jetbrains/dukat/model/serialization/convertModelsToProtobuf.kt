@@ -186,6 +186,7 @@ private fun ClassModel.convertAsClass(): ClassModelProto {
         InheritanceModifierModel.ABSTRACT -> classModelBuilder.setInheritanceModifier(InheritanceModifierModelProto.newBuilder().setInheritance(InheritanceModifierModelProto.INHERITANCE_KIND.ABSTRACT))
         InheritanceModifierModel.OPEN -> classModelBuilder.setInheritanceModifier(InheritanceModifierModelProto.newBuilder().setInheritance(InheritanceModifierModelProto.INHERITANCE_KIND.OPEN))
         InheritanceModifierModel.SEALED -> classModelBuilder.setInheritanceModifier(InheritanceModifierModelProto.newBuilder().setInheritance(InheritanceModifierModelProto.INHERITANCE_KIND.SEALED))
+        InheritanceModifierModel.FINAL -> classModelBuilder.setInheritanceModifier(InheritanceModifierModelProto.newBuilder().setInheritance(InheritanceModifierModelProto.INHERITANCE_KIND.FINAL))
         else -> classModelBuilder.setInheritanceModifier(InheritanceModifierModelProto.newBuilder().setInheritance(InheritanceModifierModelProto.INHERITANCE_KIND.FINAL))
     }
 
