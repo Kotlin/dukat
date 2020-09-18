@@ -69,10 +69,18 @@ private fun NameEntity.asNameEntityProto(): NameDeclarationProto {
 private fun TypeModel.convert(): TypeModelProto {
     val typeModelBuilder = TypeModelProto.newBuilder()
     when (this) {
-        is TypeValueModel -> typeModelBuilder.setTypeValue(
-                TypeValueModelProto
-                        .newBuilder().setValue(value.asNameEntityProto())
-        )
+        is TypeValueModel -> {
+            val typeValueBuilder = TypeValueModelProto
+                    .newBuilder()
+
+            typeValueBuilder.value = value.asNameEntityProto()
+
+            fqName?.let {
+                typeValueBuilder.setFqName(it.asNameEntityProto())
+            }
+
+            typeModelBuilder.setTypeValue(typeValueBuilder)
+        }
         is TypeParameterReferenceModel -> typeModelBuilder.setTypeParameterReference(
                 TypeParameterReferenceModelProto.newBuilder()
                         .setName(name.asNameEntityProto())
