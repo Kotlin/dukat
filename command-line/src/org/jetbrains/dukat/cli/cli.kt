@@ -223,7 +223,7 @@ fun main(vararg args: String) {
 
         val sourceSet = when {
             isTypescriptDeclarationTranslation -> {
-                translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName)
+                translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName, true)
             }
 
             isJavascriptTranslation -> {

@@ -7,15 +7,11 @@ import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translatorString.compileUnits
 import org.jetbrains.dukat.translatorString.translateSourceSet
-import org.jetbrains.dukat.ts.translator.JsRuntimeByteArrayTranslator
-import org.jetbrains.dukat.ts.translator.TypescriptLowerer
+import org.jetbrains.dukat.ts.translator.translateTypescriptDeclarations
 
 val ADD_SUPPRESS_ANNOTATIONS = !(System.getProperty("dukat.test.omitSuppressAnnotations") == "true")
 
 open class CliTranslator : InputTranslator<String> {
-
-    internal open val translator = JsRuntimeByteArrayTranslator(TypescriptLowerer(CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS))
-
     protected fun translateBinary(input: String, tsConfig: String?) = CliHttpClient(TestConfig.CLI_TEST_SERVER_PORT).translate(input, tsConfig)
 
     override fun translate(
@@ -29,7 +25,7 @@ open class CliTranslator : InputTranslator<String> {
             tsConfig: String? = null
     ): SourceSetModel {
         val binData = translateBinary(input, tsConfig)
-        return translator.translate(binData)
+        return translateTypescriptDeclarations(binData, CommonJsNameResolver(), null, ADD_SUPPRESS_ANNOTATIONS)
     }
 
     open fun convert(
