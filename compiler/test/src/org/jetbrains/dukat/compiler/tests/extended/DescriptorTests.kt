@@ -48,12 +48,8 @@ internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: Stri
     )
 
     assertEquals(
-        RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-            .serializeRecursively(
-                outputModuleDescriptor.getPackage(FqName.ROOT)
-            ),
-        RecursiveDescriptorComparator(RecursiveDescriptorComparator.RECURSIVE_ALL)
-            .serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
+        RecursiveDescriptorComparator().serializeRecursively(outputModuleDescriptor.getPackage(FqName.ROOT)),
+        RecursiveDescriptorComparator().serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
     )
 }
 
@@ -69,15 +65,15 @@ class DescriptorTests {
     }
 
     companion object {
-        private val skippedDescriptorTests = setOf(
-                "class/inheritance/overrides",
-                "class/inheritance/overridesFromReferencedFile",
-                "class/inheritance/overridingStdLib",
-                "class/inheritance/simple",
-                "interface/inheritance/simple",
-                "interface/inheritance/withQualifiedParent",
-                "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
-                "misc/missedOverloads"
+        private val skippedDescriptorTests = setOf<String>(
+//                "class/inheritance/overrides",
+//                "class/inheritance/overridesFromReferencedFile",
+//                "class/inheritance/overridingStdLib",
+//                "class/inheritance/simple",
+//                "interface/inheritance/simple",
+//                "interface/inheritance/withQualifiedParent",
+//                "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
+//                "misc/missedOverloads"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 
         @JvmStatic

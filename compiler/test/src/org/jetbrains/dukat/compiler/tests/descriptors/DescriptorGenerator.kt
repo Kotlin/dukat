@@ -18,7 +18,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-fun createFile(name: String, text: String, project: Project): KtFile {
+private fun createKtFile(name: String, text: String, project: Project): KtFile {
     var shortName = name.substring(name.lastIndexOf('/') + 1)
     shortName = shortName.substring(shortName.lastIndexOf('\\') + 1)
     val virtualFile =
@@ -64,7 +64,7 @@ fun generateModuleDescriptor(files: List<File>): ModuleDescriptor {
         val psiFiles = files.map { file ->
             val fileName = file.name
             val filePath = file.parent
-            createFile(fileName, doLoadFile(filePath, fileName), project)
+            createKtFile(fileName, doLoadFile(filePath, fileName), project)
         }
         return analyze(psiFiles, context).moduleDescriptor
     } finally {

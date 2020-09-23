@@ -33,28 +33,29 @@ import org.jetbrains.kotlin.utils.Printer
 import java.util.*
 import java.util.function.Consumer
 
-class RecursiveDescriptorComparator(private val conf: Configuration) {
+class RecursiveDescriptorComparator {
+    private val conf: Configuration = RECURSIVE_ALL
 
     fun serializeRecursively(declarationDescriptor: DeclarationDescriptor): String {
         val result = StringBuilder()
         appendDeclarationRecursively(
-            declarationDescriptor, DescriptorUtils.getContainingModule(declarationDescriptor),
-            Printer(result, 1), true
+                declarationDescriptor, DescriptorUtils.getContainingModule(declarationDescriptor),
+                Printer(result, 1), true
         )
         return result.toString()
     }
 
     private fun appendDeclarationRecursively(
-        descriptor: DeclarationDescriptor,
-        module: ModuleDescriptor,
-        printer: Printer,
-        topLevel: Boolean
+            descriptor: DeclarationDescriptor,
+            module: ModuleDescriptor,
+            printer: Printer,
+            topLevel: Boolean
     ) {
         if (!isFromModule(descriptor, module)) return
 
         val isEnumEntry = isEnumEntry(descriptor)
         val isClassOrPackage =
-            (descriptor is ClassOrPackageFragmentDescriptor || descriptor is PackageViewDescriptor) && !isEnumEntry
+                (descriptor is ClassOrPackageFragmentDescriptor || descriptor is PackageViewDescriptor) && !isEnumEntry
 
         val content = java.lang.StringBuilder()
         if (isClassOrPackage) {
@@ -66,11 +67,11 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
 
             if (descriptor is ClassDescriptor) {
                 appendSubDescriptors(
-                    descriptor,
-                    module,
-                    descriptor.defaultType.memberScope,
-                    descriptor.constructors,
-                    child
+                        descriptor,
+                        module,
+                        descriptor.defaultType.memberScope,
+                        descriptor.constructors,
+                        child
                 )
                 val staticScope = descriptor.staticScope
                 if (!DescriptorUtils.getAllDescriptors(staticScope).isEmpty()) {
@@ -80,15 +81,15 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
                 }
             } else if (descriptor is PackageFragmentDescriptor) {
                 appendSubDescriptors(
-                    descriptor, module,
-                    descriptor.getMemberScope(),
-                    emptyList(), child
+                        descriptor, module,
+                        descriptor.getMemberScope(),
+                        emptyList(), child
                 )
             } else if (descriptor is PackageViewDescriptor) {
                 appendSubDescriptors(
-                    descriptor, module,
-                    getPackageScopeInModule(descriptor, module),
-                    emptyList(), child
+                        descriptor, module,
+                        getPackageScopeInModule(descriptor, module),
+                        emptyList(), child
                 )
             }
 
@@ -116,15 +117,9 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
         } else if (conf.checkPropertyAccessors && descriptor is PropertyDescriptor) {
             printer.printlnWithNoIndent()
             printer.pushIndent()
-            val getter = descriptor.getter
-            if (getter != null) {
-                printer.println(conf.renderer.render(getter))
-            }
 
-            val setter = descriptor.setter
-            if (setter != null) {
-                printer.println(conf.renderer.render(setter))
-            }
+            descriptor.getter?.let { printer.println(conf.renderer.render(it)) }
+            descriptor.setter?.let { printer.println(conf.renderer.render(it)) }
 
             printer.popIndent()
         } else {
@@ -137,8 +132,8 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
     }
 
     private fun printDescriptor(
-        descriptor: DeclarationDescriptor,
-        printer: Printer
+            descriptor: DeclarationDescriptor,
+            printer: Printer
     ) {
         val isPrimaryConstructor = conf.checkPrimaryConstructors &&
                 descriptor is ConstructorDescriptor && descriptor.isPrimary
@@ -147,8 +142,8 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
 
         if (descriptor is FunctionDescriptor && conf.checkFunctionContracts) {
             printEffectsIfAny(
-                descriptor,
-                printer
+                    descriptor,
+                    printer
             )
         }
     }
@@ -177,7 +172,7 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
 
         // 'expected' declarations do not belong to the platform-specific module, even though they participate in the analysis
         return if (descriptor is MemberDescriptor && descriptor.isExpect &&
-            !module.platform.isCommon()
+                !module.platform.isCommon()
         ) false else module == DescriptorUtils.getContainingModule(descriptor)
 
     }
@@ -190,11 +185,11 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
     }
 
     private fun appendSubDescriptors(
-        descriptor: DeclarationDescriptor,
-        module: ModuleDescriptor,
-        memberScope: MemberScope,
-        extraSubDescriptors: Collection<DeclarationDescriptor>,
-        printer: Printer
+            descriptor: DeclarationDescriptor,
+            module: ModuleDescriptor,
+            memberScope: MemberScope,
+            extraSubDescriptors: Collection<DeclarationDescriptor>,
+            printer: Printer
     ) {
         if (!isFromModule(descriptor, module)) return
 
@@ -213,34 +208,28 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
     }
 
     class Configuration(
-        val checkPrimaryConstructors: Boolean,
-        val checkPropertyAccessors: Boolean,
-        val includeMethodsOfKotlinAny: Boolean,
-        val renderDeclarationsFromOtherModules: Boolean,
-        val checkFunctionContracts: Boolean,
-        val recursiveFilter: (DeclarationDescriptor) -> Boolean,
-        renderer: DescriptorRenderer
+            val checkPrimaryConstructors: Boolean,
+            val checkPropertyAccessors: Boolean,
+            val includeMethodsOfKotlinAny: Boolean,
+            val renderDeclarationsFromOtherModules: Boolean,
+            val checkFunctionContracts: Boolean,
+            val recursiveFilter: (DeclarationDescriptor) -> Boolean
     ) {
-        val renderer: DescriptorRenderer
-
-        init {
-            this.renderer = rendererWithPropertyAccessors(renderer, checkPropertyAccessors)
-        }
+        val renderer: DescriptorRenderer = rendererWithPropertyAccessors(DEFAULT_RENDERER, checkPropertyAccessors)
 
         private fun rendererWithPropertyAccessors(
-            renderer: DescriptorRenderer, checkPropertyAccessors: Boolean
+                renderer: DescriptorRenderer, checkPropertyAccessors: Boolean
         ): DescriptorRenderer {
             return newRenderer(
-                renderer,
-                Consumer{ options ->
-                    options.propertyAccessorRenderingPolicy =
+                    renderer
+            ) { options ->
+                options.propertyAccessorRenderingPolicy =
                         if (checkPropertyAccessors) PropertyAccessorRenderingPolicy.DEBUG else PropertyAccessorRenderingPolicy.NONE
-                }
-            )
+            }
         }
 
         private fun newRenderer(
-            renderer: DescriptorRenderer, configure: Consumer<DescriptorRendererOptions>
+                renderer: DescriptorRenderer, configure: Consumer<DescriptorRendererOptions>
         ): DescriptorRenderer {
             return renderer.withOptions {
                 configure.accept(this)
@@ -264,30 +253,19 @@ class RecursiveDescriptorComparator(private val conf: Configuration) {
         }
 
         val RECURSIVE_ALL = Configuration(
-            checkPrimaryConstructors = true,
-            checkPropertyAccessors = true,
-            includeMethodsOfKotlinAny = true,
-            renderDeclarationsFromOtherModules = false,
-            checkFunctionContracts = true,
-            recursiveFilter = { true },
-            renderer = DEFAULT_RENDERER
-        )
-
-        val RECURSIVE_ALL_WITHOUT_METHODS_FROM_ANY = Configuration(
-            checkPrimaryConstructors = true,
-            checkPropertyAccessors = true,
-            includeMethodsOfKotlinAny = false,
-            renderDeclarationsFromOtherModules = false,
-            checkFunctionContracts = true,
-            recursiveFilter = { true },
-            renderer = DEFAULT_RENDERER
+                checkPrimaryConstructors = true,
+                checkPropertyAccessors = true,
+                includeMethodsOfKotlinAny = true,
+                renderDeclarationsFromOtherModules = false,
+                checkFunctionContracts = true,
+                recursiveFilter = { true }
         )
 
         private val KOTLIN_ANY_METHOD_NAMES = ImmutableSet.of("equals", "hashCode", "toString")
 
         private fun printEffectsIfAny(functionDescriptor: FunctionDescriptor, printer: Printer) {
             val contractProvider =
-                functionDescriptor.getUserData<AbstractContractProvider>(ContractProviderKey) ?: return
+                    functionDescriptor.getUserData<AbstractContractProvider>(ContractProviderKey) ?: return
 
             val contractDescription = contractProvider.getContractDescription()
             if (contractDescription == null || contractDescription.effects.isEmpty()) return
