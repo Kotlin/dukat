@@ -10,15 +10,14 @@ import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorCompara
 import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
 import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.descriptors.translateToDescriptors
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
-import org.jetbrains.dukat.translatorString.compileUnits
 import org.jetbrains.dukat.translatorString.translateSourceSet
 import org.jetbrains.kotlin.name.FqName
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import java.io.File
 import kotlin.test.assertEquals
 
 internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: String?) {
@@ -26,33 +25,29 @@ internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: Stri
 
     val sourceSet = CliTranslator().translate(tsPath, tsConfig)
 
-    val targetPath = "./build/test/data/descriptors/$name"
-    File(targetPath).deleteRecursively()
-    compileUnits(translateSourceSet(sourceSet), "./build/test/data/descriptors/$name")
-
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
-                sourceFile.name,
-                sourceFile.fileName,
-                it,
-                sourceFile.referencedFiles
+                    sourceFile.name,
+                    sourceFile.fileName,
+                    it,
+                    sourceFile.referencedFiles
             )
         }
     })
 
     val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
-    val expectedModuleDescriptor =
-        generateModuleDescriptor(File(targetPath).walk().filter { it.isFile }.toList())
-
     validate(
-        DescriptorValidator.ValidationVisitor.errorTypesAllowed(),
-        outputModuleDescriptor.getPackage(FqName.ROOT)
+            DescriptorValidator.ValidationVisitor.errorTypesAllowed(),
+            outputModuleDescriptor.getPackage(FqName.ROOT)
     )
 
+    val expectedModuleDescriptor =
+            generateModuleDescriptor(translateSourceSet(sourceSet).filterIsInstance<ModuleTranslationUnit>())
+
     assertEquals(
-        RecursiveDescriptorComparator().serializeRecursively(outputModuleDescriptor.getPackage(FqName.ROOT)),
-        RecursiveDescriptorComparator().serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
+            RecursiveDescriptorComparator().serializeRecursively(outputModuleDescriptor.getPackage(FqName.ROOT)),
+            RecursiveDescriptorComparator().serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
     )
 }
 
@@ -68,7 +63,7 @@ class DescriptorTests {
     }
 
     companion object {
-        private val skippedDescriptorTests = setOf(
+        private val skippedDescriptorTests = setOf<String>(
                 "class/inheritance/overrides",
                 "class/inheritance/overridesFromReferencedFile",
                 "class/inheritance/overridingStdLib",
@@ -82,7 +77,7 @@ class DescriptorTests {
         @JvmStatic
         fun descriptorsTestSet(): Array<Array<String>> {
             return MethodSourceSourceFiles("./test/data/typescript/node_modules", D_TS_DECLARATION_EXTENSION)
-                .fileSetWithDescriptors().filter { !skippedDescriptorTests.contains(it.first()) }.toTypedArray()
+                    .fileSetWithDescriptors().filter { !skippedDescriptorTests.contains(it.first()) }.toTypedArray()
         }
     }
 }

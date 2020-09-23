@@ -1,10 +1,9 @@
 package org.jetbrains.dukat.compiler.tests.descriptors
 
 import org.jetbrains.dukat.descriptors.JsStdlibConfigContext
+import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.com.intellij.lang.Language
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
-import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.CharsetToolkit
 import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
@@ -14,9 +13,6 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
 
 private fun createKtFile(name: String, text: String, project: Project): KtFile {
     val virtualFile =
@@ -25,46 +21,25 @@ private fun createKtFile(name: String, text: String, project: Project): KtFile {
     virtualFile.charset = CharsetToolkit.UTF8_CHARSET
     val factory = PsiFileFactory.getInstance(project) as PsiFileFactoryImpl
 
-    return factory.trySetupPsiForFile(virtualFile, (KotlinLanguage.INSTANCE), true, false) as KtFile
+    return factory.trySetupPsiForFile(virtualFile, KotlinLanguage.INSTANCE, true, false) as KtFile
 }
 
-fun doLoadFile(myFullDataPath: String, name: String): String {
-    val fullName = myFullDataPath + File.separatorChar + name
-    return doLoadFile(File(fullName))
-}
-
-fun doLoadFile(file: File): String {
-    try {
-        return FileUtil.loadFile(file, "UTF-8", true)
-    } catch (fileNotFoundException: FileNotFoundException) {
-        val messageWithFullPath = file.absolutePath + " (No such file or directory)"
-        throw IOException(
-            "Ensure you have your 'Working Directory' configured correctly as the root " +
-                    "Kotlin project directory in your test configuration\n\t" +
-                    messageWithFullPath,
-            fileNotFoundException
-        )
-    }
-}
-
-fun analyze(
-    files: List<KtFile>,
-    configContext: JsStdlibConfigContext
+private fun analyze(
+        ktFiles: Collection<KtFile>,
+        configContext: JsStdlibConfigContext
 ): AnalysisResult {
-    return TopDownAnalyzerFacadeForJS.analyzeFiles(files, configContext.generateJSConfig())
+    return TopDownAnalyzerFacadeForJS.analyzeFiles(ktFiles, configContext.generateJSConfig())
 }
 
-fun generateModuleDescriptor(files: List<File>): ModuleDescriptor {
+fun generateModuleDescriptor(moduleUnits: Collection<ModuleTranslationUnit>): ModuleDescriptor {
     val context = JsStdlibConfigContext()
     try {
         val environment = context.environment
         val project = environment.project
-        val psiFiles = files.map { file ->
-            val fileName = file.name
-            val filePath = file.parent
-            createKtFile(fileName, doLoadFile(filePath, fileName), project)
+        val ktFiles = moduleUnits.map { moduleUnit ->
+            createKtFile("${moduleUnit.name}.kt", moduleUnit.content, project)
         }
-        return analyze(psiFiles, context).moduleDescriptor
+        return analyze(ktFiles, context).moduleDescriptor
     } finally {
         context.destroy()
     }
