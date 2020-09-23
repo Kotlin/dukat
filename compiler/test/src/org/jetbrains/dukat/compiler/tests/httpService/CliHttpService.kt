@@ -6,8 +6,8 @@ import org.jetbrains.dukat.compiler.tests.core.TestConfig
 class CliHttpService(
         private val serverPath: String = "./test/src/org/jetbrains/dukat/compiler/tests/server.js",
         private val nodeResolver: NodeResolver = NodeResolver("../node-package/build/env.json"),
-        private val inspectNodeProcess: Boolean = false,
-        private val emitDiagnostics: Boolean = false
+        private val emitDiagnostics: Boolean = false,
+        private val inspectNodeProcess: Boolean = false
 ) {
 
     private val maxOldSpaceSize = 8192

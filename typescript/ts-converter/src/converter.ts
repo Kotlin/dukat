@@ -45,12 +45,13 @@ class SourceBundleBuilder {
     private tsConfig: string | null,
     private stdLib: string,
     private emitDiagnostics: boolean,
+    private failOnWarnings: boolean,
     originalFiles: Array<string>
   ) {
     this.program = this.createProgram(originalFiles);
 
     if (emitDiagnostics) {
-      this.printDiagnostics(this.program);
+      this.printWarningsAndTreatThemAsErrors(this.program);
     }
 
     this.libsSet = getLibPaths(this.program, this.program.getSourceFile(this.stdLib));
@@ -70,7 +71,7 @@ class SourceBundleBuilder {
     );
   }
 
-  private printDiagnostics(program: ts.Program) {
+  private printWarningsAndTreatThemAsErrors(program: ts.Program) {
     let diagnostics = ts.getPreEmitDiagnostics(program).concat(program.emit().diagnostics);
 
     if (diagnostics.length > 0) {
@@ -79,6 +80,10 @@ class SourceBundleBuilder {
         let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
         console.log(`[warning] [tsc] ${message} ${diagnostic.file.fileName}:${line + 1}:${character + 1}`);
       });
+
+      if (this.failOnWarnings) {
+        throw new Error("failing on warnings");
+      }
     }
   }
 
@@ -111,6 +116,6 @@ class SourceBundleBuilder {
   }
 }
 
-export function createSourceSet(tsConfig: string | null, stdlib: string, emitDiagnostics: boolean, files: Array<string>): declarations.SourceSetDeclarationProto  {
-  return new SourceBundleBuilder(tsConfig, stdlib, emitDiagnostics, files).createBundle();
+export function createSourceSet(tsConfig: string | null, stdlib: string, emitDiagnostics: boolean, failOnWarnings: boolean, files: Array<string>): declarations.SourceSetDeclarationProto  {
+  return new SourceBundleBuilder(tsConfig, stdlib, emitDiagnostics, failOnWarnings, files).createBundle();
 }

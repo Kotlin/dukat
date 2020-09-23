@@ -122,8 +122,8 @@ function endsWith(str, postfix) {
 
 
 
-function createBinary(tsConfig, stdlib, emitDiagnostics, files) {
-    return createSourceSet(tsConfig, stdlib, emitDiagnostics, files);
+function createBinary(tsConfig, stdlib, emitDiagnostics, failOnWarnings, files) {
+    return createSourceSet(tsConfig, stdlib, emitDiagnostics, failOnWarnings, files);
 }
 
 function createReadableStream(binary, onData, onEnd) {
@@ -167,7 +167,7 @@ function cliMode(args) {
 
     if (is_ts || is_js) {
         try {
-            let bundle = createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, false, files);
+            let bundle = createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, false, false, files);
 
             var inputStream = createReadableStream(bundle);
 

@@ -56,6 +56,7 @@ function createServer(port, emitDiagnostics, sandboxDirs) {
                             data.tsConfig,
                             dukatCli.getStdLib(),
                             emitDiagnostics == "true",
+                            emitDiagnostics == "true",
                             files
                         ),
                         onBinaryStreamData,
