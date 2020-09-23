@@ -8,6 +8,7 @@ import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
 import org.jetbrains.dukat.compiler.tests.descriptors.generateModuleDescriptor
+import org.jetbrains.dukat.compiler.tests.toFileUriScheme
 import org.jetbrains.dukat.descriptors.translateToDescriptors
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.compileUnits
@@ -21,6 +22,8 @@ import java.io.File
 import kotlin.test.assertEquals
 
 internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: String?) {
+    println("\nSOURCE:\t${tsPath.toFileUriScheme()}")
+
     val sourceSet = CliTranslator().translate(tsPath, tsConfig)
 
     val targetPath = "./build/test/data/descriptors/$name"
