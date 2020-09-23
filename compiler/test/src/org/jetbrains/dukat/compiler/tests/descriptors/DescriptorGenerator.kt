@@ -19,15 +19,13 @@ import java.io.FileNotFoundException
 import java.io.IOException
 
 private fun createKtFile(name: String, text: String, project: Project): KtFile {
-    var shortName = name.substring(name.lastIndexOf('/') + 1)
-    shortName = shortName.substring(shortName.lastIndexOf('\\') + 1)
     val virtualFile =
-        LightVirtualFile(shortName, (KotlinLanguage.INSTANCE as Language), StringUtilRt.convertLineSeparators(text))
+        LightVirtualFile(name, KotlinLanguage.INSTANCE, StringUtilRt.convertLineSeparators(text))
 
     virtualFile.charset = CharsetToolkit.UTF8_CHARSET
     val factory = PsiFileFactory.getInstance(project) as PsiFileFactoryImpl
 
-    return factory.trySetupPsiForFile(virtualFile, (KotlinLanguage.INSTANCE as Language), true, false) as KtFile
+    return factory.trySetupPsiForFile(virtualFile, (KotlinLanguage.INSTANCE), true, false) as KtFile
 }
 
 fun doLoadFile(myFullDataPath: String, name: String): String {
