@@ -29,7 +29,6 @@ import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
 import org.jetbrains.dukat.model.commonLowerings.lower
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceModels
-import org.jetbrains.dukat.tsLowerings.AddPackageName
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
 import org.jetbrains.dukat.tsLowerings.EscapeLiterals
 import org.jetbrains.dukat.tsLowerings.FilterOutNonDeclarations
@@ -69,7 +68,6 @@ open class TypescriptLowerer(
         val declarations = sourceSet
                 .lower(
                         IntroduceMissingConstructors(),
-                        AddPackageName(packageName),
                         RemoveThisParameters(),
                         MergeModules(),
                         MergeClassLikes(),

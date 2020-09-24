@@ -155,7 +155,7 @@ export class AstConverter {
     });
   }
 
-  private createModuleDeclarationAsTopLevel(packageName: NameEntity, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
+  private createModuleDeclarationAsTopLevel(packageName: string, imports: Array<ImportClauseDeclaration>, references: Array<ReferenceClauseDeclarationProto>, declarations: Iterable<Declaration>, modifiers: Array<ModifierDeclaration>, uid: string, resourceName: string, definitions: Array<DefinitionInfoDeclaration>, kind: MODULE_KINDMap[keyof MODULE_KINDMap]): TopLevelDeclarationProto {
     return this.astFactory.createModuleDeclarationAsTopLevel(this.astFactory.createModuleDeclaration(packageName, imports, references, declarations, modifiers, uid, resourceName, definitions, kind));
   }
 
@@ -1111,7 +1111,7 @@ export class AstConverter {
       let references = this.getReferences(body.getSourceFile());
 
       let kind = (parentModule.flags & ts.NodeFlags.Namespace) || !ts.isNonGlobalAmbientModule(parentModule) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE;
-      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), kind);
+      return this.createModuleDeclarationAsTopLevel(sourceNameFragment, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), kind);
     }
 
     return null;

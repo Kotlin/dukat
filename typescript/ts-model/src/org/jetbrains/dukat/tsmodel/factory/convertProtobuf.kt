@@ -349,7 +349,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
     }
 
     return ModuleDeclaration(
-            name = if (hasPackageName()) { packageName.convert() } else IdentifierEntity("<ROOT>"),
+            name = name,
             imports = importsList.mapNotNull { it.convert() },
             references = referencesList.map { it.convert() },
             export = export,

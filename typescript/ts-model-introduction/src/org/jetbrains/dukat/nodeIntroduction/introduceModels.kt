@@ -10,6 +10,7 @@ import org.jetbrains.dukat.astCommon.TopLevelEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -170,15 +171,20 @@ private fun escapeName(name: String): String {
             .replace("^interface$".toRegex(), "`interface`")
 }
 
-private fun NameEntity.unquote(): NameEntity {
-    return when (this) {
-        is IdentifierEntity -> copy(value = escapeName(value.replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")))
-        else -> this
-    }
-}
-
 private fun TopLevelModel.isUnqualifiable(): Boolean {
     return (this is InterfaceModel) || (this is TypeAliasModel)
+}
+
+private fun ModuleDeclaration.asPackageShortName(): NameEntity {
+    return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
+        if (name.startsWith("/")) {
+            IdentifierEntity(File(name).nameWithoutExtension)
+        } else {
+            escapeName(name.unquote()).toNameEntity()
+        }
+    } else {
+        IdentifierEntity(name)
+    }
 }
 
 internal class DocumentConverter(
@@ -195,17 +201,7 @@ internal class DocumentConverter(
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-        val shortName = if (moduleNode.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-            val nameValue = moduleNode.name.toString()
-            if (nameValue.startsWith("/")) {
-                IdentifierEntity(File(nameValue).nameWithoutExtension)
-            } else {
-                moduleNode.name.unquote()
-            }
-        } else {
-            moduleNode.name
-        }
-
+        val shortName = moduleNode.asPackageShortName()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
@@ -229,7 +225,7 @@ internal class DocumentConverter(
             val jsModuleQualifier = exportQualifierMap[moduleNode.uid] as? JsModule
 
             jsModuleQualifier?.name?.let { qualifier ->
-                annotations.add(AnnotationModel("file:JsModule", listOf(qualifier.process { unquote(it) })))
+                annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(qualifier.unquote()))))
                 annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
             }
 
@@ -600,7 +596,7 @@ internal class DocumentConverter(
 
     private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
         return when (this) {
-            is JsModule -> mutableListOf(AnnotationModel("JsModule", listOf(name).filterNotNull()))
+            is JsModule -> mutableListOf(AnnotationModel("JsModule", name?.let { listOf(IdentifierEntity(it)) } ?: emptyList()))
             is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
             else -> mutableListOf()
         }
@@ -775,7 +771,7 @@ internal class DocumentConverter(
                 val variableType = type.convertToNode()
 
                 val nameResolved = if (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                    (exportQualifierMap[uid] as? JsModule)?.name ?: IdentifierEntity(name)
+                    (exportQualifierMap[uid] as? JsModule)?.name?.let { IdentifierEntity(it) } ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)
                 }
@@ -899,13 +895,11 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
         visit(declaration.uid, FqNode(declaration, ownerName.appendLeft(IdentifierEntity(declaration.name))))
     }
 
-    fun visitModule(node: ModuleDeclaration, ownerPackageName: NameEntity?) {
-        val name = node.name
-
-        val shortName = name.unquote()
+    fun visitModule(declaration: ModuleDeclaration, ownerPackageName: NameEntity?) {
+        val shortName = declaration.asPackageShortName()
         val qualifiedName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
-        node.declarations.forEach { topLevelNode ->
+        declaration.declarations.forEach { topLevelNode ->
             when (topLevelNode) {
                 is ClassLikeDeclaration -> visitClassLike(topLevelNode, qualifiedName)
                 is TypeAliasDeclaration -> visitTypeAlias(topLevelNode, qualifiedName)

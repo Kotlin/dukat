@@ -14,7 +14,7 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 
-private fun String.unquote(): String {
+fun String.unquote(): String {
     return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
 }
 
@@ -96,7 +96,7 @@ private abstract class ExportQualifierBuilder(
         return assignExports
     }
 
-    abstract fun ModuleDeclaration.getModuleName(): NameEntity?
+    abstract fun ModuleDeclaration.getModuleName(): String?
 }
 
 class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver)  {
@@ -106,18 +106,15 @@ class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolv
         return source.copy(sources = source.sources.map { sourceFileNode ->
 
             object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
-                override fun ModuleDeclaration.getModuleName(): NameEntity? {
+                override fun ModuleDeclaration.getModuleName(): String? {
                     return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                        val nameValue = name.toString()
-                        if (nameValue.startsWith("/")) {
-                            moduleNameResolver.resolveName(nameValue)?.let { resolvedName ->
-                                IdentifierEntity(resolvedName)
-                            }
+                        if (name.startsWith("/")) {
+                            moduleNameResolver.resolveName(name)
                         } else {
-                            name.process { it.unquote() }
+                            name.unquote()
                         }
                     } else {
-                        moduleNameResolver.resolveName(sourceFileNode.fileName)?.let { resolvedName -> IdentifierEntity(resolvedName) }
+                        moduleNameResolver.resolveName(sourceFileNode.fileName)
                     }
                 }
             }

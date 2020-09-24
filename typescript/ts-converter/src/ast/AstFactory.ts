@@ -94,8 +94,8 @@ export class AstFactory {
   private log = createLogger("AstFactory");
 
   private static FACTORY = new AstFactory()
-  static TSLIBROOT = AstFactory.FACTORY.createIdentifierDeclarationAsNameEntity("tsstdlib");
-  static ROOT = AstFactory.FACTORY.createIdentifierDeclarationAsNameEntity("<ROOT>");
+  static TSLIBROOT = "tsstdlib";
+  static ROOT = "<ROOT>";
 
   createNamespaceImportClause(name: string): ImportClauseDeclaration {
     let namespaceClause = new NamespaceImportDeclarationProto();
@@ -506,7 +506,7 @@ export class AstFactory {
   }
 
   createModuleDeclaration(
-    packageName: NameEntity,
+    name: string,
     imports: Array<ImportClauseDeclaration>,
     references: Array<ReferenceClauseDeclarationProto>,
     moduleDeclarations: Iterable<Declaration>,
@@ -521,9 +521,7 @@ export class AstFactory {
     moduleDeclaration.setImportsList(imports);
     moduleDeclaration.setReferencesList(references);
 
-    if (packageName) {
-      moduleDeclaration.setPackagename(packageName);
-    }
+    moduleDeclaration.setName(name);
 
     moduleDeclaration.setDeclarationsList(Array.from(moduleDeclarations));
     moduleDeclaration.setModifiersList(modifiers);

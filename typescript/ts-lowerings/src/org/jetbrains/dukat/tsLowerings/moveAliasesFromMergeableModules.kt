@@ -15,7 +15,7 @@ import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 private fun TopLevelDeclaration.getName(): NameEntity? {
     return when (this) {
         is ClassLikeDeclaration -> name
-        is ModuleDeclaration -> name
+        is ModuleDeclaration -> IdentifierEntity(name)
         else -> null
     }
 }

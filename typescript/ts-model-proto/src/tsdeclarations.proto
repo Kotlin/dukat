@@ -548,7 +548,7 @@ message TopLevelDeclarationProto {
 }
 
 message ModuleDeclarationProto {
-    NameDeclarationProto packageName = 1;
+    string name = 1;
     repeated ImportClauseDeclarationProto imports = 2;
     repeated ReferenceClauseDeclarationProto references = 3;
     repeated TopLevelDeclarationProto declarations = 4;
