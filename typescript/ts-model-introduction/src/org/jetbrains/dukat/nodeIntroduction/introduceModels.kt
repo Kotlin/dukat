@@ -175,7 +175,7 @@ private fun TopLevelModel.isUnqualifiable(): Boolean {
     return (this is InterfaceModel) || (this is TypeAliasModel)
 }
 
-private fun ModuleDeclaration.asPackageShortName(): NameEntity {
+private fun ModuleDeclaration.shortPackageName(): NameEntity {
     return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
         if (name.startsWith("/")) {
             IdentifierEntity(File(name).nameWithoutExtension)
@@ -201,7 +201,7 @@ internal class DocumentConverter(
 
     @Suppress("UNCHECKED_CAST")
     fun convert(sourceFileName: String, generated: MutableList<SourceFileModel>): ModuleModel {
-        val shortName = moduleNode.asPackageShortName()
+        val shortName = moduleNode.shortPackageName()
         val fullPackageName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         val (roots, topDeclarations) = moduleNode.declarations.partition { it is ModuleDeclaration }
@@ -896,7 +896,7 @@ private class ReferenceVisitor(private val visit: (String, FqNode) -> Unit) {
     }
 
     fun visitModule(declaration: ModuleDeclaration, ownerPackageName: NameEntity?) {
-        val shortName = declaration.asPackageShortName()
+        val shortName = declaration.shortPackageName()
         val qualifiedName = ownerPackageName?.appendLeft(shortName) ?: shortName
 
         declaration.declarations.forEach { topLevelNode ->
