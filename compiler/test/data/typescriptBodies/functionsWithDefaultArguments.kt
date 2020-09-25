@@ -1,4 +1,4 @@
-// [test] functionsWithDefaultArguments.module_resolved_name.kt
+// [test] functionsWithDefaultArguments.kt
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
 import kotlin.js.*
@@ -15,10 +15,15 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external fun withOneAny(a: Any = definedExternally): Any
+interface Settings
 
-external fun withOneString(s: String = definedExternally): String
+fun withOneAny(a: Any = definedExternally): Any = a
 
-external fun withOneStringAndOptional(s: String = definedExternally, settings: JQueryAjaxSettings = definedExternally): Boolean
+fun withOneString(s: String = definedExternally): String = s
 
-external interface JQueryAjaxSettings
+fun withOneStringAndOptional(s: String = definedExternally, settings: Settings = definedExternally): Boolean {
+    if ((settings != null) && s == "anything") {
+        return true
+    }
+    return false
+}
