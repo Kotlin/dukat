@@ -41,7 +41,7 @@ fun ModuleDeclaration.introduceTypes(context: TypeAnalysisContext): ModuleDeclar
     environment.resolveConstraints()
 
     val declarations =
-            context.getExportsFrom(environment, resourceName)
+            context.getExportsFrom(environment, sourceName)
                     .map {
                         when (it) {
                             is FunctionDeclaration -> it.copy(modifiers = makeExternal())

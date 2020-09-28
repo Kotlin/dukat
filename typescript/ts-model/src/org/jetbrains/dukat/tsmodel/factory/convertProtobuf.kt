@@ -357,7 +357,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
             modifiers = modifiersList.mapNotNull { it.convert() }.toSet(),
             definitionsInfo = definitionsInfoList.map { it.convert() },
             uid = uid,
-            resourceName = resourceName,
+            sourceName = sourceName,
             kind = when (kind) {
                 ModuleDeclarationProto.MODULE_KIND.DECLARATION_FILE -> ModuleDeclarationKind.DECLARATION_FILE
                 ModuleDeclarationProto.MODULE_KIND.SOURCE_FILE -> ModuleDeclarationKind.SOURCE_FILE

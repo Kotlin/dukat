@@ -512,7 +512,7 @@ export class AstFactory {
     moduleDeclarations: Iterable<Declaration>,
     modifiers: Array<ModifierDeclaration>,
     uid: string,
-    resourceName: string,
+    sourceName: string,
     definitions: Array<DefinitionInfoDeclaration>,
     kind: MODULE_KINDMap[keyof MODULE_KINDMap]
   ): ModuleDeclaration {
@@ -527,7 +527,7 @@ export class AstFactory {
     moduleDeclaration.setModifiersList(modifiers);
 
     moduleDeclaration.setUid(uid);
-    moduleDeclaration.setResourcename(resourceName);
+    moduleDeclaration.setSourcename(sourceName);
     moduleDeclaration.setDefinitionsinfoList(definitions);
     moduleDeclaration.setKind(kind);
 

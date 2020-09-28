@@ -16,6 +16,6 @@ data class ModuleDeclaration(
 
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
         override val uid: String,
-        val resourceName: String,
+        val sourceName: String,
         val kind: ModuleDeclarationKind
 ) : TopLevelDeclaration, WithModifiersDeclaration, MergeableDeclaration

@@ -124,7 +124,7 @@ export class AstConverter {
 
   private createModuleFromSourceFile(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): ModuleDeclaration {
     let packageNameFragments = sourceFile.fileName.split("/");
-    let sourceName = packageNameFragments[packageNameFragments.length - 1].replace(".d.ts", "");
+    let sourceName = sourceFile.fileName;
 
     let statements = filter ? sourceFile.statements.filter(filter) : sourceFile.statements;
 
