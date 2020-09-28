@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationRuntimeVersion}"
     implementation(project(":ast-common"))
+    implementation(project(":ts-model"))
 
     testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
 

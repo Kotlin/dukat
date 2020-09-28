@@ -24,9 +24,10 @@ private fun WithModifiersDeclaration.resolveAsJsDefaultQualifier(): ExportQualif
     } else null
 }
 
-private abstract class ExportQualifierBuilder(
+private class ExportQualifierBuilder(
         root: ModuleDeclaration,
-        private val exportQualifierMap: MutableMap<String?, ExportQualifier>
+        private val exportQualifierMap: MutableMap<String?, ExportQualifier>,
+        private val moduleNameResolver: ModuleNameResolver
 ) {
     init {
         scanModules(root, exportQualifierMap)
@@ -35,7 +36,7 @@ private abstract class ExportQualifierBuilder(
 
     private fun scanModules(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf(), nested: Boolean = false): Map<String?, ExportQualifier> {
         val exports = docRoot.export
-        val moduleName = docRoot.getModuleName()
+        val moduleName = moduleNameResolver.resolveName(docRoot)
 
         exports?.uids?.forEach { uid ->
             assignExports[uid] = if (exports.isExportEquals) {
@@ -47,7 +48,7 @@ private abstract class ExportQualifierBuilder(
             val jsModule = exportQualifierMap[docRoot.uid]
             if (jsModule == null) {
                 assignExports[docRoot.uid] = if (docRoot.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                    JsModule(name = docRoot.getModuleName() ?: docRoot.name)
+                    JsModule(name = moduleName ?: docRoot.name)
                 } else {
                     JsModule(
                             name = null,
@@ -66,7 +67,7 @@ private abstract class ExportQualifierBuilder(
 
 
     private fun scanTopLevelNodes(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
-        val moduleName = docRoot.getModuleName()
+        val moduleName = moduleNameResolver.resolveName(docRoot)
 
         docRoot.declarations.forEach { declaration ->
             if (declaration is ModuleDeclaration) {
@@ -95,8 +96,6 @@ private abstract class ExportQualifierBuilder(
 
         return assignExports
     }
-
-    abstract fun ModuleDeclaration.getModuleName(): String?
 }
 
 class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver)  {
@@ -104,21 +103,7 @@ class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolv
 
     fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.copy(sources = source.sources.map { sourceFileNode ->
-
-            object : ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap) {
-                override fun ModuleDeclaration.getModuleName(): String? {
-                    return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                        if (name.startsWith("/")) {
-                            moduleNameResolver.resolveName(name)
-                        } else {
-                            name.unquote()
-                        }
-                    } else {
-                        moduleNameResolver.resolveName(sourceName)
-                    }
-                }
-            }
-
+            ExportQualifierBuilder(sourceFileNode.root, exportQualifierMap, moduleNameResolver)
             sourceFileNode
         })
     }
