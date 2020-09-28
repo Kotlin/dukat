@@ -9,10 +9,6 @@ import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 
-fun String.unquote(): String {
-    return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
-}
-
 private class ExportQualifierBuilder(
         root: ModuleDeclaration,
         private val exportQualifierMap: MutableMap<String?, JsModule>,

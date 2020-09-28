@@ -180,7 +180,7 @@ private fun ModuleDeclaration.shortPackageName(): NameEntity {
         if (name.startsWith("/")) {
             IdentifierEntity(File(name).nameWithoutExtension)
         } else {
-            escapeName(name.unquote()).toNameEntity()
+            escapeName(unquote(name)).toNameEntity()
         }
     } else {
         IdentifierEntity(name)
@@ -236,7 +236,7 @@ private class DocumentConverter(
                 annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
             } else {
                 jsModuleQualifier?.name?.let { qualifier ->
-                    annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(qualifier.unquote()))))
+                    annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(unquote(qualifier)))))
                     annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
                 }
             }
