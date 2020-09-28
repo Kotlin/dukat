@@ -114,7 +114,7 @@ class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolv
                             name.unquote()
                         }
                     } else {
-                        moduleNameResolver.resolveName(sourceFileNode.fileName)
+                        moduleNameResolver.resolveName(sourceName)
                     }
                 }
             }
