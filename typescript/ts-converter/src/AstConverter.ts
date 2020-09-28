@@ -289,12 +289,12 @@ export class AstConverter {
       let resolveAssignment = this.exportResolver.resolveStatement(parent)
       if (resolveAssignment) {
         if (!resolveAssignment.isExportEquals) {
-          console.log(`RA ${resolveAssignment.getText()}`);
           res.push(
             this.astFactory.createModifierDeclaration(MODIFIER_KIND.EXPORT),
             this.astFactory.createModifierDeclaration(MODIFIER_KIND.DEFAULT)
           )
         } else {
+          this.astFactory.createModifierDeclaration(MODIFIER_KIND.SYNTH_EXPORT_ASSIGNMENT)
         }
       }
     }

@@ -161,6 +161,7 @@ message ModifierDeclarationProto {
         DECLARE = 1;
         EXPORT = 2;
         DEFAULT = 3;
+        SYNTH_EXPORT_ASSIGNMENT = 4;
     }
     MODIFIER_KIND token = 1;
 }
