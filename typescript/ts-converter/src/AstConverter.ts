@@ -39,10 +39,12 @@ import MODULE_KIND = ModuleDeclarationProto.MODULE_KIND;
 import MODULE_KINDMap = ModuleDeclarationProto.MODULE_KINDMap;
 import MODIFIER_KIND = ModifierDeclarationProto.MODIFIER_KIND;
 import {resolveModulePath} from "./resolveModulePath";
+import {ExportAssignmentResolver} from "./ExportAssignmentResolver";
 
 export class AstConverter {
   private log = createLogger("AstConverter");
   private unsupportedDeclarations = new Set<Number>();
+  private exportResolver = new ExportAssignmentResolver(this.typeChecker);
 
   constructor(
     private exportContext: ExportContext,
@@ -142,6 +144,8 @@ export class AstConverter {
   }
 
   createSourceFileDeclaration(sourceFile: ts.SourceFile, filter?: (node: ts.Node) => boolean): SourceFileDeclaration {
+    this.exportResolver.visit(sourceFile);
+
     return this.astFactory.createSourceFileDeclaration(
       sourceFile.fileName,
       this.createModuleFromSourceFile(sourceFile, filter)
@@ -267,7 +271,7 @@ export class AstConverter {
         parameterDeclarations,
         returnType,
         typeParameterDeclarations,
-        this.convertModifiers(functionDeclaration.modifiers),
+        this.convertModifiers(functionDeclaration.modifiers, functionDeclaration),
         this.convertBlock(functionDeclaration.body),
         this.convertDefinitions(functionDeclaration),
         uid,
@@ -278,8 +282,23 @@ export class AstConverter {
     return null;
   }
 
-  convertModifiers(nativeModifiers: ts.NodeArray<ts.Modifier> | undefined): Array<ModifierDeclaration> {
+  convertModifiers(nativeModifiers: ts.NodeArray<ts.Modifier> | undefined, parent: ts.Node | undefined = undefined): Array<ModifierDeclaration> {
     let res: Array<ModifierDeclaration> = [];
+
+    if (parent) {
+      let resolveAssignment = this.exportResolver.resolveStatement(parent)
+      if (resolveAssignment) {
+        if (!resolveAssignment.isExportEquals) {
+          console.log(`RA ${resolveAssignment.getText()}`);
+          res.push(
+            this.astFactory.createModifierDeclaration(MODIFIER_KIND.EXPORT),
+            this.astFactory.createModifierDeclaration(MODIFIER_KIND.DEFAULT)
+          )
+        } else {
+        }
+      }
+    }
+
     if (nativeModifiers) {
       nativeModifiers.forEach(modifier => {
         if (modifier.kind == ts.SyntaxKind.StaticKeyword) {
@@ -813,7 +832,7 @@ export class AstConverter {
       this.convertClassElementsToMembers(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
-      this.convertModifiers(statement.modifiers),
+      this.convertModifiers(statement.modifiers, statement),
       this.convertDefinitions(statement),
       this.exportContext.getUID(statement)
     );
@@ -831,7 +850,7 @@ export class AstConverter {
       this.convertMembersToInterfaceMemberDeclarations(statement.members),
       this.convertTypeParams(statement.typeParameters),
       this.convertHeritageClauses(statement.heritageClauses, statement),
-      this.convertModifiers(statement.modifiers),
+      this.convertModifiers(statement.modifiers, statement),
       this.convertDefinitions(statement),
       this.exportContext.getUID(statement)
     );
@@ -865,7 +884,7 @@ export class AstConverter {
         res.push(this.astFactory.declareVariable(
             declaration.name.getText(),
             this.convertType(declaration.type),
-            this.convertModifiers(modifiers),
+            this.convertModifiers(modifiers, declaration),
             declaration.initializer == null ? null : this.astExpressionConverter.convertExpression(declaration.initializer),
             this.convertDefinitions(declaration),
             this.exportContext.getUID(declaration),
@@ -1102,7 +1121,7 @@ export class AstConverter {
     if (declarations) {
       let parentModule = body.parent;
 
-      let modifiers = this.convertModifiers(parentModule.modifiers);
+      let modifiers = this.convertModifiers(parentModule.modifiers, parentModule);
       let uid = this.exportContext.getUID(parentModule);
       let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
 

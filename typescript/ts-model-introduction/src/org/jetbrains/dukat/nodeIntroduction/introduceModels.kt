@@ -47,6 +47,7 @@ import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.logger.Logging
+import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
@@ -58,13 +59,11 @@ import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
-import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.MemberDeclaration
 import org.jetbrains.dukat.tsmodel.MethodDeclaration
@@ -80,6 +79,7 @@ import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
 import org.jetbrains.dukat.tsmodel.TypeAliasDeclaration
 import org.jetbrains.dukat.tsmodel.TypeParameterDeclaration
 import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.WithModifiersDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.IndexSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.types.NumericLiteralDeclaration
@@ -187,10 +187,10 @@ private fun ModuleDeclaration.shortPackageName(): NameEntity {
     }
 }
 
-internal class DocumentConverter(
+private class DocumentConverter(
         private val moduleNode: ModuleDeclaration,
         private val uidToNameMapper: UidMapper,
-        private val exportQualifierMap: Map<String?, ExportQualifier>,
+        private val exportQualifierMap: Map<String?, JsModule>,
         private val rootIsDeclaration: Boolean,
         private val ownerPackageName: NameEntity?
 ) {
@@ -221,12 +221,24 @@ internal class DocumentConverter(
 
         val annotations = mutableListOf<AnnotationModel>()
 
-        if (topLevelModels.any { ! it.isUnqualifiable() } ) {
-            val jsModuleQualifier = exportQualifierMap[moduleNode.uid] as? JsModule
+        val hasDefaultExport = topDeclarations.any { topDeclaration ->
+            val withModifiersDeclaration = topDeclaration as? WithModifiersDeclaration
+            (withModifiersDeclaration?.hasExportModifier()  == true) && (withModifiersDeclaration.hasDefaultModifier())
+        }
 
-            jsModuleQualifier?.name?.let { qualifier ->
-                annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(qualifier.unquote()))))
+        val moduleNameResolver = CommonJsNameResolver()
+
+        if (topLevelModels.any { !it.isUnqualifiable() }) {
+            val jsModuleQualifier = exportQualifierMap[moduleNode.uid]
+
+            if (hasDefaultExport && (jsModuleQualifier?.name == null)) {
+                annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name))))
                 annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+            } else {
+                jsModuleQualifier?.name?.let { qualifier ->
+                    annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(qualifier.unquote()))))
+                    annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+                }
             }
 
             jsModuleQualifier?.qualifier?.let { qualifier ->
@@ -481,18 +493,18 @@ internal class DocumentConverter(
             }
             is MethodSignatureDeclaration -> {
                 listOf(
-                    MethodModel(
-                        name = IdentifierEntity(name),
-                        type = type.convertToNode().process(),
-                        parameters = parameters.map { param -> param.convertToNode().process() },
-                        typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                        static = isStatic(),
-                        override = null,
-                        annotations = emptyList(),
-                        open = owner.isOpen(),
-                        body = null,
-                        operator = false
-                    )
+                        MethodModel(
+                                name = IdentifierEntity(name),
+                                type = type.convertToNode().process(),
+                                parameters = parameters.map { param -> param.convertToNode().process() },
+                                typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
+                                static = isStatic(),
+                                override = null,
+                                annotations = emptyList(),
+                                open = owner.isOpen(),
+                                body = null,
+                                operator = false
+                        )
                 )
             }
             is MethodDeclaration -> listOf(
@@ -594,10 +606,11 @@ internal class DocumentConverter(
         }
     }
 
-    private fun ExportQualifier?.toAnnotation(): MutableList<AnnotationModel> {
-        return when (this) {
-            is JsModule -> mutableListOf(AnnotationModel("JsModule", name?.let { listOf(IdentifierEntity(it)) } ?: emptyList()))
-            is JsDefault -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
+    private fun JsModule?.toAnnotation(declaration: WithModifiersDeclaration): MutableList<AnnotationModel> {
+        return when {
+            this is JsModule -> mutableListOf(AnnotationModel("JsModule", name?.let { listOf(IdentifierEntity(it)) }
+                    ?: emptyList()))
+            (declaration.hasDefaultModifier() && declaration.hasExportModifier()) -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
             else -> mutableListOf()
         }
     }
@@ -683,7 +696,7 @@ internal class DocumentConverter(
                 },
                 typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
                 parentEntities = parentModelEntities,
-                annotations = exportQualifierMap[uid].toAnnotation(),
+                annotations = exportQualifierMap[uid].toAnnotation(this),
                 comment = null,
                 external = external,
                 inheritanceModifier = InheritanceModifierModel.OPEN,
@@ -749,7 +762,7 @@ internal class DocumentConverter(
                         type = type.convertToNode().process(),
 
                         typeParameters = convertTypeParams(convertParameterDeclarations(typeParameters)),
-                        annotations = exportQualifierMap[uid].toAnnotation(),
+                        annotations = exportQualifierMap[uid].toAnnotation(this),
                         export = hasExportModifier(),
                         inline = false,
                         operator = false,
@@ -771,7 +784,7 @@ internal class DocumentConverter(
                 val variableType = type.convertToNode()
 
                 val nameResolved = if (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-                    (exportQualifierMap[uid] as? JsModule)?.name?.let { IdentifierEntity(it) } ?: IdentifierEntity(name)
+                    exportQualifierMap[uid]?.name?.let { IdentifierEntity(it) } ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)
                 }
@@ -809,7 +822,7 @@ internal class DocumentConverter(
                     VariableModel(
                             name = nameResolved,
                             type = variableType.process(),
-                            annotations = exportQualifierMap[uid].toAnnotation(),
+                            annotations = exportQualifierMap[uid].toAnnotation(this),
                             immutable = exportQualifierMap[uid] is JsModule,
                             inline = false,
                             external = true,
@@ -853,7 +866,7 @@ internal class DocumentConverter(
 private class NodeConverter(
         private val node: SourceSetDeclaration,
         private val uidToNameMapper: UidMapper,
-        private val exportQualifierMap: Map<String?, ExportQualifier>
+        private val exportQualifierMap: Map<String?, JsModule>
 ) {
 
     fun convert(): SourceSetModel {

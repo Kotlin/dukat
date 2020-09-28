@@ -1,13 +1,8 @@
 package org.jetbrains.dukat.nodeIntroduction
 
 import MergeableDeclaration
-import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
-import org.jetbrains.dukat.tsmodel.ExportQualifier
 import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.JsDefault
 import org.jetbrains.dukat.tsmodel.JsModule
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ModuleDeclarationKind
@@ -18,15 +13,9 @@ fun String.unquote(): String {
     return replace("(?:^[\"\'])|(?:[\"\']$)".toRegex(), "")
 }
 
-private fun WithModifiersDeclaration.resolveAsJsDefaultQualifier(): ExportQualifier? {
-    return if (hasDefaultModifier() && hasExportModifier()) {
-        JsDefault
-    } else null
-}
-
 private class ExportQualifierBuilder(
         root: ModuleDeclaration,
-        private val exportQualifierMap: MutableMap<String?, ExportQualifier>,
+        private val exportQualifierMap: MutableMap<String?, JsModule>,
         private val moduleNameResolver: ModuleNameResolver
 ) {
     init {
@@ -34,14 +23,14 @@ private class ExportQualifierBuilder(
         scanTopLevelNodes(root, exportQualifierMap)
     }
 
-    private fun scanModules(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf(), nested: Boolean = false): Map<String?, ExportQualifier> {
+    private fun scanModules(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, JsModule> = mutableMapOf(), nested: Boolean = false): Map<String?, JsModule> {
         val exports = docRoot.export
         val moduleName = moduleNameResolver.resolveName(docRoot)
 
         exports?.uids?.forEach { uid ->
-            assignExports[uid] = if (exports.isExportEquals) {
-                JsModule(moduleName)
-            } else JsDefault
+            if (exports.isExportEquals) {
+                assignExports[uid] = JsModule(moduleName)
+            }
         }
 
         if (nested) {
@@ -66,29 +55,16 @@ private class ExportQualifierBuilder(
     }
 
 
-    private fun scanTopLevelNodes(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, ExportQualifier> = mutableMapOf()): Map<String?, ExportQualifier> {
-        val moduleName = moduleNameResolver.resolveName(docRoot)
-
+    private fun scanTopLevelNodes(docRoot: ModuleDeclaration, assignExports: MutableMap<String?, JsModule> = mutableMapOf()): Map<String?, JsModule> {
         docRoot.declarations.forEach { declaration ->
             if (declaration is ModuleDeclaration) {
                 scanTopLevelNodes(declaration, assignExports)
             } else if (declaration is WithModifiersDeclaration) {
                 if ((declaration is MergeableDeclaration) && (declaration !is InterfaceDeclaration)) {
-                    declaration.resolveAsJsDefaultQualifier()?.let {
-                        assignExports.getOrPut(declaration.uid) { it }
-                    }
-
                     val exportQualifier = assignExports[declaration.uid]
 
                     if (exportQualifier != null) {
-                        when (exportQualifier) {
-                            is JsDefault -> {
-                                assignExports[docRoot.uid] = JsModule(moduleName)
-                            }
-                            is JsModule -> {
-                                assignExports.remove(docRoot.uid)
-                            }
-                        }
+                        assignExports.remove(docRoot.uid)
                     }
                 }
             }
@@ -99,7 +75,7 @@ private class ExportQualifierBuilder(
 }
 
 class ExportQualifierMapBuilder(private val moduleNameResolver: ModuleNameResolver)  {
-    val exportQualifierMap = mutableMapOf<String?, ExportQualifier>()
+    val exportQualifierMap = mutableMapOf<String?, JsModule>()
 
     fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         return source.copy(sources = source.sources.map { sourceFileNode ->
