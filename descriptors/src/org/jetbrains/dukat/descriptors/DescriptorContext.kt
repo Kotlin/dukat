@@ -34,9 +34,7 @@ class DescriptorContext {
     private var configContext: JsStdlibConfigContext? = null
 
     fun destroyConfigContext() {
-        if (configContext != null) {
-            configContext!!.destroy()
-        }
+        configContext?.destroy()
     }
 
     val stdlibModule: ModuleDescriptor by lazy {
@@ -96,21 +94,18 @@ class DescriptorContext {
     }
 
     fun registerTypeParameter(name: NameEntity, descriptor: TypeParameterDescriptor) {
-        if (typeParameters[name] == null) {
-            typeParameters[name] = Stack()
-        }
-        typeParameters[name]!!.push(descriptor)
+        typeParameters.getOrPut(name) { Stack() }.push(descriptor)
     }
 
     fun getTypeParameter(name: NameEntity): TypeParameterDescriptor? {
-        if (typeParameters[name] == null || typeParameters[name]!!.isEmpty()) {
+        if (typeParameters[name] == null || typeParameters[name]?.isEmpty() == true) {
             return null
         }
-        return typeParameters[name]!!.peek()
+        return typeParameters[name]?.peek()
     }
 
     fun removeTypeParameter(name: NameEntity) {
-        typeParameters[name]!!.pop()
+        typeParameters[name]?.pop()
     }
 
     fun getAllClassDescriptors(): List<ClassDescriptor> {
@@ -130,10 +125,7 @@ class DescriptorContext {
         typeParameterDescriptor: TypeParameterDescriptorImpl,
         constraint: KotlinType
     ) {
-        if (constraintToInitialize[typeParameterDescriptor] == null) {
-            constraintToInitialize[typeParameterDescriptor] = mutableListOf()
-        }
-        constraintToInitialize[typeParameterDescriptor]!!.add(constraint)
+        constraintToInitialize.getOrPut(typeParameterDescriptor) { mutableListOf() }.add(constraint)
     }
 
     fun canBeInitialized(typeParameterDescriptor: TypeParameterDescriptorImpl): Boolean {
