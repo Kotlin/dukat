@@ -110,13 +110,6 @@ task download(type: Copy) {
     rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
 }
 
-task downloadDist(type: Copy) {
-    from configurations.toDownload
-    into "$rootDir/compiler/dist/kotlinc/lib"
-    rename "kotlin-stdlib-js-${gradle.kotlinVersion}.jar", "kotlin-stdlib-js.jar"
-}
-
-
 task downloadDefinitelyTyped(type: Download) {
     onlyIfModified true
     overwrite false
@@ -176,10 +169,8 @@ task prebuild {
     dependsOn = ["testClasses", ":node-package:buildDistrib", compileKotlin]
 }
 
-//TODO: having download and downloadDist is a shame
 test.dependsOn = [
         download,
-        downloadDist,
         fetchDefinitelyTyped,
         installTopN,
         extractKoltinJsLibs,

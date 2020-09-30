@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator
 import org.jetbrains.dukat.compiler.tests.descriptors.DescriptorValidator.validate
 import org.jetbrains.dukat.compiler.tests.descriptors.RecursiveDescriptorComparator
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import java.io.File
 import kotlin.test.assertEquals
 
 internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: String?) {
@@ -36,7 +38,7 @@ internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: Stri
         }
     })
 
-    val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors()
+    val outputModuleDescriptor = flattenedSourceSet.translateToDescriptors(TestConfig.STDLIB_JAR)
     validate(
             DescriptorValidator.ValidationVisitor.errorTypesAllowed(),
             outputModuleDescriptor.getPackage(FqName.ROOT)

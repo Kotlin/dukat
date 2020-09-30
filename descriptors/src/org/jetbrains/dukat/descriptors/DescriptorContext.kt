@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 import java.util.*
 
-class DescriptorContext {
+class DescriptorContext(stdLib: String) {
 
     var currentPackageName: NameEntity = IdentifierEntity("")
     private val registeredDescriptors: MutableMap<NameEntity, ClassDescriptor> = mutableMapOf()
@@ -38,7 +38,7 @@ class DescriptorContext {
     }
 
     val stdlibModule: ModuleDescriptor by lazy {
-        configContext = JsStdlibConfigContext()
+        configContext = JsStdlibConfigContext(stdLib)
         configContext!!.stdlibModule
     }
 

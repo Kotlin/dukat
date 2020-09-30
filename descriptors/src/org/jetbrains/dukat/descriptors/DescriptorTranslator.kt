@@ -1186,14 +1186,14 @@ private fun addFakeOverrides(context: DescriptorContext, classDescriptor: ClassD
     context.addResolved(classDescriptor)
 }
 
-fun SourceSetModel.translateToDescriptors(): ModuleDescriptor {
+fun SourceSetModel.translateToDescriptors(stdLib: String): ModuleDescriptor {
 
     val moduleDescriptor = ModuleDescriptorImpl(
             Name.special("<main>"),
             LockBasedStorageManager.NO_LOCKS,
             DefaultBuiltIns.Instance
     )
-    val context = DescriptorContext()
+    val context = DescriptorContext(stdLib)
     val translator = DescriptorTranslator(context)
     try {
         val fragments = sources.map {

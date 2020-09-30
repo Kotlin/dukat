@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.descriptors
 
+import org.jetbrains.dukat.compiler.tests.core.TestConfig
 import org.jetbrains.dukat.descriptors.JsStdlibConfigContext
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
 import org.jetbrains.kotlin.analyzer.AnalysisResult
@@ -13,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
 
 private fun createKtFile(name: String, text: String, project: Project): KtFile {
     val virtualFile =
@@ -32,7 +34,7 @@ private fun analyze(
 }
 
 fun generateModuleDescriptor(moduleUnits: Collection<ModuleTranslationUnit>): ModuleDescriptor {
-    val context = JsStdlibConfigContext()
+    val context = JsStdlibConfigContext(TestConfig.STDLIB_JAR)
     try {
         val environment = context.environment
         val project = environment.project

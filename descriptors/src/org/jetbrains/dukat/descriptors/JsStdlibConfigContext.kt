@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.name.Name
 
-class JsStdlibConfigContext {
+class JsStdlibConfigContext(private val stdLib: String) {
 
     private val disposable = Disposer.newDisposable()
     val environment = generateDefaultEnvironment()
@@ -26,7 +26,7 @@ class JsStdlibConfigContext {
         val configuration = CompilerConfiguration()
         configuration.put(CommonConfigurationKeys.MODULE_NAME, "test-module")
         configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-        configuration.put(JSConfigurationKeys.LIBRARIES, JsConfig.JS_STDLIB)
+        configuration.put(JSConfigurationKeys.LIBRARIES, listOf(stdLib))
 
         return configuration
     }

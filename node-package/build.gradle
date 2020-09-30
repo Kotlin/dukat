@@ -109,9 +109,13 @@ task buildDistrib {
             from configurations.cliBinary
             into "${DISTRIB_PATH}/build/runtime"
         }
+
+        copy {
+            from project(":compiler").getTasksByName("download", true).outputs.files.singleFile[0]
+            into "${DISTRIB_PATH}/build/runtime"
+        }
     }
 }
-
 
 task nodeEnv(type: Exec, dependsOn: [execConfig, ":node-distrib:config"]) {
     doFirst {

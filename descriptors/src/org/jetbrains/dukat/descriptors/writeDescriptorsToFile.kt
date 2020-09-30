@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.utils.JsMetadataVersion
 import java.io.File
 
-fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String) {
+fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib: String) {
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
@@ -27,7 +27,7 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String) {
         }
     })
 
-    val moduleDescriptor = flattenedSourceSet.translateToDescriptors()
+    val moduleDescriptor = flattenedSourceSet.translateToDescriptors(stdLib)
 
     val name = File(flattenedSourceSet.sources.firstOrNull()?.fileName ?: "index.d.ts").nameWithoutExtension
 

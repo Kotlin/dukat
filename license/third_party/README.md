@@ -20,3 +20,6 @@ Following third-party dependencies exist in Dukat:
     * BSD 2-Clause License [yarn.txt](yarn.txt)            
     * https://github.com/yarnpkg/yarn/blob/master/LICENSE
     
+* Java Native Access:
+    * Apache License 2.0: [jna.txt](jna.txt)
+    * https://github.com/java-native-access/jna/blob/master/LICENSE
