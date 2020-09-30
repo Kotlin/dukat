@@ -246,7 +246,13 @@ fun main(vararg args: String) {
         }
 
         if (options.generateDescriptors) {
-            writeDescriptorsToFile(sourceSet, options.outDir, File(PACKAGE_DIR, "/build/runtime/kotlin-stdlib-js.jar").absolutePath)
+            writeDescriptorsToFile(
+                sourceSet,
+                options.outDir,
+                File(PACKAGE_DIR, "/build/runtime/kotlin-stdlib-js.jar").absolutePath
+            ).forEach { output ->
+                println(output)
+            }
         } else {
             val reportOutput = compileUnits(translateSourceSet(sourceSet), options.outDir)
             if (options.reportPath != null) {

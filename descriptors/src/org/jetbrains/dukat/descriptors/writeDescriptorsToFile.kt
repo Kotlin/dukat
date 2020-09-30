@@ -5,7 +5,6 @@ import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputBinaryFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
-import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
@@ -15,7 +14,7 @@ import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.utils.JsMetadataVersion
 import java.io.File
 
-fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib: String) {
+fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib: String): List<String> {
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
@@ -53,8 +52,11 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib:
         )
     }
 
-    FileUtil.writeToFile(File(outputDir, outputMetaJsFile.relativePath), outputMetaJsFile.asByteArray())
-    outputKjsmFiles.forEach { kjsmFile ->
-        FileUtil.writeToFile(File(outputDir, kjsmFile.relativePath), kjsmFile.asByteArray())
+    val metaFile = File(outputDir, outputMetaJsFile.relativePath)
+    metaFile.writeBytes(outputMetaJsFile.asByteArray())
+    return listOf(outputMetaJsFile.relativePath) + outputKjsmFiles.map { kjsmFile ->
+        val kjsmOutput = File(outputDir, kjsmFile.relativePath)
+        kjsmOutput.writeBytes(kjsmFile.asByteArray())
+        kjsmFile.relativePath
     }
 }
