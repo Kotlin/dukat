@@ -9,7 +9,9 @@ def DISTRIB_PATH = "${project.buildDir}/distrib"
 def TYPESCRIPT_VERSION = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE)
                                                         .replace("__DEFAULT__", gradle.defaultNpmPackageVersion)
-                                                        .replace("__TIMESTAMP__", new Date().format("yyyyMMdd")) : gradle.defaultNpmPackageVersion
+                                                        .replace("__TIMESTAMP__", new Date().format("yyyyMMdd"))
+                                                        .replace("__HEAD__", "git rev-parse --short HEAD".execute().text.trim())
+                                                         : gradle.defaultNpmPackageVersion
 configurations {
     cliBinary
 }
