@@ -102,7 +102,7 @@ task buildFrontend {
 
 task buildDistrib {
     description = "Copies all artefacts needed to the node-package distrib folder"
-    dependsOn = [buildFrontend, ":command-line:build"]
+    dependsOn = [buildFrontend, ":command-line:build", ":compiler:download"]
 
     doLast {
         copy {
