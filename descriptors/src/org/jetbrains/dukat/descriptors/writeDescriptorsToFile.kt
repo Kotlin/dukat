@@ -3,6 +3,7 @@ package org.jetbrains.dukat.descriptors
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.flattenDeclarations
+import org.jetbrains.kotlin.backend.common.output.OutputFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputBinaryFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
@@ -13,21 +14,31 @@ import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil
 import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.utils.JsMetadataVersion
 import java.io.File
+import java.io.FileOutputStream
+import java.util.jar.Attributes
+import java.util.jar.JarEntry
+import java.util.jar.JarOutputStream
+import java.util.jar.Manifest
 
-fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib: String): List<String> {
+
+private fun SourceSetModel.getId(): String {
+    return File(sources.first().fileName).nameWithoutExtension
+}
+
+private fun convertToDescriptors(sourceSet: SourceSetModel, stdLib: String): Collection<OutputFile> {
     if (sourceSet.sources.isEmpty()) {
         return emptyList()
     }
 
-    val name = File(sourceSet.sources.first().fileName).nameWithoutExtension
+    val name = sourceSet.getId()
 
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
-                sourceFile.name,
-                sourceFile.fileName,
-                it,
-                sourceFile.referencedFiles
+                    sourceFile.name,
+                    sourceFile.fileName,
+                    it,
+                    sourceFile.referencedFiles
             )
         }
     })
@@ -35,32 +46,56 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib:
     val moduleDescriptor = flattenedSourceSet.translateToDescriptors(stdLib)
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
-        BindingContext.EMPTY,
-        JsModuleDescriptor(
-            name,
-            ModuleKind.COMMON_JS,
-            listOf(),
-            moduleDescriptor
-        ),
-        LanguageVersionSettingsImpl.DEFAULT,
-        JsMetadataVersion.INSTANCE
+            BindingContext.EMPTY,
+            JsModuleDescriptor(
+                    name,
+                    ModuleKind.COMMON_JS,
+                    listOf(),
+                    moduleDescriptor
+            ),
+            LanguageVersionSettingsImpl.DEFAULT,
+            JsMetadataVersion.INSTANCE
     )
     val outputMetaJsFile =
-        SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())
+            SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())
 
-    val outputKjsmFiles = metadata.serializedPackages().map { serializedPackage ->
+    return listOf(outputMetaJsFile) + metadata.serializedPackages().map { serializedPackage ->
         SimpleOutputBinaryFile(
-            listOf(),
-            JsSerializerProtocol.getKjsmFilePath(serializedPackage.fqName),
-            serializedPackage.bytes
+                listOf(),
+                JsSerializerProtocol.getKjsmFilePath(serializedPackage.fqName),
+                serializedPackage.bytes
         )
     }
+}
 
-    val metaFile = File(outputDir, outputMetaJsFile.relativePath)
-    metaFile.writeBytes(outputMetaJsFile.asByteArray())
-    return listOf(outputMetaJsFile.relativePath) + outputKjsmFiles.map { kjsmFile ->
-        val kjsmOutput = File(outputDir, kjsmFile.relativePath)
-        kjsmOutput.writeBytes(kjsmFile.asByteArray())
-        kjsmFile.relativePath
+fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDir: String): Collection<String> {
+    if (sourceSet.sources.isEmpty()) {
+        return emptyList()
+    }
+
+    val manifest = Manifest()
+    val mainAttributes: Attributes = manifest.mainAttributes
+    mainAttributes.putValue("Manifest-Version", "1.0")
+    mainAttributes.putValue("Created-By", "JetBrains Kotlin")
+
+    val jarName = "${sourceSet.getId()}.jar"
+    val fileOutputStream = FileOutputStream(File(outputDir, jarName))
+    val jarStream = JarOutputStream(fileOutputStream, manifest)
+
+    convertToDescriptors(sourceSet, stdLib).forEach { outputFile ->
+        jarStream.putNextEntry(JarEntry(outputFile.relativePath))
+        jarStream.write(outputFile.asByteArray())
+    }
+
+    jarStream.finish()
+
+    return listOf(jarName)
+}
+
+fun writeDescriptorsToFile(sourceSet: SourceSetModel, stdLib: String, outputDir: String): Collection<String> {
+    return convertToDescriptors(sourceSet, stdLib).map { outputFile ->
+        val output = File(outputDir, outputFile.relativePath)
+        output.writeBytes(output.readBytes())
+        outputFile.relativePath
     }
 }

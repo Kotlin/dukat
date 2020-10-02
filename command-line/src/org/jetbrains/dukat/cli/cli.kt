@@ -6,15 +6,12 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.compiler.translator.translateIdlSources
 import org.jetbrains.dukat.descriptors.writeDescriptorsToFile
+import org.jetbrains.dukat.descriptors.writeDescriptorsToJar
 import org.jetbrains.dukat.js.translator.translateJsSources
 import org.jetbrains.dukat.moduleNameResolver.CommonJsNameResolver
 import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
-import org.jetbrains.dukat.translator.ModuleTranslationUnit
-import org.jetbrains.dukat.translator.TranslationErrorFileNotFound
-import org.jetbrains.dukat.translator.TranslationErrorInvalidFile
-import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
@@ -84,6 +81,7 @@ private data class CliOptions(
         val reportPath: String?,
         val tsDefaultLib: String,
         val generateDescriptors: Boolean,
+        val generateDescriptorsJar: Boolean,
         val tsConfig: String?
 )
 
@@ -101,6 +99,7 @@ private fun process(args: List<String>): CliOptions? {
     var jsModuleName: String? = null
     var reportPath: String? = null
     var generateDescriptors = false
+    var generateDescriptorsJar = false
     var tsConfig: String? = null
 
     while (argsIterator.hasNext()) {
@@ -111,6 +110,9 @@ private fun process(args: List<String>): CliOptions? {
             }
             "--descriptors" -> {
                 generateDescriptors = true
+            }
+            "--descriptors-jar" -> {
+                generateDescriptorsJar = true
             }
             "-d" -> {
                 val outDirArg = argsIterator.readArg()
@@ -189,8 +191,17 @@ following file extensions are supported:
 
     val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
 
-    return CliOptions(sources, outDir
-            ?: "./", basePackageName, jsModuleName, reportPath, tsDefaultLib, generateDescriptors, tsConfig)
+    return CliOptions(
+        sources,
+        outDir ?: "./",
+        basePackageName,
+        jsModuleName,
+        reportPath,
+        tsDefaultLib,
+        generateDescriptors,
+        generateDescriptorsJar,
+        tsConfig
+        )
 }
 
 fun main(vararg args: String) {
@@ -245,11 +256,21 @@ fun main(vararg args: String) {
             }
         }
 
+        val stdLib = File(PACKAGE_DIR, "/build/runtime/kotlin-stdlib-js.jar").absolutePath
+
         if (options.generateDescriptors) {
             writeDescriptorsToFile(
+                    sourceSet,
+                    stdLib,
+                    options.outDir
+            ).forEach { output ->
+                println(output)
+            }
+        }  else if(options.generateDescriptorsJar) {
+            writeDescriptorsToJar(
                 sourceSet,
-                options.outDir,
-                File(PACKAGE_DIR, "/build/runtime/kotlin-stdlib-js.jar").absolutePath
+                stdLib,
+                options.outDir
             ).forEach { output ->
                 println(output)
             }

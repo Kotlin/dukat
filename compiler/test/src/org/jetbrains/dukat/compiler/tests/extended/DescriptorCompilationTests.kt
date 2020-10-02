@@ -23,7 +23,7 @@ class DescriptorCompilationTests : CompilationTests() {
         targetDir.deleteRecursively()
 
         val sourceSet = getTranslator().translate(sourcePath)
-        writeDescriptorsToFile(sourceSet, targetDir.absolutePath, TestConfig.STDLIB_JAR)
+        writeDescriptorsToFile(sourceSet, TestConfig.STDLIB_JAR, targetDir.absolutePath)
     }
 
     companion object {

@@ -74,7 +74,7 @@ function getStdLib() {
 
 function processArgs(args) {
     var skip_2args = new Set(["-d", "-p", "-m", "-r"]);
-    var ordinary_args = new Set(["--descriptors"]);
+    var ordinary_args = new Set(["--descriptors", "--descriptors-jar"]);
     var count = 0;
 
     var binaryOutput = null;
