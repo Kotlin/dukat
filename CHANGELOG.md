@@ -1,5 +1,27 @@
 # Changelog
 
+### [0.5.8-rc.0] - 3'October 2020
+  This is a release candidate with one known feature regression, "-p" key is not supported in CLI.
+  We've received a lot of feedback on how this can be done better. We'll keep you posted.  
+
+  - [#248](https://github.com/Kotlin/dukat/issues/248) Copying constructor to descendant class if former doesn't have it's own constructor
+  - [#344](https://github.com/Kotlin/dukat/issues/344) Optional method overloading without conflicting declarations
+  - [#341](https://github.com/Kotlin/dukat/issues/341) Support for optional lambdas in classes
+  - [#379](https://github.com/Kotlin/dukat/issues/379) No explicit import generated for types with the same name as stdlib types
+  - [#296](https://github.com/Kotlin/dukat/issues/296) ClassLike can not extend nested entity
+  - [#307](https://github.com/Kotlin/dukat/issues/307) dynamic TypeParam should be equivalent to generic param
+  - [#367](https://github.com/Kotlin/dukat/issues/367) Extract interfaces from files annotates with JsModule and/or JsQualifie
+  - [#368](https://github.com/Kotlin/dukat/issues/368) TypeAliases moved outside of external declarations files are lost
+  - [#372](https://github.com/Kotlin/dukat/issues/372) Illegal dynamic TypeAlias occurs under specific circumstances
+  - [#272](https://github.com/Kotlin/dukat/issues/272) Unalias members in union types
+  - [#275](https://github.com/Kotlin/dukat/issues/275) Redundant overloads are causing compilation issue
+  - [#349](https://github.com/Kotlin/dukat/issues/349) Type parameters are not substituted or generated in particular cases
+  - [#314](https://github.com/Kotlin/dukat/issues/314) Lambdas are not overriding similar methods in Kotlin, they do in Typescript #314
+  - [#343](https://github.com/Kotlin/dukat/issues/343) Recursive typealias's generated with Dukat 0.5.7
+  - [#350](https://github.com/Kotlin/dukat/pull/350) Merge multiple lambda properties with same name and type, but different metadata
+  - [#358](https://github.com/Kotlin/dukat/issues/358) - Unaliased type parameters are not processed incorrectly
+  
+
 ### [0.5.7] - 16'July 2020
   - Fix some issues with inheriting from UInt8Array  
   - [#331](https://github.com/Kotlin/dukat/issues/331) - Rename type alias if there's a name clash
