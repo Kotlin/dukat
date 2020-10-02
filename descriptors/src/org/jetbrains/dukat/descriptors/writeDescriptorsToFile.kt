@@ -15,6 +15,12 @@ import org.jetbrains.kotlin.utils.JsMetadataVersion
 import java.io.File
 
 fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib: String): List<String> {
+    if (sourceSet.sources.isEmpty()) {
+        return emptyList()
+    }
+
+    val name = File(sourceSet.sources.first().fileName).nameWithoutExtension
+
     val flattenedSourceSet = sourceSet.copy(sources = sourceSet.sources.flatMap { sourceFile ->
         sourceFile.root.flattenDeclarations().map {
             SourceFileModel(
@@ -27,8 +33,6 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, outputDir: String, stdLib:
     })
 
     val moduleDescriptor = flattenedSourceSet.translateToDescriptors(stdLib)
-
-    val name = File(flattenedSourceSet.sources.firstOrNull()?.fileName ?: "index.d.ts").nameWithoutExtension
 
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
         BindingContext.EMPTY,
