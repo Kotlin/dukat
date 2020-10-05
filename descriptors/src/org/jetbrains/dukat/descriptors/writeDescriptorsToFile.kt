@@ -95,7 +95,7 @@ fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDir: 
 fun writeDescriptorsToFile(sourceSet: SourceSetModel, stdLib: String, outputDir: String): Collection<String> {
     return convertToDescriptors(sourceSet, stdLib).map { outputFile ->
         val output = File(outputDir, outputFile.relativePath)
-        output.writeBytes(output.readBytes())
+        output.writeBytes(outputFile.asByteArray())
         outputFile.relativePath
     }
 }

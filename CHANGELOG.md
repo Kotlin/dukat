@@ -1,5 +1,8 @@
 # Changelog
 
+### [0.5.8-rc.1] - 5'October 2020
+  Fix descriptors output in CLI
+
 ### [0.5.8-rc.0] - 3'October 2020
   This is a release candidate with one known feature regression, "-p" key is not supported in CLI.
   We've received a lot of feedback on how this can be done better. We'll keep you posted.  

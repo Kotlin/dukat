@@ -42,7 +42,7 @@ gradle.ext {
   jupiterVersion = "5.7.0"
   nodeVersion = "14.7.0"
   defaultTsVersion = "3.9.5"
-  defaultNpmPackageVersion = "0.5.8-rc.0"
+  defaultNpmPackageVersion = "0.5.8-rc.1"
   kotlinSerializationRuntimeVersion = "1.0.0-RC"
   antlr4_version = "4.7.1"
   protobufGradlePluginVersion = "0.8.10"
