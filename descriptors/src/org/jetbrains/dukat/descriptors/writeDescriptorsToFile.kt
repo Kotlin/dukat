@@ -68,7 +68,10 @@ private fun convertToDescriptors(sourceSet: SourceSetModel, stdLib: String): Col
     }
 }
 
-fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDir: String): Collection<String> {
+fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDirPath: String): Collection<String> {
+    val outputDir = File(outputDirPath)
+    outputDir.mkdirs()
+
     if (sourceSet.sources.isEmpty()) {
         return emptyList()
     }
@@ -79,7 +82,7 @@ fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDir: 
     mainAttributes.putValue("Created-By", "JetBrains Kotlin")
 
     val jarName = "${sourceSet.getId()}.jar"
-    val fileOutputStream = FileOutputStream(File(outputDir, jarName))
+    val fileOutputStream = FileOutputStream(outputDir.resolve(jarName))
     val jarStream = JarOutputStream(fileOutputStream, manifest)
 
     convertToDescriptors(sourceSet, stdLib).forEach { outputFile ->
@@ -92,9 +95,12 @@ fun writeDescriptorsToJar(sourceSet: SourceSetModel, stdLib: String, outputDir: 
     return listOf(jarName)
 }
 
-fun writeDescriptorsToFile(sourceSet: SourceSetModel, stdLib: String, outputDir: String): Collection<String> {
+fun writeDescriptorsToFile(sourceSet: SourceSetModel, stdLib: String, outputDirPath: String): Collection<String> {
+    val outputDir = File(outputDirPath)
+    outputDir.mkdirs()
+
     return convertToDescriptors(sourceSet, stdLib).map { outputFile ->
-        val output = File(outputDir, outputFile.relativePath)
+        val output = outputDir.resolve(outputFile.relativePath)
         output.writeBytes(outputFile.asByteArray())
         outputFile.relativePath
     }
