@@ -25,7 +25,12 @@ import java.io.File
 import kotlin.system.exitProcess
 
 
-val PACKAGE_DIR = System.getProperty("dukat.cli.internal.packagedir")
+private fun getPackageDir(): File {
+    val jarPath = CliOptions::class.java.protectionDomain.codeSource.location.toURI()
+    return File(jarPath).parentFile.parentFile.parentFile
+}
+
+val PACKAGE_DIR = getPackageDir()
 
 @Serializable
 private data class Report(val outputs: Iterable<String>)
@@ -189,7 +194,7 @@ following file extensions are supported:
         }
     }
 
-    val tsDefaultLib = File(PACKAGE_DIR, "d.ts.libs/lib.d.ts").absolutePath
+    val tsDefaultLib = PACKAGE_DIR.resolve("d.ts.libs/lib.d.ts").absolutePath
 
     return CliOptions(
         sources,
@@ -234,7 +239,7 @@ fun main(vararg args: String) {
 
         val sourceSet = when {
             isTypescriptDeclarationTranslation -> {
-                val stdLibPath = File(PACKAGE_DIR, "resources/stdlib.dukat").absolutePath
+                val stdLibPath = PACKAGE_DIR.resolve("resources/stdlib.dukat").absolutePath
                 translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName, true, stdLibPath)
             }
 
@@ -256,7 +261,7 @@ fun main(vararg args: String) {
             }
         }
 
-        val stdLib = File(PACKAGE_DIR, "/build/runtime/kotlin-stdlib-js.jar").absolutePath
+        val stdLib = PACKAGE_DIR.resolve("build/runtime/kotlin-stdlib-js.jar").absolutePath
 
         if (options.generateDescriptors) {
             writeDescriptorsToFile(

@@ -165,6 +165,8 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
     var is_js = files.every(function(file) { return endsWith(file, ".js")});
 
+    var commandArgs = ["-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+
     if (is_ts || is_js) {
         try {
             let bundle = createBinary(argsProcessed.tsConfig, argsProcessed.stdlib, false, false, files);
@@ -175,10 +177,6 @@ function cliMode(args) {
                 inputStream.pipe(fs.createWriteStream(argsProcessed.binaryOutput));
                 return null;
             }
-
-            var commandArgs = [
-                "-Ddukat.cli.internal.packagedir=" + packageDir,
-                "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
 
             var dukatProcess = run(java, commandArgs);
             inputStream.pipe(dukatProcess.stdin);
@@ -194,10 +192,6 @@ function cliMode(args) {
         }
 
     } else if (is_idl) {
-        var commandArgs = [
-            "-Ddukat.cli.internal.packagedir=" + packageDir,
-            "-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
-
         return run(java, commandArgs);
     }
 
