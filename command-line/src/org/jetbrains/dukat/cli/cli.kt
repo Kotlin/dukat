@@ -24,13 +24,25 @@ import org.jetbrains.dukat.ts.translator.translateTypescriptSources
 import java.io.File
 import kotlin.system.exitProcess
 
+private class ResourceResolver {
+    private val packageDir = getPackageDir()
 
-private fun getPackageDir(): File {
-    val jarPath = CliOptions::class.java.protectionDomain.codeSource.location.toURI()
-    return File(jarPath).parentFile.parentFile.parentFile
+    private fun getPackageDir(): File {
+        val jarPath = CliOptions::class.java.protectionDomain.codeSource.location.toURI()
+        return File(jarPath).parentFile.parentFile.parentFile
+    }
+
+    val tsDefaultLib: String
+        get() = packageDir.resolve("d.ts.libs/lib.d.ts").absolutePath
+
+    val serializedStdLib: String
+        get() = packageDir.resolve("resources/stdlib.dukat").absolutePath
+
+    val stdlibJar: String
+        get() = packageDir.resolve("build/runtime/kotlin-stdlib-js.jar").absolutePath
 }
 
-val PACKAGE_DIR = getPackageDir()
+private val RESOURCE_RESOLVER = ResourceResolver()
 
 @Serializable
 private data class Report(val outputs: Iterable<String>)
@@ -194,7 +206,7 @@ following file extensions are supported:
         }
     }
 
-    val tsDefaultLib = PACKAGE_DIR.resolve("d.ts.libs/lib.d.ts").absolutePath
+    val tsDefaultLib = RESOURCE_RESOLVER.tsDefaultLib
 
     return CliOptions(
         sources,
@@ -239,7 +251,7 @@ fun main(vararg args: String) {
 
         val sourceSet = when {
             isTypescriptDeclarationTranslation -> {
-                val stdLibPath = PACKAGE_DIR.resolve("resources/stdlib.dukat").absolutePath
+                val stdLibPath = RESOURCE_RESOLVER.serializedStdLib
                 translateTypescriptDeclarations(System.`in`.readBytes(), moduleResolver, options.basePackageName, true, stdLibPath)
             }
 
@@ -261,7 +273,7 @@ fun main(vararg args: String) {
             }
         }
 
-        val stdLib = PACKAGE_DIR.resolve("build/runtime/kotlin-stdlib-js.jar").absolutePath
+        val stdLib = RESOURCE_RESOLVER.stdlibJar
 
         if (options.generateDescriptors) {
             writeDescriptorsToFile(
