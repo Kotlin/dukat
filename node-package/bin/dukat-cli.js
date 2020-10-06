@@ -153,8 +153,7 @@ function cliMode(args) {
     }
 
     var runtimePath = path.resolve(packageDir, "build/runtime");
-    var cliPath = path.resolve(runtimePath, "dukat-cli.jar");
-    var classPath = [cliPath].join(path.delimiter);
+    var cliJar = path.resolve(runtimePath, "dukat-cli.jar");
 
     var java = findJavaExecutable();
 
@@ -165,7 +164,7 @@ function cliMode(args) {
     var is_idl = files.every(function(file) { return endsWith(file, ".idl") || endsWith(file, ".webidl")});
     var is_js = files.every(function(file) { return endsWith(file, ".js")});
 
-    var commandArgs = ["-cp", classPath, "org.jetbrains.dukat.cli.CliKt"].concat(args);
+    var commandArgs = ["-jar", cliJar].concat(args);
 
     if (is_ts || is_js) {
         try {
