@@ -26,9 +26,9 @@ import kotlin.system.exitProcess
 
 private class ResourceResolver {
     private val packageDir = getPackageDir()
-
+    
     private fun getPackageDir(): File {
-        val jarPath = CliOptions::class.java.protectionDomain.codeSource.location.toURI()
+        val jarPath = ResourceResolver::class.java.protectionDomain.codeSource.location.toURI()
         return File(jarPath).parentFile.parentFile.parentFile
     }
 
