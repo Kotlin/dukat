@@ -1,5 +1,8 @@
 # Changelog
 
+### [0.5.8-rc.2] - 7'October 2020
+  Create target if needed for `--descriptors` and `--descriptors-jar` targets 
+  
 ### [0.5.8-rc.1] - 5'October 2020
   Fix descriptors output in CLI
 
