@@ -78,7 +78,7 @@ class SourceBundleBuilder {
       diagnostics.forEach(diagnostic => {
         let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
         let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-        console.log(`[warning] [tsc] ${message} ${diagnostic.file.fileName}:${line + 1}:${character + 1}`);
+        console.log(`[warning] [tsc] TS${diagnostic.code}: ${message} ${diagnostic.file.fileName}:${line + 1}:${character + 1}`);
       });
 
       if (this.failOnWarnings) {
