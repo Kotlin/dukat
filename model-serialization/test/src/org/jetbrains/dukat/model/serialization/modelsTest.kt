@@ -16,7 +16,7 @@ class ModelsProtoTest {
 
         val contents = units.filterIsInstance(ModuleTranslationUnit::class.java).flatMap {
             listOf("// --------- ${it.packageName} ---------", it.content)
-        }.joinToString("\n")
+        }.joinToString(System.lineSeparator())
 
         assertEquals(contents.trimEnd(), File("test/resources/code.out.kt").readText().trimEnd(), "De-serialized stdlib does not look like as expected")
     }
