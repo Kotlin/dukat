@@ -175,15 +175,12 @@ private fun TopLevelModel.isUnqualifiable(): Boolean {
     return (this is InterfaceModel) || (this is TypeAliasModel)
 }
 
+
 private fun ModuleDeclaration.shortPackageName(): NameEntity {
-    return if (kind == ModuleDeclarationKind.AMBIENT_MODULE) {
-        if (name.startsWith("/")) {
-            IdentifierEntity(File(name).nameWithoutExtension)
-        } else {
-            escapeName(unquote(name)).toNameEntity()
-        }
-    } else {
-        IdentifierEntity(name)
+    return when (kind) {
+        ModuleDeclarationKind.AMBIENT_FILE_PATH -> IdentifierEntity(File(name).nameWithoutExtension)
+        ModuleDeclarationKind.AMBIENT_MODULE -> escapeName(unquote(name)).toNameEntity()
+        else -> IdentifierEntity(name)
     }
 }
 
@@ -783,7 +780,7 @@ private class DocumentConverter(
             is VariableDeclaration -> {
                 val variableType = type.convertToNode()
 
-                val nameResolved = if (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
+                val nameResolved = if ((moduleOwner.kind == ModuleDeclarationKind.AMBIENT_MODULE) || (moduleOwner.kind == ModuleDeclarationKind.AMBIENT_FILE_PATH)) {
                     exportQualifierMap[uid]?.name?.let { IdentifierEntity(it) } ?: IdentifierEntity(name)
                 } else {
                     IdentifierEntity(name)

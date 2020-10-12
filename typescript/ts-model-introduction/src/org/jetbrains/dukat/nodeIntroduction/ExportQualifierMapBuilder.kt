@@ -32,7 +32,7 @@ private class ExportQualifierBuilder(
         if (nested) {
             val jsModule = exportQualifierMap[docRoot.uid]
             if (jsModule == null) {
-                assignExports[docRoot.uid] = if (docRoot.kind == ModuleDeclarationKind.AMBIENT_MODULE) {
+                assignExports[docRoot.uid] = if ((docRoot.kind == ModuleDeclarationKind.AMBIENT_MODULE) || (docRoot.kind == ModuleDeclarationKind.AMBIENT_FILE_PATH)) {
                     JsModule(name = moduleName ?: docRoot.name)
                 } else {
                     JsModule(

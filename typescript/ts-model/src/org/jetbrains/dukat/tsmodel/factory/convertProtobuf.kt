@@ -363,6 +363,7 @@ fun ModuleDeclarationProto.convert(): ModuleDeclaration {
                 ModuleDeclarationProto.MODULE_KIND.DECLARATION_FILE -> ModuleDeclarationKind.DECLARATION_FILE
                 ModuleDeclarationProto.MODULE_KIND.SOURCE_FILE -> ModuleDeclarationKind.SOURCE_FILE
                 ModuleDeclarationProto.MODULE_KIND.AMBIENT_MODULE -> ModuleDeclarationKind.AMBIENT_MODULE
+                ModuleDeclarationProto.MODULE_KIND.AMBIENT_FILE_PATH -> ModuleDeclarationKind.AMBIENT_FILE_PATH
                 ModuleDeclarationProto.MODULE_KIND.NAMESPACE -> ModuleDeclarationKind.NAMESPACE
                 else -> ModuleDeclarationKind.SOURCE_FILE
             }

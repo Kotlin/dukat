@@ -563,6 +563,7 @@ message ModuleDeclarationProto {
             SOURCE_FILE = 1;
             AMBIENT_MODULE = 2;
             NAMESPACE = 3;
+            AMBIENT_FILE_PATH = 4;
     }
     MODULE_KIND kind = 9;
 }

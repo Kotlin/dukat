@@ -1094,15 +1094,23 @@ export class AstConverter {
     }
   }
 
-  private resolveAmbientModuleName(moduleDeclaration: ts.ModuleDeclaration): string {
-    if (ts.isNonGlobalAmbientModule(moduleDeclaration) && ts.isExternalModuleAugmentation(moduleDeclaration)) {
+  private resolveAmbientModuleName(moduleDeclaration: ts.ModuleDeclaration): string | undefined {
       let moduleSymbol = this.typeChecker.getSymbolAtLocation(moduleDeclaration.name);
       if (moduleSymbol?.valueDeclaration && ts.isSourceFile(moduleSymbol?.valueDeclaration)) {
         return moduleSymbol?.valueDeclaration?.fileName;
       }
-    }
 
-    return moduleDeclaration.name.getText();
+      return undefined;
+  }
+
+  private resolveKind(module: ts.ModuleDeclaration): MODULE_KINDMap[keyof MODULE_KINDMap] {
+    if ((module.flags & ts.NodeFlags.Namespace) || !ts.isNonGlobalAmbientModule(module)) {
+      return MODULE_KIND.NAMESPACE
+    } else if (ts.isNonGlobalAmbientModule(module) && ts.isExternalModuleAugmentation(module)) {
+      return MODULE_KIND.AMBIENT_FILE_PATH
+    } else {
+      return MODULE_KIND.AMBIENT_MODULE
+    }
   }
 
   private convertModuleBody(body: ts.ModuleBody | null, filter?: (node: ts.Node) => boolean): TopLevelDeclarationProto | null {
@@ -1123,14 +1131,14 @@ export class AstConverter {
 
       let modifiers = this.convertModifiers(parentModule.modifiers, parentModule);
       let uid = this.exportContext.getUID(parentModule);
-      let sourceNameFragment = this.resolveAmbientModuleName(parentModule);
 
-      let packageName = this.astFactory.createIdentifierDeclarationAsNameEntity(sourceNameFragment);
       let imports = this.getImports(body.getSourceFile());
       let references = this.getReferences(body.getSourceFile());
 
-      let kind = (parentModule.flags & ts.NodeFlags.Namespace) || !ts.isNonGlobalAmbientModule(parentModule) ? MODULE_KIND.NAMESPACE : MODULE_KIND.AMBIENT_MODULE;
-      return this.createModuleDeclarationAsTopLevel(sourceNameFragment, imports, references, declarations, modifiers, uid, sourceNameFragment, this.convertDefinitions(parentModule), kind);
+      let kind = this.resolveKind(parentModule);
+      let packageName = ((kind == MODULE_KIND.AMBIENT_FILE_PATH) ?  this.resolveAmbientModuleName(parentModule) : undefined) || parentModule.name.getText()
+
+      return this.createModuleDeclarationAsTopLevel(packageName, imports, references, declarations, modifiers, uid, packageName, this.convertDefinitions(parentModule), kind);
     }
 
     return null;
