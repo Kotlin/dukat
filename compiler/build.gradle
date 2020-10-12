@@ -30,7 +30,8 @@ def TOPN_DIR = "${project.projectDir}/test/data/topN"
 def TOPN_TARGET_DIR = "${project.buildDir}/tests/topN"
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
 
     implementation(project(":ast-common"))
     implementation(project(":ast-model"))
@@ -75,7 +76,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-gradle-plugin"
     implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable"
 
-    testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationRuntimeVersion}"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationVersion}"
 
     compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 

@@ -36,14 +36,14 @@ gradle.ext {
     //TODO: for some reason hasProperty is not working for me
     kotlinVersion = getProperty("dukatKotlinVersion")
   } catch (e) {
-    kotlinVersion = "1.4.10"
+    kotlinVersion = "1.4.20-M1"
   }
 
   jupiterVersion = "5.7.0"
   nodeVersion = "14.7.0"
   defaultTsVersion = "3.9.5"
   defaultNpmPackageVersion = "0.5.8-rc.2"
-  kotlinSerializationRuntimeVersion = "1.0.0-RC"
+  kotlinSerializationVersion = "1.0.0-RC"
   antlr4_version = "4.7.1"
   protobufGradlePluginVersion = "0.8.10"
   protobufImplementationVersion = "3.12.2"

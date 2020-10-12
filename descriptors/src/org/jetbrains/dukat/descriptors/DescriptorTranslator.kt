@@ -38,7 +38,7 @@ import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
@@ -47,6 +47,8 @@ import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -73,6 +75,7 @@ import org.jetbrains.kotlin.descriptors.impl.PropertyGetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertySetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
+import org.jetbrains.kotlin.fir.lightTree.fir.modifier.VisibilityModifier
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.name.FqName
@@ -138,6 +141,7 @@ private fun KotlinType.makeNullableIf(condition: Boolean): KotlinType {
 }
 
 private val KOTLIN_ANY_METHOD_NAMES = setOf("equals", "hashCode", "toString")
+private val FQ_NAMES = StandardNames.FqNames
 
 private class DescriptorTranslator(val context: DescriptorContext) {
 
@@ -373,7 +377,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 Annotations.EMPTY,
                 Name.identifier(translateName(typeAliasModel.name)),
                 SourceElement.NO_SOURCE,
-                Visibilities.PUBLIC
+                DescriptorVisibilities.PUBLIC
         )
         val typeParameters = translateTypeParameters(typeAliasModel.typeParameters, typeAliasDescriptor)
         fun computeUnderlyingType(shouldExpand: Boolean): NotNullLazyValue<SimpleType> {
@@ -526,7 +530,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     ClassKind.OBJECT -> Modality.FINAL
                     else -> if (methodModel.open) Modality.OPEN else Modality.FINAL
                 },
-                Visibilities.PUBLIC
+                DescriptorVisibilities.PUBLIC
         )
         functionDescriptor.isOperator = methodModel.operator
 
@@ -558,7 +562,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 translateParameters(functionModel.parameters, functionDescriptor),
                 translateType(functionModel.type),
                 Modality.FINAL,
-                Visibilities.PUBLIC
+                DescriptorVisibilities.PUBLIC
         )
         typeParameters.forEach {
             context.removeTypeParameter(IdentifierEntity(it.name.identifier))
@@ -573,7 +577,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
             constructorModel: ConstructorModel,
             parent: ClassDescriptor,
             isPrimary: Boolean,
-            visibility: Visibility
+            visibility: DescriptorVisibility
     ): ClassConstructorDescriptor {
         val constructorDescriptor = ClassConstructorDescriptorImpl.create(
                 parent,
@@ -638,7 +642,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     propertyModel.open -> Modality.OPEN
                     else -> Modality.FINAL
                 },
-                Visibilities.PUBLIC,
+                DescriptorVisibilities.PUBLIC,
                 !propertyModel.immutable,
                 Name.identifier(translateName(propertyModel.name)),
                 CallableMemberDescriptor.Kind.DECLARATION,
@@ -740,7 +744,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 parent,
                 translateAnnotations(variableModel.annotations),
                 Modality.FINAL,
-                Visibilities.PUBLIC,
+                DescriptorVisibilities.PUBLIC,
                 !variableModel.immutable,
                 Name.identifier(translateName(variableModel.name)),
                 CallableMemberDescriptor.Kind.DECLARATION,
@@ -876,7 +880,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                 ConstructorModel(listOf(), listOf()),
                                 classDescriptor,
                                 true,
-                                Visibilities.PUBLIC
+                                DescriptorVisibilities.PUBLIC
                         )
                     } else {
                         classLikeModel.primaryConstructor?.let {
@@ -884,7 +888,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                                     it,
                                     classDescriptor,
                                     true,
-                                    Visibilities.PUBLIC
+                                    DescriptorVisibilities.PUBLIC
                             )
                         }
                     }
@@ -893,7 +897,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         it,
                         classDescriptor,
                         false,
-                        Visibilities.PUBLIC
+                        DescriptorVisibilities.PUBLIC
                 )
             } + primaryConstructorDescriptor).filterNotNull().toSet()
         }
@@ -943,7 +947,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 ConstructorModel(listOf(), listOf()),
                 objectDescriptor,
                 true,
-                Visibilities.PRIVATE
+                DescriptorVisibilities.PRIVATE
         )
 
         objectDescriptor.initialize(
@@ -999,7 +1003,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 ConstructorModel(listOf(), listOf()),
                 enumDescriptor,
                 true,
-                Visibilities.PRIVATE
+                DescriptorVisibilities.PRIVATE
         )
         val enumMemberNames = enumModel.values.map { Name.identifier(translateName(IdentifierEntity(it.value))) }
         enumDescriptor.initialize(
