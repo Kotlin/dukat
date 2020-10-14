@@ -36,23 +36,21 @@ export class TranslateAllSymbolsDependency implements Dependency {
 }
 
 export class TranslateSubsetOfSymbolsDependency implements Dependency {
-  private constructor(public fileName: string, private symbols: Set<ts.Node>, private parentUids: Set<ts.Node>) {}
+  private constructor(public fileName: string, private symbols: Set<ts.Node>, private parentUids: Set<ts.Node>) {
+  }
 
-  static create(fileName: string, symbolDependencies: Array<ts.Node>): TranslateSubsetOfSymbolsDependency {
-    let symbols = new Set(symbolDependencies);
+  static create(fileName: string, node: ts.Node): TranslateSubsetOfSymbolsDependency {
     let parentUids = new Set<ts.Node>();
 
-    symbols.forEach(node => {
-      let parent = node.parent;
-      while (parent) {
-        if (ts.isModuleDeclaration(parent)) {
-          parentUids.add(parent);
-        }
-        parent = parent.parent;
+    let parent = node.parent;
+    while (parent) {
+      if (ts.isModuleDeclaration(parent)) {
+        parentUids.add(parent);
       }
-    });
+      parent = parent.parent;
+    }
 
-    return new TranslateSubsetOfSymbolsDependency(fileName, symbols, parentUids);
+    return new TranslateSubsetOfSymbolsDependency(fileName, new Set([node]), parentUids);
   }
 
   merge(dependency: Dependency): Dependency {

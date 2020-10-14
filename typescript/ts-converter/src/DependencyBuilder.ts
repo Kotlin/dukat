@@ -76,9 +76,7 @@ export class DependencyBuilder {
       this.checkedReferences.add(declaration);
       let sourceFile = declaration.getSourceFile();
 
-      this.registerDependency(TranslateSubsetOfSymbolsDependency.create(sourceFile.fileName, [
-        declaration
-      ]));
+      this.registerDependency(TranslateSubsetOfSymbolsDependency.create(sourceFile.fileName, declaration));
 
       sourceFile.forEachChild(node => {
         if (ts.isImportDeclaration(node)) {
