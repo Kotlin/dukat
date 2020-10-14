@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.config.Services
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.jetbrains.kotlin.psi.psiUtil.forEachDescendantOfTypeVisitor
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.ExtendWith
@@ -49,7 +50,7 @@ abstract class CompilationTests {
         private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
         fun commonReport(fileName: String) {
-            File(fileName).mkdirs()
+            File(fileName).ensureParentDirsCreated()
             val printStream = TiedPrintStream(PrintStream(fileName), System.out)
             val messages = reportDataMap.values.flatMap { reportData ->
                 reportData.errors.map { it.substringBefore("file:") }
@@ -65,7 +66,7 @@ abstract class CompilationTests {
         }
 
         fun report(fileName: String) {
-            File(fileName).mkdirs()
+            File(fileName).ensureParentDirsCreated()
             val printStream = TiedPrintStream(PrintStream(fileName), System.out)
             val passed = reportDataMap.values.count { it.compilationResult == ExitCode.OK }
             val total = reportDataMap.values.size
