@@ -137,13 +137,11 @@ task extractKoltinJsLibs(type: Copy) {
 }
 
 task prepareTopNPackage(type: Copy) {
-    from "${TOPN_DIR}/package.template.json"
+    from "${TOPN_DIR}/package.json"
     into TOPN_TARGET_DIR
 
     from "${TOPN_DIR}/package-lock.json"
     into TOPN_TARGET_DIR
-
-    rename { String fileName -> fileName.replace(".template", "") }
 }
 
 task npmLsConfig {
