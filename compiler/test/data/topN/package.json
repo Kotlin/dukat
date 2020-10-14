@@ -8,7 +8,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "@aws-sdk/client-codebuild": "^1.0.0-alpha.1",
+    "@aws-sdk/client-codebuild": "^1.0.0-gamma.11",
     "@types/async": "^3.0.3",
     "@types/bluebird": "^3.5.29",
     "@types/body-parser": "^1.17.1",
@@ -28,6 +28,8 @@
     "chalk": "^3.0.0",
     "commander": "^4.0.1",
     "moment": "^2.24.0",
+    "react": "^16.13.1",
+    "react-native": "^0.63.3",
     "rxjs": "^6.5.3",
     "tslib": "^1.10.0",
     "vue": "^2.6.10"
