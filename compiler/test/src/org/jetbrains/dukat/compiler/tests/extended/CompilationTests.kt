@@ -49,6 +49,7 @@ abstract class CompilationTests {
         private val reportDataMap: MutableMap<String, ReportData> = mutableMapOf()
 
         fun commonReport(fileName: String) {
+            File(fileName).mkdirs()
             val printStream = TiedPrintStream(PrintStream(fileName), System.out)
             val messages = reportDataMap.values.flatMap { reportData ->
                 reportData.errors.map { it.substringBefore("file:") }
@@ -64,6 +65,7 @@ abstract class CompilationTests {
         }
 
         fun report(fileName: String) {
+            File(fileName).mkdirs()
             val printStream = TiedPrintStream(PrintStream(fileName), System.out)
             val passed = reportDataMap.values.count { it.compilationResult == ExitCode.OK }
             val total = reportDataMap.values.size
