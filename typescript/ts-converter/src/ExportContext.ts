@@ -18,6 +18,10 @@ export function resolveDeclarations(node: ts.Identifier, typeChecker: ts.TypeChe
   let symbolAtLocation = typeChecker.getSymbolAtLocation(node);
   if (symbolAtLocation) {
 
+    if (symbolAtLocation.flags & ts.SymbolFlags.TypeParameter) {
+      return [];
+    }
+
     if (symbolAtLocation.flags & ts.SymbolFlags.Alias) {
       let aliasedSymbol = typeChecker.getAliasedSymbol(symbolAtLocation);
       if (aliasedSymbol && Array.isArray(aliasedSymbol.declarations)) {
