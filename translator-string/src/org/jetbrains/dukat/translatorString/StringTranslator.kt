@@ -803,7 +803,7 @@ private fun MemberModel.translate(): List<String> {
 }
 
 private fun ImportModel.translate(): String {
-    return name.translate(ROOT_PACKAGENAME) + (asAlias?.let { " as ${it.value}" } ?: "")
+    return name.translate(false) + (asAlias?.let { " as ${it.value}" } ?: "")
 }
 
 private fun PropertyModel.translateSignature(): List<String> {
@@ -1125,7 +1125,7 @@ class StringTranslator : ModelVisitor {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
             if ((moduleModel.name != ROOT_PACKAGENAME)) {
-                addOutput("${translateAnnotations}package ${moduleModel.name.translate(ROOT_PACKAGENAME)}")
+                addOutput("${translateAnnotations}package ${moduleModel.name.translate(false)}")
                 addOutput("")
             } else {
                 if (translateAnnotations.isNotEmpty()) {
