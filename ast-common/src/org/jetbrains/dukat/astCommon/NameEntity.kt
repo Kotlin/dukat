@@ -61,14 +61,16 @@ fun NameEntity.rightMost(): IdentifierEntity {
 fun NameEntity.shiftLeft(): NameEntity? {
     return when (this) {
         is IdentifierEntity -> null
-        is QualifierEntity -> {
-            val leftShifted = left.shiftLeft()
-            if (leftShifted == null) {
-                right
-            } else {
-                QualifierEntity(leftShifted, right)
-            }
-        }
+        is QualifierEntity -> shiftLeft()
+    }
+}
+
+fun QualifierEntity.shiftLeft(): NameEntity {
+    val leftShifted = left.shiftLeft()
+    return if (leftShifted == null) {
+        right
+    } else {
+        QualifierEntity(leftShifted, right)
     }
 }
 
@@ -76,6 +78,7 @@ fun String.toNameEntity(): NameEntity {
     return split(".").map { IdentifierEntity(it) }.reduce<NameEntity, IdentifierEntity> { acc, identifier -> identifier.appendRight(acc) }
 }
 
-fun NameEntity.startsWith(prefix: NameEntity): Boolean {
-    return generateSequence(this) { it.shiftRight() }.any { prefix == it }
+fun NameEntity.hasPrefix(vararg prefixes: IdentifierEntity): Boolean {
+    val left = leftMost()
+    return prefixes.any { left == it }
 }

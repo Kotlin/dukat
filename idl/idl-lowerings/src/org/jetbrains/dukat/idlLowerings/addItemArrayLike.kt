@@ -14,7 +14,6 @@ import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
 import org.jetbrains.dukat.idlDeclarations.InterfaceKind
 import org.jetbrains.dukat.idlDeclarations.toNotNullable
 import org.jetbrains.dukat.stdlib.KLIBROOT
-import org.jetbrains.dukat.stdlib.TSLIBROOT
 
 private class ItemArrayLikeLowering : IDLLowering {
 

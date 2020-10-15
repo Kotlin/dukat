@@ -5,9 +5,9 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.appendRight
-import org.jetbrains.dukat.astCommon.leftMost
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
+import org.jetbrains.dukat.astCommon.hasPrefix
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -27,19 +27,18 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-fun NameEntity.translate(): String = when (this) {
+fun NameEntity.translate(vararg omitPrefixes: IdentifierEntity = arrayOf(ROOT_PACKAGENAME, KLIBROOT)): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
-        when (leftMost()) {
-            ROOT_PACKAGENAME -> shiftLeft()!!.translate()
-            KLIBROOT -> shiftLeft()!!.translate()
-            else -> "${left.translate()}.${right.translate()}"
+        when {
+            hasPrefix(*omitPrefixes) -> shiftLeft().translate()
+            else -> "${left.translate(*omitPrefixes)}.${right.translate()}"
         }
     }
 }
 
 private fun NameEntity.normalize(): NameEntity? {
-    return if (leftMost() == ROOT_PACKAGENAME) {
+    return if (hasPrefix(ROOT_PACKAGENAME)) {
         this.shiftLeft()
     } else {
         this

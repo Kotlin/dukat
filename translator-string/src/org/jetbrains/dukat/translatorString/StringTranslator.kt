@@ -45,17 +45,46 @@ import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
-import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
 import org.jetbrains.dukat.astModel.expressions.UnaryExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.BooleanLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.LiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NullLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.NumericLiteralExpressionModel
+import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_AND
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.BITWISE_XOR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.DIV_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.GT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LE
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.LT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MINUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MOD_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.MULT_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.OR
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.PLUS_ASSIGN
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.REF_NOT_EQ
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_LEFT
+import org.jetbrains.dukat.astModel.expressions.operators.BinaryOperatorModel.SHIFT_RIGHT
 import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel
-import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.*
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.DECREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.INCREMENT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.NOT
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_MINUS
+import org.jetbrains.dukat.astModel.expressions.operators.UnaryOperatorModel.UNARY_PLUS
 import org.jetbrains.dukat.astModel.expressions.templates.ExpressionTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
@@ -243,8 +272,8 @@ private fun translateTypeArguments(typeParameters: List<TypeModel>): String {
 
 private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boolean = true): String {
     return parameters
-        .map { parameter -> parameter.translate(needsMeta) }
-        .joinToString(", ")
+            .map { parameter -> parameter.translate(needsMeta) }
+            .joinToString(", ")
 }
 
 private fun translateAnnotations(annotations: List<AnnotationModel>): String {
@@ -257,7 +286,7 @@ private fun translateAnnotations(annotations: List<AnnotationModel>): String {
     }
 
     val annotationTranslated =
-        if (annotationsResolved.isEmpty()) "" else annotationsResolved.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
+            if (annotationsResolved.isEmpty()) "" else annotationsResolved.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
 
     return annotationTranslated
 }
@@ -287,9 +316,13 @@ private fun CallExpressionModel.translateMultiLine(): List<String> {
 }
 
 private fun CallExpressionModel.translate(): String {
-    return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.translate() }}>"}${"(${arguments.joinToString(
-        ", "
-    ) { it.translate() }})"}"
+    return "${expression.translate()}${if (typeParameters.isEmpty()) "" else "<${typeParameters.joinToString(", ") { it.translate() }}>"}${
+        "(${
+            arguments.joinToString(
+                    ", "
+            ) { it.translate() }
+        })"
+    }"
 }
 
 private fun LiteralExpressionModel.translate(): String {
@@ -400,7 +433,8 @@ private fun ExpressionModel.translate(): String {
             when (val condition = condition) {
                 is ParenthesizedExpressionModel -> condition.expression.translate()
                 else -> condition.translate()
-            }}) ${whenTrue.translate()} else ${whenFalse.translate()}"
+            }
+        }) ${whenTrue.translate()} else ${whenFalse.translate()}"
         is AsExpressionModel -> "${expression.translate()} as ${type.translate()}"
         is NonNullExpressionModel -> expression.translate()
         is LambdaExpressionModel -> {
@@ -438,10 +472,12 @@ private fun StatementModel.translate(): List<String> {
                 statements.flatMap { it.translate() }.map { FORMAT_TAB + it } +
                 listOf("}")
         is IfStatementModel -> {
-            val header = "if (${when (val condition = condition) {
-                is ParenthesizedExpressionModel -> condition.expression.translate()
-                else -> condition.translate()
-            }}) {"
+            val header = "if (${
+                when (val condition = condition) {
+                    is ParenthesizedExpressionModel -> condition.expression.translate()
+                    else -> condition.translate()
+                }
+            }) {"
             val mainBranch = thenStatement.statements.flatMap { it.translate() }.map { FORMAT_TAB + it }
             val elseStatement = elseStatement
             when {
@@ -540,7 +576,7 @@ private fun BlockStatementModel?.translate(padding: Int, output: (String) -> Uni
         statements.forEach { statement ->
             statement.translate().forEach { statementLine ->
                 output(
-                    FORMAT_TAB.repeat(padding + 1) + statementLine
+                        FORMAT_TAB.repeat(padding + 1) + statementLine
                 )
             }
         }
@@ -579,7 +615,11 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     val tokens = mutableListOf<String>()
     visibilityModifier.translate()?.let { tokens.add(it) }
 
-    val modifier = if (inline) { KEYWORD_INLINE } else if (external) { KEYWORD_EXTERNAL } else null
+    val modifier = if (inline) {
+        KEYWORD_INLINE
+    } else if (external) {
+        KEYWORD_EXTERNAL
+    } else null
     modifier?.let { tokens.add(modifier) }
 
     if (operator) {
@@ -602,10 +642,12 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     tokens.add("fun")
 
     output(
-        FORMAT_TAB.repeat(padding) +
-                "${translateAnnotations(annotations)}${tokens.joinToString(" ")}${typeParams} ${funName}(${translateParameters(
-                    parameters
-                )})${returnClause}${type.translateMeta()}${bodyFirstLine}"
+            FORMAT_TAB.repeat(padding) +
+                    "${translateAnnotations(annotations)}${tokens.joinToString(" ")}${typeParams} ${funName}(${
+                        translateParameters(
+                                parameters
+                        )
+                    })${returnClause}${type.translateMeta()}${bodyFirstLine}"
     )
 
     if (!shouldBeTranslatedAsOneLine) {
@@ -650,9 +692,11 @@ private fun MethodModel.translate(): List<String> {
 
     return annotations +
             listOf(
-                "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(
-                    parameters
-                )})${returnClause}$metaClause${bodyFirstLine}"
+                    "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${
+                        translateParameters(
+                                parameters
+                        )
+                    })${returnClause}$metaClause${bodyFirstLine}"
             ) +
             bodyOtherLines
 }
@@ -736,7 +780,7 @@ private fun PropertyModel.translate(): String {
     val modifier = if (!override.isNullOrEmpty()) "override " else if (open) "open " else ""
     val lateinitModifier = if (lateinit) "lateinit " else ""
     val varModifier = if (immutable) "val" else "var"
-    val initializer = initializer?.let {" = ${it.translate()}" } ?: ""
+    val initializer = initializer?.let { " = ${it.translate()}" } ?: ""
     val type = if (explicitlyDeclaredType) {
         ": ${type.translate()}${type.translateMeta()}"
     } else {
@@ -759,7 +803,7 @@ private fun MemberModel.translate(): List<String> {
 }
 
 private fun ImportModel.translate(): String {
-    return name.translate() + (asAlias?.let { " as ${it.value}" } ?: "")
+    return name.translate(ROOT_PACKAGENAME) + (asAlias?.let { " as ${it.value}" } ?: "")
 }
 
 private fun PropertyModel.translateSignature(): List<String> {
@@ -773,7 +817,7 @@ private fun PropertyModel.translateSignature(): List<String> {
     }
     val metaClause = type.translateMeta()
     val res = mutableListOf(
-        "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
+            "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
     )
     if (getter) {
         res.add(FORMAT_TAB + "get() = definedExternally")
@@ -799,7 +843,7 @@ private fun MethodModel.translateSignature(): List<String> {
 
     val metaClause = type.translateMeta()
     val methodNodeTranslation =
-        "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
+            "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
     return annotations + listOf(methodNodeTranslation)
 }
 
@@ -884,9 +928,11 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     }
 
     val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${translateParameters(
-            primaryConstructor.parameters
-        )})"
+        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${
+            translateParameters(
+                    primaryConstructor.parameters
+            )
+        })"
 
     when (inheritanceModifier) {
         InheritanceModifierModel.ABSTRACT -> "abstract"
@@ -898,9 +944,11 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     }
 
     val classDeclaration =
-        "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} class ${name.translate()}${translateTypeParameters(
-            typeParameters
-        )}${params}${parents}"
+            "${translateAnnotations(annotations)}${modifiers.joinToString(" ")} class ${name.translate()}${
+                translateTypeParameters(
+                        typeParameters
+                )
+            }${params}${parents}"
 
     val members = members
     val staticMembers = companionObject?.members.orEmpty()
@@ -961,9 +1009,11 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
     tokens.add("interface")
 
     output(
-        "${translateAnnotations(annotations)}${tokens.joinToString(" ")} ${name.translate()}${translateTypeParameters(
-            typeParameters
-        )}${parents}" + if (isBlock) " {" else ""
+            "${translateAnnotations(annotations)}${tokens.joinToString(" ")} ${name.translate()}${
+                translateTypeParameters(
+                        typeParameters
+                )
+            }${parents}" + if (isBlock) " {" else ""
     )
     if (isBlock) {
         members.flatMap { it.translateSignature() }.map { FORMAT_TAB.repeat(padding + 1) + it }.forEach { output(it) }
@@ -983,7 +1033,7 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
 
             if (staticMembers.isNotEmpty()) {
                 staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }
-                    .forEach { output(it) }
+                        .forEach { output(it) }
                 output("${FORMAT_TAB.repeat(padding + 1)}}")
             }
         }
@@ -1027,7 +1077,7 @@ class StringTranslator : ModelVisitor {
         modifiers.add(KEYWORD_EXTERNAL)
 
         val objectModel =
-            "${modifiers.joinToString(" ")} object ${objectNode.name.translate()}"
+                "${modifiers.joinToString(" ")} object ${objectNode.name.translate()}"
 
         val members = objectNode.members
 
@@ -1075,7 +1125,7 @@ class StringTranslator : ModelVisitor {
             val translateAnnotations = translateAnnotations(moduleModel.annotations)
 
             if ((moduleModel.name != ROOT_PACKAGENAME)) {
-                addOutput("${translateAnnotations}package ${moduleModel.name.translate()}")
+                addOutput("${translateAnnotations}package ${moduleModel.name.translate(ROOT_PACKAGENAME)}")
                 addOutput("")
             } else {
                 if (translateAnnotations.isNotEmpty()) {

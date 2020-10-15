@@ -2,7 +2,7 @@ package org.jetbrains.dukat.model.commonLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.startsWith
+import org.jetbrains.dukat.astCommon.hasPrefix
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
@@ -14,7 +14,6 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.NamedModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.PropertyModel
-import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.toposort.Graph
@@ -45,7 +44,7 @@ private fun ModelContext.buildInheritanceGraph(): Graph<ClassLikeModel> {
 
 
 private fun <T : ClassLikeModel> ResolvedClassLike<T>.existsOnlyInTsStdlib(member: NamedModel): Boolean {
-    return (fqName?.startsWith(TSLIBROOT) == true && (stdlibClassMethodsMap.containsKey(classLike.name)) && (stdlibClassMethodsMap[classLike.name]?.contains(member.name) == false))
+    return (fqName?.hasPrefix(TSLIBROOT) == true && (stdlibClassMethodsMap.containsKey(classLike.name)) && (stdlibClassMethodsMap[classLike.name]?.contains(member.name) == false))
 }
 
 private class ClassLikeOverrideResolver(
