@@ -32,11 +32,11 @@ import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 
 private fun MethodModel.isNativeGetter(): Boolean {
-    return operator && (name == IdentifierEntity("get")) && (annotations.contains(AnnotationModel("nativeGetter", emptyList())))
+    return operator && (name == IdentifierEntity("get")) && (annotations.contains(AnnotationModel.NATIVE_GETTER))
 }
 
 private fun MethodModel.isNativeSetter(): Boolean {
-    return operator && (name == IdentifierEntity("set")) && (annotations.contains(AnnotationModel("nativeSetter", emptyList())))
+    return operator && (name == IdentifierEntity("set")) && (annotations.contains(AnnotationModel.NATIVE_SETTER))
 }
 
 

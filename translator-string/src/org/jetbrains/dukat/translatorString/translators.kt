@@ -8,6 +8,7 @@ import org.jetbrains.dukat.astCommon.appendRight
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.shiftLeft
 import org.jetbrains.dukat.astCommon.hasPrefix
+import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
 import org.jetbrains.dukat.astModel.SourceFileModel
 import org.jetbrains.dukat.astModel.SourceSetModel
@@ -27,12 +28,13 @@ private fun unescape(name: String): String {
     return name.replace("(?:^`)|(?:`$)".toRegex(), "")
 }
 
-fun NameEntity.translate(vararg omitPrefixes: IdentifierEntity = arrayOf(ROOT_PACKAGENAME, KLIBROOT)): String = when (this) {
+fun NameEntity.translate(shortNameForKotlin: Boolean = true): String = when (this) {
     is IdentifierEntity -> value
     is QualifierEntity -> {
         when {
-            hasPrefix(*omitPrefixes) -> shiftLeft().translate()
-            else -> "${left.translate(*omitPrefixes)}.${right.translate()}"
+            shortNameForKotlin && hasPrefix(KLIBROOT) -> rightMost().translate()
+            hasPrefix(ROOT_PACKAGENAME) -> shiftLeft().translate()
+            else -> "${left.translate(shortNameForKotlin)}.${right.translate()}"
         }
     }
 }

@@ -229,18 +229,18 @@ private class DocumentConverter(
             val jsModuleQualifier = exportQualifierMap[moduleNode.uid]
 
             if (hasDefaultExport && (jsModuleQualifier?.name == null)) {
-                annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name))))
-                annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+                annotations.add(AnnotationModel(IdentifierEntity("JsModule"), listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name)), AnnotationTarget.FILE))
+                annotations.add(AnnotationModel(IdentifierEntity("JsNonModule"), emptyList(), AnnotationTarget.FILE))
             } else {
                 jsModuleQualifier?.name?.let { qualifier ->
-                    annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(unquote(qualifier)))))
-                    annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsModule"), listOf(IdentifierEntity(unquote(qualifier))), AnnotationTarget.FILE))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsNonModule"), emptyList(), AnnotationTarget.FILE))
                 }
             }
 
             jsModuleQualifier?.qualifier?.let { qualifier ->
                 if (qualifier) {
-                    annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsQualifier"), listOf(fullPackageName.process { unquote(it) }), AnnotationTarget.FILE))
                 }
             }
         }
@@ -445,7 +445,7 @@ private class DocumentConverter(
 
                             override = null,
                             operator = true,
-                            annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
+                            annotations = listOf(AnnotationModel.NATIVE_INVOKE),
 
                             open = owner.isOpen(),
                             body = null
@@ -458,7 +458,7 @@ private class DocumentConverter(
                             parameters = parameters.map { param -> param.convertToNode().process() },
                             typeParameters = emptyList(),
 
-                            annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
+                            annotations = listOf(AnnotationModel.NATIVE_GETTER),
                             open = owner.isOpen(),
                             override = null,
 
@@ -479,7 +479,7 @@ private class DocumentConverter(
                         ),
                         typeParameters = emptyList(),
 
-                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
+                        annotations = listOf(AnnotationModel.NATIVE_SETTER),
                         open = owner.isOpen(),
                         override = null,
 
@@ -605,9 +605,9 @@ private class DocumentConverter(
 
     private fun JsModule?.toAnnotation(declaration: WithModifiersDeclaration): MutableList<AnnotationModel> {
         return when {
-            this is JsModule -> mutableListOf(AnnotationModel("JsModule", name?.let { listOf(IdentifierEntity(it)) }
+            this is JsModule -> mutableListOf(AnnotationModel(IdentifierEntity("JsModule"), name?.let { listOf(IdentifierEntity(it)) }
                     ?: emptyList()))
-            (declaration.hasDefaultModifier() && declaration.hasExportModifier()) -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
+            (declaration.hasDefaultModifier() && declaration.hasExportModifier()) -> mutableListOf(AnnotationModel(IdentifierEntity("JsName"), listOf(IdentifierEntity("default"))))
             else -> mutableListOf()
         }
     }

@@ -108,7 +108,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                     static = false,
                     override = null,
                     operator = true,
-                    annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
+                    annotations = listOf(AnnotationModel.NATIVE_GETTER),
                     open = false,
                     body = null
             )
@@ -136,7 +136,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                         static = false,
                         override = null,
                         operator = true,
-                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
+                        annotations = listOf(AnnotationModel.NATIVE_SETTER),
                         open = false,
                         body = null
                 )
