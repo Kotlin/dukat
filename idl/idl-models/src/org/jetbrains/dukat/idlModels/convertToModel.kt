@@ -88,6 +88,10 @@ private fun IDLDeclaration.resolveName(): String? {
     }
 }
 
+private val INLINE_ONLY_ANNOTATION = AnnotationModel(
+        name = IdentifierEntity("kotlin.internal.InlineOnly"),
+        params = listOf()
+)
 
 private class IdlFileConverter(
         private val fileDeclaration: IDLFileDeclaration,
@@ -269,10 +273,7 @@ private class IdlFileConverter(
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
-                        AnnotationModel(
-                                name = "kotlin.internal.InlineOnly".toNameEntity(),
-                                params = listOf()
-                        )
+                        INLINE_ONLY_ANNOTATION
                 ),
                 export = false,
                 inline = true,
@@ -315,10 +316,7 @@ private class IdlFileConverter(
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
-                        AnnotationModel(
-                                name = "kotlin.internal.InlineOnly".toNameEntity(),
-                                params = listOf()
-                        )
+                        INLINE_ONLY_ANNOTATION
                 ),
                 export = false,
                 inline = true,
@@ -543,10 +541,7 @@ private class IdlFileConverter(
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
-                        AnnotationModel(
-                                name = "kotlin.internal.InlineOnly".toNameEntity(),
-                                params = listOf()
-                        )
+                        INLINE_ONLY_ANNOTATION
                 ),
                 export = false,
                 inline = true,
