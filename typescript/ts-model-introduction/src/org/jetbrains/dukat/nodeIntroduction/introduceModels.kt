@@ -445,7 +445,7 @@ private class DocumentConverter(
 
                             override = null,
                             operator = true,
-                            annotations = listOf(AnnotationModel("nativeInvoke", emptyList())),
+                            annotations = listOf(AnnotationModel.NATIVE_INVOKE),
 
                             open = owner.isOpen(),
                             body = null
@@ -458,7 +458,7 @@ private class DocumentConverter(
                             parameters = parameters.map { param -> param.convertToNode().process() },
                             typeParameters = emptyList(),
 
-                            annotations = listOf(AnnotationModel("nativeGetter", emptyList())),
+                            annotations = listOf(AnnotationModel.NATIVE_GETTER),
                             open = owner.isOpen(),
                             override = null,
 
@@ -479,7 +479,7 @@ private class DocumentConverter(
                         ),
                         typeParameters = emptyList(),
 
-                        annotations = listOf(AnnotationModel("nativeSetter", emptyList())),
+                        annotations = listOf(AnnotationModel.NATIVE_SETTER),
                         open = owner.isOpen(),
                         override = null,
 
