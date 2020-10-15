@@ -278,7 +278,11 @@ private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boo
 
 private fun translateAnnotations(annotations: List<AnnotationModel>): String {
     val annotationsResolved = annotations.map { annotationNode ->
-        var res = "@" + annotationNode.name
+        val target = when (annotationNode.target) {
+            AnnotationTarget.FILE -> "file:"
+            else -> ""
+        }
+        var res = "@${target}" + annotationNode.name
         if (annotationNode.params.isNotEmpty()) {
             res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
         }

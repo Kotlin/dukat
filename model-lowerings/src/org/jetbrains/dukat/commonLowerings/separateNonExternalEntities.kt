@@ -23,7 +23,7 @@ private fun TopLevelModel.isValidExternalDeclaration(): Boolean {
 
 private fun ModuleModel.canNotContainExternalEntities(): Boolean {
     return annotations.any {
-        (it.name == "file:JsQualifier") || (it.name == "file:JsModule")
+        ((it.name == "JsQualifier") || (it.name == "JsModule")) && (it.target == AnnotationTarget.FILE)
     }
 }
 

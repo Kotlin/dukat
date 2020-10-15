@@ -229,18 +229,18 @@ private class DocumentConverter(
             val jsModuleQualifier = exportQualifierMap[moduleNode.uid]
 
             if (hasDefaultExport && (jsModuleQualifier?.name == null)) {
-                annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name))))
-                annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+                annotations.add(AnnotationModel("JsModule", listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name)), AnnotationTarget.FILE))
+                annotations.add(AnnotationModel("JsNonModule", emptyList(), AnnotationTarget.FILE))
             } else {
                 jsModuleQualifier?.name?.let { qualifier ->
-                    annotations.add(AnnotationModel("file:JsModule", listOf(IdentifierEntity(unquote(qualifier)))))
-                    annotations.add(AnnotationModel("file:JsNonModule", emptyList()))
+                    annotations.add(AnnotationModel("JsModule", listOf(IdentifierEntity(unquote(qualifier))), AnnotationTarget.FILE))
+                    annotations.add(AnnotationModel("JsNonModule", emptyList(), AnnotationTarget.FILE))
                 }
             }
 
             jsModuleQualifier?.qualifier?.let { qualifier ->
                 if (qualifier) {
-                    annotations.add(AnnotationModel("file:JsQualifier", listOf(fullPackageName.process { unquote(it) })))
+                    annotations.add(AnnotationModel("JsQualifier", listOf(fullPackageName.process { unquote(it) }), AnnotationTarget.FILE))
                 }
             }
         }
