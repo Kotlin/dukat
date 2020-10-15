@@ -276,18 +276,22 @@ private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boo
             .joinToString(", ")
 }
 
-private fun translateAnnotations(annotations: List<AnnotationModel>): String {
-    val annotationsResolved = annotations.map { annotationNode ->
-        val target = when (annotationNode.target) {
-            AnnotationTarget.FILE -> "file:"
-            else -> ""
-        }
-        var res = "@${target}" + annotationNode.name
-        if (annotationNode.params.isNotEmpty()) {
-            res = res + "(" + annotationNode.params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
-        }
-        res
+
+private fun AnnotationModel.translate(): String {
+    val target = when (target) {
+        AnnotationTarget.FILE -> "file:"
+        else -> ""
     }
+    var res = "@${target}" + name.translate(true)
+    if (params.isNotEmpty()) {
+        res = res + "(" + params.joinToString(", ") { "\"${it.translate()}\"" } + ")"
+    }
+
+    return res
+}
+
+private fun translateAnnotations(annotations: List<AnnotationModel>): String {
+    val annotationsResolved = annotations.map { it.translate() }
 
     val annotationTranslated =
             if (annotationsResolved.isEmpty()) "" else annotationsResolved.joinToString(LINE_SEPARATOR) + LINE_SEPARATOR
@@ -671,7 +675,7 @@ private fun MethodModel.translate(): List<String> {
     }
 
     val operatorModifier = if (operator) "operator " else ""
-    val annotations = annotations.map { "@${it.name}" }
+    val annotations = annotations.map { it.translate() }
 
     val open = !static && open
     val overrideClause = if (!override.isNullOrEmpty()) "override " else if (open) "open " else ""
@@ -839,7 +843,7 @@ private fun MethodModel.translateSignature(): List<String> {
     }
 
     val operatorModifier = if (operator) "${KEYWORD_OPERATOR} " else ""
-    val annotations = annotations.map { "@${it.name}" }
+    val annotations = annotations.map { it.translate() }
 
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
