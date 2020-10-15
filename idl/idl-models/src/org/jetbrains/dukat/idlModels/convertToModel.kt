@@ -263,14 +263,14 @@ private class IdlFileConverter(
                 typeParameters = listOf(),
                 annotations = mutableListOf(
                         AnnotationModel(
-                                name = "Suppress",
+                                name = IdentifierEntity("Suppress"),
                                 params = listOf(
                                         IdentifierEntity("INVISIBLE_REFERENCE"),
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
                         AnnotationModel(
-                                name = "kotlin.internal.InlineOnly",
+                                name = "kotlin.internal.InlineOnly".toNameEntity(),
                                 params = listOf()
                         )
                 ),
@@ -309,14 +309,14 @@ private class IdlFileConverter(
                 typeParameters = listOf(),
                 annotations = mutableListOf(
                         AnnotationModel(
-                                name = "Suppress",
+                                name = IdentifierEntity("Suppress"),
                                 params = listOf(
                                         IdentifierEntity("INVISIBLE_REFERENCE"),
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
                         AnnotationModel(
-                                name = "kotlin.internal.InlineOnly",
+                                name = "kotlin.internal.InlineOnly".toNameEntity(),
                                 params = listOf()
                         )
                 ),
@@ -394,7 +394,7 @@ private class IdlFileConverter(
         val annotationModels = listOfNotNull(
                 if (companionObjectModel != null) {
                     AnnotationModel(
-                            "Suppress",
+                            IdentifierEntity("Suppress"),
                             listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                     )
                 } else {
@@ -537,14 +537,14 @@ private class IdlFileConverter(
                 typeParameters = listOf(),
                 annotations = mutableListOf(
                         AnnotationModel(
-                                name = "Suppress",
+                                name = IdentifierEntity("Suppress"),
                                 params = listOf(
                                         IdentifierEntity("INVISIBLE_REFERENCE"),
                                         IdentifierEntity("INVISIBLE_MEMBER")
                                 )
                         ),
                         AnnotationModel(
-                                name = "kotlin.internal.InlineOnly",
+                                name = "kotlin.internal.InlineOnly".toNameEntity(),
                                 params = listOf()
                         )
                 ),
@@ -585,7 +585,7 @@ private class IdlFileConverter(
                 ),
                 annotations = mutableListOf(
                         AnnotationModel(
-                                "Suppress",
+                                IdentifierEntity("Suppress"),
                                 listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                         )
                 ),

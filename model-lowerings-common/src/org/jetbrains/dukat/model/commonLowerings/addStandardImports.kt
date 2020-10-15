@@ -25,7 +25,7 @@ class AddStandardImportsAndAnnotations(private val addSuppressAnnotations: Boole
     private fun ModuleModel.addStandardImportsAndAnnotations() {
 
         if (addSuppressAnnotations) {
-            annotations.add(AnnotationModel("Suppress", listOf(
+            annotations.add(AnnotationModel(IdentifierEntity("Suppress"), listOf(
                     "INTERFACE_WITH_SUPERCLASS",
                     "OVERRIDING_FINAL_MEMBER",
                     "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
@@ -67,7 +67,7 @@ class AddStandardImportsAndAnnotations(private val addSuppressAnnotations: Boole
                     }
 
                     if (supressionAnnotations.isNotEmpty()) {
-                        topLevelModel.annotations.add(AnnotationModel("Suppress", supressionAnnotations))
+                        topLevelModel.annotations.add(AnnotationModel(IdentifierEntity("Suppress"), supressionAnnotations))
                     }
                 }
                 is ModuleModel -> {

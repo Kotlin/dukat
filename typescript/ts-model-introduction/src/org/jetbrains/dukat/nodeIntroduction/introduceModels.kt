@@ -229,18 +229,18 @@ private class DocumentConverter(
             val jsModuleQualifier = exportQualifierMap[moduleNode.uid]
 
             if (hasDefaultExport && (jsModuleQualifier?.name == null)) {
-                annotations.add(AnnotationModel("JsModule", listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name)), AnnotationTarget.FILE))
-                annotations.add(AnnotationModel("JsNonModule", emptyList(), AnnotationTarget.FILE))
+                annotations.add(AnnotationModel(IdentifierEntity("JsModule"), listOf(IdentifierEntity(moduleNameResolver.resolveName(moduleNode) ?: moduleNode.name)), AnnotationTarget.FILE))
+                annotations.add(AnnotationModel(IdentifierEntity("JsNonModule"), emptyList(), AnnotationTarget.FILE))
             } else {
                 jsModuleQualifier?.name?.let { qualifier ->
-                    annotations.add(AnnotationModel("JsModule", listOf(IdentifierEntity(unquote(qualifier))), AnnotationTarget.FILE))
-                    annotations.add(AnnotationModel("JsNonModule", emptyList(), AnnotationTarget.FILE))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsModule"), listOf(IdentifierEntity(unquote(qualifier))), AnnotationTarget.FILE))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsNonModule"), emptyList(), AnnotationTarget.FILE))
                 }
             }
 
             jsModuleQualifier?.qualifier?.let { qualifier ->
                 if (qualifier) {
-                    annotations.add(AnnotationModel("JsQualifier", listOf(fullPackageName.process { unquote(it) }), AnnotationTarget.FILE))
+                    annotations.add(AnnotationModel(IdentifierEntity("JsQualifier"), listOf(fullPackageName.process { unquote(it) }), AnnotationTarget.FILE))
                 }
             }
         }
@@ -605,9 +605,9 @@ private class DocumentConverter(
 
     private fun JsModule?.toAnnotation(declaration: WithModifiersDeclaration): MutableList<AnnotationModel> {
         return when {
-            this is JsModule -> mutableListOf(AnnotationModel("JsModule", name?.let { listOf(IdentifierEntity(it)) }
+            this is JsModule -> mutableListOf(AnnotationModel(IdentifierEntity("JsModule"), name?.let { listOf(IdentifierEntity(it)) }
                     ?: emptyList()))
-            (declaration.hasDefaultModifier() && declaration.hasExportModifier()) -> mutableListOf(AnnotationModel("JsName", listOf(IdentifierEntity("default"))))
+            (declaration.hasDefaultModifier() && declaration.hasExportModifier()) -> mutableListOf(AnnotationModel(IdentifierEntity("JsName"), listOf(IdentifierEntity("default"))))
             else -> mutableListOf()
         }
     }

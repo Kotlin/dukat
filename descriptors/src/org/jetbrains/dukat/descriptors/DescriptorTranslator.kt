@@ -408,7 +408,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
     private fun translateAnnotations(annotationModels: List<AnnotationModel>): Annotations {
         return Annotations.create(annotationModels.map { annotationModel ->
             val typeModel = TypeValueModel(
-                    value = IdentifierEntity(annotationModel.name),
+                    value = annotationModel.name,
                     params = listOf(),
                     metaDescription = null,
                     fqName = null
