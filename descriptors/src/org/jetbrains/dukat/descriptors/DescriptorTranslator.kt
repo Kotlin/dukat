@@ -147,7 +147,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
 
     private fun findClassInStdlib(typeModel: TypeValueModel): ClassDescriptor? {
         val packageNames = context.registeredImports.map { FqName(it) }
-        return (packageNames + FqName("kotlin") + FqName("kotlin.collections")).map { packageName ->
+        return (packageNames + listOf(FqName("kotlin"), FqName("kotlin.collections"), FqName("kotlin.js"))).map { packageName ->
             val packageDescriptor = context.stdlibModule.getPackage(packageName)
             packageDescriptor.fragments.mapNotNull { fragment ->
                 fragment.getMemberScope().getContributedClassifier(
