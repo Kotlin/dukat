@@ -1,6 +1,6 @@
 package org.jetbrains.dukat.astModel
 
 data class ConstructorModel(
-        val parameters: List<ParameterModel>,
+        override val parameters: List<ParameterModel>,
         val typeParameters: List<TypeParameterModel>
-) : MemberModel
+) : MemberModel, ParametersOwnerModel<ParameterModel>
