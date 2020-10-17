@@ -45,7 +45,7 @@ gradle.ext {
   defaultNpmPackageVersion = "0.5.8-rc.2"
   kotlinSerializationVersion = "1.0.0-RC"
   antlr4_version = "4.7.1"
-  protobufGradlePluginVersion = "0.8.10"
+  protobufGradlePluginVersion = "0.8.13"
   protobufImplementationVersion = "3.12.2"
 }
 buildLog("gradle settings properties: ${gradle.ext.properties}")
