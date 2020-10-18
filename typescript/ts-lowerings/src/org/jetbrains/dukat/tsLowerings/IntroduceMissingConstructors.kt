@@ -13,7 +13,7 @@ class IntroduceMissingConstructors : TopLevelDeclarationLowering {
 
     override fun lowerClassDeclaration(declaration: ClassDeclaration, owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
         val constructors = parentConstructorsMap[declaration.uid]
-        val declarationResolved = if (constructors.isNullOrEmpty()) {
+        val declarationResolved = if (constructors.isNullOrEmpty() || declaration.parentEntities.isEmpty()) {
             declaration
         } else {
             declaration.copy(members = constructors + declaration.members)
