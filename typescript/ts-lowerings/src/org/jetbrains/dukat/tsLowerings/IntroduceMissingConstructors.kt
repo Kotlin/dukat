@@ -16,7 +16,8 @@ class IntroduceMissingConstructors : TopLevelDeclarationLowering {
         val declarationResolved = if (constructors.isNullOrEmpty() || declaration.parentEntities.isEmpty()) {
             declaration
         } else {
-            declaration.copy(members = constructors + declaration.members)
+            // TODO: this is a strange thing to do and I need to figure out how to avoid this
+            declaration.copy(members = (constructors + declaration.members).distinct())
         }
         return super.lowerClassDeclaration(declarationResolved, owner)
     }
