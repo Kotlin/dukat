@@ -39,7 +39,7 @@ private class ProcessOptionalMethodsLowering(private val context: GeneratedInter
                 nullable = true
             ),
             typeParameters = method.typeParameters,
-            optional = true,
+            optional = false,
             modifiers = method.modifiers + ModifierDeclaration.SYNTH_IMMUTABLE,
             explicitlyDeclaredType = true
         )
