@@ -91,6 +91,8 @@ import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.canBeJson
+import org.jetbrains.dukat.tsmodel.types.canBeTranslatedAsNumericLiteral
+import org.jetbrains.dukat.tsmodel.types.canBeTranslatedAsStringLiteral
 import org.jetbrains.dukat.tsmodel.types.makeNullable
 import java.io.File
 
@@ -124,14 +126,6 @@ private fun createKlibType(name: String, nullable: Boolean = false, metaDescript
 private val UNIT_TYPE = createKlibType("Unit")
 private val JSON_TYPE = createKlibType("Json")
 private val ANY_TYPE = createKlibType("Any")
-
-private fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
-    return params.all { it is StringLiteralDeclaration }
-}
-
-private fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
-    return params.all { it is NumericLiteralDeclaration }
-}
 
 private fun dynamicType(metaDescription: String? = null) = TypeValueModel(
         IdentifierEntity("dynamic"),

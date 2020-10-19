@@ -9,3 +9,11 @@ data class UnionTypeDeclaration(
         override var nullable: Boolean = false,
         override var meta: MetaData? = null
 ) : ParameterValueDeclaration, ParameterOwnerDeclaration
+
+fun UnionTypeDeclaration.canBeTranslatedAsStringLiteral(): Boolean {
+    return params.all { it is StringLiteralDeclaration }
+}
+
+fun UnionTypeDeclaration.canBeTranslatedAsNumericLiteral(): Boolean {
+    return params.all { it is NumericLiteralDeclaration }
+}

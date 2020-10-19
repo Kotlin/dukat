@@ -32,6 +32,8 @@ import org.jetbrains.dukat.tsmodel.types.StringLiteralDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeParamReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.types.UnionTypeDeclaration
+import org.jetbrains.dukat.tsmodel.types.canBeTranslatedAsNumericLiteral
+import org.jetbrains.dukat.tsmodel.types.canBeTranslatedAsStringLiteral
 
 const val COMPLEXITY_THRESHOLD = 15
 
@@ -77,13 +79,17 @@ private fun specifyArguments(params: List<ParameterDeclaration>): List<List<Para
     return params.map { parameterDeclaration ->
         when (val type = parameterDeclaration.type) {
             is UnionTypeDeclaration -> {
-                currentComplexity *= type.params.size
-                if (currentComplexity <= COMPLEXITY_THRESHOLD) {
-                    type.params.map { param ->
-                        parameterDeclaration.copy(type = param)
-                    }
-                } else {
+                if (type.canBeTranslatedAsNumericLiteral() || type.canBeTranslatedAsStringLiteral()) {
                     listOf(parameterDeclaration)
+                } else {
+                    currentComplexity *= type.params.size
+                    if (currentComplexity <= COMPLEXITY_THRESHOLD) {
+                        type.params.map { param ->
+                            parameterDeclaration.copy(type = param)
+                        }
+                    } else {
+                        listOf(parameterDeclaration)
+                    }
                 }
             }
             else -> {
