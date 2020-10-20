@@ -60,13 +60,19 @@ private abstract class MoveAliasesFromMergeableModulesLowering : DeclarationLowe
 
 private fun ModuleDeclaration.collectTopLevelData(): List<Triple<String, NameEntity?, String>> {
     return declarations.filterIsInstance(MergeableDeclaration::class.java).flatMap { declaration ->
-        val record = listOf(Triple(uid, declaration.getName(), declaration.uid))
+        val declarationName = declaration.getName()
+        val record =
+            if (declarationName == null) {
+                emptyList()
+            } else {
+                listOf(Triple(uid, declarationName, declaration.uid))
+            }
         if (declaration is ModuleDeclaration) {
             record + declaration.collectTopLevelData()
         } else {
             record
         }
-    }.filter { it.second != null }
+    }
 }
 
 class MoveAliasesFromMergeableModules : TsLowering {
