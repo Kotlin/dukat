@@ -73,7 +73,8 @@ class DescriptorTests {
                 "interface/inheritance/simple",
                 "interface/inheritance/withQualifiedParent",
                 "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
-                "misc/missedOverloads"
+                "misc/missedOverloads",
+                "override/copyGeneratedMembers"
         ).map { it.replace("/", System.getProperty("file.separator")) }
 
         @JvmStatic
