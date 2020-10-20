@@ -26,7 +26,6 @@ class TopNCompilationTests : CompilationTests() {
             val minimalCore = listOf(
                     "@types/async",
                     "@types/bluebird",
-                    "@types/lodash",
                     "@types/node",
                     "@types/prop-types",
                     "@types/yargs",
@@ -50,8 +49,9 @@ class TopNCompilationTests : CompilationTests() {
                     "@types/webpack",
                     "commander/typings",
                     "rxjs",
-                    "vue/types"
-            )
+                    "vue/types",
+                    "@types/lodash"
+                    )
 
             return (if (System.getProperty("dukat.test.extended.topn") == "true") {
                 allTests
