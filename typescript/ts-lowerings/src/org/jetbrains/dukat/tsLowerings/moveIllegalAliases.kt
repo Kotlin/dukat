@@ -27,7 +27,7 @@ private fun NameEntity.replaceRightMost(handler: (String) -> String): NameEntity
     }
 }
 
-private abstract class MoveAliasesFromMergeableModulesLowering : DeclarationLowering {
+private abstract class MoveIllegalAliasesLowering : DeclarationLowering {
     abstract fun isMergeableModule(declaration: ModuleDeclaration): Boolean
 
     private val loweredAliases = mutableSetOf<NameEntity>()
@@ -75,7 +75,7 @@ private fun ModuleDeclaration.collectTopLevelData(): List<Triple<String, NameEnt
     }
 }
 
-class MoveAliasesFromMergeableModules : TsLowering {
+class MoveIllegalAliases : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
         val bucket = source.sources.flatMap { sourceFile ->
             sourceFile.root.collectTopLevelData()
@@ -85,7 +85,7 @@ class MoveAliasesFromMergeableModules : TsLowering {
         .values.flatMap { it.map { data -> data.third }}.toSet()
 
         return source.copy(sources = source.sources.map { sourceFileDeclaration ->
-            sourceFileDeclaration.copy(root = object:  MoveAliasesFromMergeableModulesLowering() {
+            sourceFileDeclaration.copy(root = object:  MoveIllegalAliasesLowering() {
                 override fun isMergeableModule(declaration: ModuleDeclaration): Boolean {
                     return bucket.contains(declaration.uid)
                 }

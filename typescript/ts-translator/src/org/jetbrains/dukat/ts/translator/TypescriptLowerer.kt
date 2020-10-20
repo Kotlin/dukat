@@ -40,7 +40,7 @@ import org.jetbrains.dukat.tsLowerings.LowerPrimitives
 import org.jetbrains.dukat.tsLowerings.LowerThisType
 import org.jetbrains.dukat.tsLowerings.MergeClassLikes
 import org.jetbrains.dukat.tsLowerings.MergeModules
-import org.jetbrains.dukat.tsLowerings.MoveAliasesFromMergeableModules
+import org.jetbrains.dukat.tsLowerings.MoveIllegalAliases
 import org.jetbrains.dukat.tsLowerings.PreprocessUnionTypes
 import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
 import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
@@ -91,7 +91,7 @@ open class TypescriptLowerer(
                         ProcessForOfStatements(),
                         ProcessNullabilityChecks(),
                         EscapeLiterals(),
-                        MoveAliasesFromMergeableModules()
+                        MoveIllegalAliases()
                 )
 
         val models = declarations
