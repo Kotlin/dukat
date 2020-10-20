@@ -1,5 +1,8 @@
 # Changelog
 
+### [0.5.8-rc.3] - 20'October 2020
+  Unrolling default params in case there's a probable overload ambiguity
+
 ### [0.5.8-rc.2] - 7'October 2020
   Create target if needed for `--descriptors` and `--descriptors-jar` targets 
   
