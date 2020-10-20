@@ -99,15 +99,15 @@ private fun ModuleModel.processTopLevelDeclarations(topLevelMap: Map<NameEntity,
 }
 
 private class ResolveOverloadResolutionAmbiguityLowering : ModelWithOwnerTypeLowering {
-//    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
-//        val model = ownerContext.node
-//        return super.lowerInterfaceModel(ownerContext.copy(node = model.copy(members = model.processMembers())), parentModule)
-//    }
-//
-//    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
-//        val model = ownerContext.node
-//        return super.lowerClassModel(ownerContext.copy(node = model.copy(members = model.processMembers())), parentModule)
-//    }
+    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
+        val model = ownerContext.node
+        return super.lowerInterfaceModel(ownerContext.copy(node = model.copy(members = model.processMembers())), parentModule)
+    }
+
+    override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
+        val model = ownerContext.node
+        return super.lowerClassModel(ownerContext.copy(node = model.copy(members = model.processMembers())), parentModule)
+    }
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         val topLevelMap = mutableMapOf<NameEntity, Boolean>()
