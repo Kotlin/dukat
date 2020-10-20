@@ -23,8 +23,8 @@ private class ExportQualifierBuilder(
         val exports = docRoot.export
         val moduleName = moduleNameResolver.resolveName(docRoot)
 
-        exports?.uids?.forEach { uid ->
-            if (exports.isExportEquals) {
+        if (exports?.isExportEquals == true) {
+            exports.uids.forEach { uid ->
                 assignExports[uid] = JsModule(moduleName)
             }
         }

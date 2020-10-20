@@ -58,7 +58,7 @@ private abstract class MoveIllegalAliasesLowering : DeclarationLowering {
     }
 }
 
-private fun ModuleDeclaration.collectTopLevelData(): List<Triple<String, NameEntity?, String>> {
+private fun ModuleDeclaration.collectTopLevelData(): List<Triple<String, NameEntity, String>> {
     return declarations.filterIsInstance(MergeableDeclaration::class.java).flatMap { declaration ->
         val declarationName = declaration.getName()
         val record =
@@ -85,7 +85,7 @@ class MoveIllegalAliases : TsLowering {
         .values.flatMap { it.map { data -> data.third }}.toSet()
 
         return source.copy(sources = source.sources.map { sourceFileDeclaration ->
-            sourceFileDeclaration.copy(root = object:  MoveIllegalAliasesLowering() {
+            sourceFileDeclaration.copy(root = object: MoveIllegalAliasesLowering() {
                 override fun isMergeableModule(declaration: ModuleDeclaration): Boolean {
                     return bucket.contains(declaration.uid)
                 }
