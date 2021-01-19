@@ -2,6 +2,7 @@ import kotlin.js.*
 import org.khronos.webgl.*
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface A {
     companion object

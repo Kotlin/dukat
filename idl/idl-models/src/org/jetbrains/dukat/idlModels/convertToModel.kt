@@ -580,6 +580,10 @@ private class IdlFileConverter(
                 ),
                 annotations = mutableListOf(
                         AnnotationModel(
+                                IdentifierEntity("JsName"),
+                                listOf(IdentifierEntity("null"))
+                        ),
+                        AnnotationModel(
                                 IdentifierEntity("Suppress"),
                                 listOf(IdentifierEntity("NESTED_CLASS_IN_EXTERNAL_INTERFACE"))
                         )

@@ -22,6 +22,7 @@ public external interface UnionAOrBOrC
 public external interface D
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface C : D, UnionAOrBOrC {
     companion object
