@@ -173,6 +173,7 @@ public inline fun MediaEncryptedEventInit(initDataType: String? = "", initData: 
 }
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface MediaKeysRequirement {
     companion object
@@ -185,6 +186,7 @@ public inline val MediaKeysRequirement.Companion.OPTIONAL: MediaKeysRequirement 
 public inline val MediaKeysRequirement.Companion.NOT_ALLOWED: MediaKeysRequirement get() = "not-allowed".asDynamic().unsafeCast<MediaKeysRequirement>()
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface MediaKeySessionType {
     companion object
@@ -195,6 +197,7 @@ public inline val MediaKeySessionType.Companion.TEMPORARY: MediaKeySessionType g
 public inline val MediaKeySessionType.Companion.PERSISTENT_LICENSE: MediaKeySessionType get() = "persistent-license".asDynamic().unsafeCast<MediaKeySessionType>()
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface MediaKeyStatus {
     companion object
@@ -215,6 +218,7 @@ public inline val MediaKeyStatus.Companion.STATUS_PENDING: MediaKeyStatus get() 
 public inline val MediaKeyStatus.Companion.INTERNAL_ERROR: MediaKeyStatus get() = "internal-error".asDynamic().unsafeCast<MediaKeyStatus>()
 
 /* please, don't implement this interface! */
+@JsName("null")
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 public external interface MediaKeyMessageType {
     companion object
