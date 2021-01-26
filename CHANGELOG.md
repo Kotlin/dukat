@@ -1,5 +1,8 @@
 # Changelog
 
+### [0.5.8-rc.4] - 26'January 2021
+    [webidl] JsName("null") companion for union types
+
 ### [0.5.8-rc.3] - 20'October 2020
   Unrolling default params in case there's a probable overload ambiguity
 
