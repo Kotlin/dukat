@@ -1219,9 +1219,10 @@ fun SourceSetModel.translateToDescriptors(stdLib: String): ModuleDescriptor {
 
         moduleDescriptor.setDependencies(
                 ModuleDependenciesImpl(
-                        listOf(moduleDescriptor) + DefaultBuiltIns.Instance.builtInsModule,
-                        setOf(),
-                        listOf()
+                        allDependencies = listOf(moduleDescriptor) + DefaultBuiltIns.Instance.builtInsModule,
+                        modulesWhoseInternalsAreVisible = emptySet(),
+                        directExpectedByDependencies = emptyList(),
+                        allExpectedByDependencies = emptySet()
                 )
         )
         moduleDescriptor.initialize(provider)

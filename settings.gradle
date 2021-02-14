@@ -36,7 +36,7 @@ gradle.ext {
     //TODO: for some reason hasProperty is not working for me
     kotlinVersion = getProperty("dukatKotlinVersion")
   } catch (e) {
-    kotlinVersion = "1.4.20-M2"
+    kotlinVersion = "1.4.30"
   }
 
   jupiterVersion = "5.7.0"

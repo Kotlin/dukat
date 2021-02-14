@@ -6,7 +6,12 @@ import org.jetbrains.dukat.astModel.flattenDeclarations
 import org.jetbrains.kotlin.backend.common.output.OutputFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputBinaryFile
 import org.jetbrains.kotlin.backend.common.output.SimpleOutputFile
+import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
+import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
 import org.jetbrains.kotlin.serialization.js.JsSerializerProtocol
@@ -45,6 +50,12 @@ private fun convertToDescriptors(sourceSet: SourceSetModel, stdLib: String): Col
 
     val moduleDescriptor = flattenedSourceSet.translateToDescriptors(stdLib)
 
+    val environment = KotlinCoreEnvironment.createForTests(
+        Disposer.newDisposable(),
+        CompilerConfiguration(),
+        EnvironmentConfigFiles.JS_CONFIG_FILES
+    )
+
     val metadata = KotlinJavascriptSerializationUtil.serializeMetadata(
             BindingContext.EMPTY,
             JsModuleDescriptor(
@@ -54,7 +65,8 @@ private fun convertToDescriptors(sourceSet: SourceSetModel, stdLib: String): Col
                     moduleDescriptor
             ),
             LanguageVersionSettingsImpl.DEFAULT,
-            JsMetadataVersion.INSTANCE
+            JsMetadataVersion.INSTANCE,
+            JsConfig(environment.project, environment.configuration).project
     )
     val outputMetaJsFile =
             SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())

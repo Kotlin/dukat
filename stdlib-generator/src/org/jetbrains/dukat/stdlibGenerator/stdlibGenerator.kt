@@ -50,6 +50,7 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.descriptors.packageFragments
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices
 import org.jetbrains.kotlin.name.FqName
@@ -311,9 +312,7 @@ private fun PackageFragmentDescriptor.convertToModuleModel(): SourceFileModel {
 }
 
 fun processPackageFragments(packageFragmentProvider: PackageFragmentProvider, fqName: String): List<SourceFileModel> {
-    val packageFragments = mutableListOf<PackageFragmentDescriptor>()
-    packageFragmentProvider.collectPackageFragments(FqName(fqName), packageFragments)
-    return (packageFragments.map {
+    return (packageFragmentProvider.packageFragments(FqName(fqName)).map {
         it.convertToModuleModel()
     })
 }
