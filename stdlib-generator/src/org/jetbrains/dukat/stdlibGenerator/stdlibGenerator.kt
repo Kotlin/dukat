@@ -311,7 +311,8 @@ private fun PackageFragmentDescriptor.convertToModuleModel(): SourceFileModel {
 }
 
 fun processPackageFragments(packageFragmentProvider: PackageFragmentProvider, fqName: String): List<SourceFileModel> {
-    val packageFragments = packageFragmentProvider.getPackageFragments(FqName(fqName))
+    val packageFragments = mutableListOf<PackageFragmentDescriptor>()
+    packageFragmentProvider.collectPackageFragments(FqName(fqName), packageFragments)
     return (packageFragments.map {
         it.convertToModuleModel()
     })
