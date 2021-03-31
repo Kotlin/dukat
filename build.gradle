@@ -31,7 +31,7 @@ allprojects {
 
       compileKotlin {
         kotlinOptions {
-          jvmTarget = '1.6'
+          jvmTarget = '1.8'
           allWarningsAsErrors = true
           freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
         }
@@ -50,8 +50,8 @@ allprojects {
 
     if (project.plugins.hasPlugin("java")) {
       compileJava {
-        sourceCompatibility = '1.6'
-        targetCompatibility = '1.6'
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
       }
     }
   }
