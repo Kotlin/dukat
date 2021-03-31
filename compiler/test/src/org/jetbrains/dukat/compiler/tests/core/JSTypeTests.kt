@@ -20,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import kotlin.test.assertEquals
 
 @ExtendWith(CliTestsStarted::class, CliTestsEnded::class)
 class JSTypeTests : OutputTests() {
@@ -65,7 +64,7 @@ class JSTypeTests : OutputTests() {
         val modules = translateSourceSet(getTranslator().translate(tsPath))
         val translated = concatenate(tsPath, modules)
 
-        assertEquals(
+        assertNormalizedContentEquals(
                 translated,
                 File(ktPath).readText().trimEnd(),
                 "\nSOURCE:\tfile:///${tsPath}\nTARGET:\tfile:///${ktPath}"
