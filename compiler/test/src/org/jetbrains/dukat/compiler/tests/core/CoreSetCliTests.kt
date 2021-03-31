@@ -1,7 +1,6 @@
 package org.jetbrains.dukat.compiler.tests.core
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.jetbrains.dukat.compiler.tests.CliTranslator
 import org.jetbrains.dukat.compiler.tests.MethodSourceSourceFiles
 import org.jetbrains.dukat.compiler.tests.OutputTests
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import kotlin.test.assertEquals
 
 
 @Serializable
@@ -73,7 +71,7 @@ open class CoreSetCliTests {
             "// [test] ${file.name}" + System.getProperty("line.separator") + file.readText()
         }
 
-        assertEquals(
+        assertNormalizedContentEquals(
                 if (translated.isEmpty()) {
                     "// NO DECLARATIONS"
                 } else {
