@@ -1,5 +1,6 @@
 package org.jetbrains.dukat.compiler.tests
 
+import org.jetbrains.dukat.compiler.tests.core.assertNormalizedContentEquals
 import org.jetbrains.dukat.panic.resolvePanicMode
 import org.jetbrains.dukat.translator.InputTranslator
 import org.jetbrains.dukat.translator.ModuleTranslationUnit
@@ -7,8 +8,6 @@ import org.jetbrains.dukat.translator.TranslationUnitResult
 import org.jetbrains.dukat.translatorString.translateFile
 import org.junit.jupiter.api.BeforeAll
 import java.io.File
-import kotlin.test.assertEquals
-
 
 abstract class OutputTests {
     abstract fun getTranslator(): InputTranslator<String>
@@ -60,8 +59,8 @@ abstract class OutputTests {
 
         val translated = output(tsPath, getTranslator())
 
-        assertEquals(
-                translated,
+        assertNormalizedContentEquals(
+                translated.trimEnd(),
                 File(ktPath).readText().trimEnd()
         )
     }
