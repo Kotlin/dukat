@@ -18,8 +18,8 @@
     "@types/lodash": "^4.14.146",
     "@types/node": "^13.13.5",
     "@types/prop-types": "^15.7.3",
-    "@types/react": "^16.9.11",
-    "@types/react-dom": "^16.9.4",
+    "@types/react": "^17.0.1",
+    "@types/react-dom": "^17.0.1",
     "@types/request": "^2.48.3",
     "@types/underscore": "^1.9.3",
     "@types/webpack": "^4.39.8",
@@ -28,10 +28,13 @@
     "chalk": "^3.0.0",
     "commander": "^4.0.1",
     "moment": "^2.24.0",
-    "react": "^16.13.1",
-    "react-native": "^0.63.3",
+    "react": "17.0.1",
+    "react-native": "^0.64.0",
     "rxjs": "^6.5.3",
     "tslib": "^1.10.0",
     "vue": "^2.6.10"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.1.6"
   }
 }
