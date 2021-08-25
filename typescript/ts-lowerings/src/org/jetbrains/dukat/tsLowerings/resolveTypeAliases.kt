@@ -42,12 +42,31 @@ private fun ModuleDeclaration.filterAliases(astContext: TypeAliasContext): Modul
 
 
 private class ResolveTypeAliasesLowering(private val typeAliasContext: TypeAliasContext) : DeclarationLowering {
+    private val possibleRecursiveTypes = mutableSetOf<TypeDeclaration>();
+
     private fun resolveType(declaration: ParameterValueDeclaration): ParameterValueDeclaration {
         return typeAliasContext.dereference(declaration)
     }
 
+    private fun ParameterValueDeclaration.isRecursive(): Boolean {
+       return this is TypeDeclaration && possibleRecursiveTypes.contains(this)
+    }
+
+    private fun ParameterValueDeclaration.addToPossibleRecursiveTypes() {
+       if (this !is TypeDeclaration) return
+       possibleRecursiveTypes.add(this)
+    }
+
+    private fun ParameterValueDeclaration.removeFromPossibleRecursiveTypes() {
+        if (this !is TypeDeclaration) return
+        possibleRecursiveTypes.remove(this)
+    }
+
     override fun lowerParameterValue(declaration: ParameterValueDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): ParameterValueDeclaration {
+        if (declaration.isRecursive()) return declaration
+        declaration.addToPossibleRecursiveTypes()
         return super.lowerParameterValue(this.resolveType(declaration), owner)
+            .also { declaration.removeFromPossibleRecursiveTypes() }
     }
 
     private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> {
