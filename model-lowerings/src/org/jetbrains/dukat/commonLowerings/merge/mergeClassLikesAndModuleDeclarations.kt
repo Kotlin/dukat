@@ -92,7 +92,7 @@ private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
 }
 
 private fun ModuleModel.fetchDeclarations(): List<MemberModel> {
-    return declarations.filterIsInstance(MemberModel::class.java).map {
+    return declarations.filterIsInstance<MemberModel>().map {
         when (it) {
             is EnumModel -> it.copy(external = false)
             is ClassModel -> it.copy(external = false)
