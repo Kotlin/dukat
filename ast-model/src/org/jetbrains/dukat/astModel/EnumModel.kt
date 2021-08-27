@@ -8,5 +8,6 @@ data class EnumModel(
         override val name: NameEntity,
         val values: List<EnumTokenModel>,
         override val visibilityModifier: VisibilityModifierModel,
-        override val comment: CommentEntity?
-) : TopLevelModel
+        override val comment: CommentEntity?,
+        override val external: Boolean = true,
+) : CanHaveExternalModifierModel, MemberModel

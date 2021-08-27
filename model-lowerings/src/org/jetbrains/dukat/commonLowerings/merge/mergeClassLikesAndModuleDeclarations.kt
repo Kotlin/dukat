@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.EnumModel
 import org.jetbrains.dukat.astModel.FunctionModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.MemberModel
@@ -14,7 +15,6 @@ import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.SourceSetModel
 import org.jetbrains.dukat.astModel.TopLevelModel
-import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.commonLowerings.merge.processing.fetchClassLikes
@@ -39,7 +39,6 @@ private fun VariableModel.convert(): MemberModel {
 }
 
 private fun FunctionModel.convert(): MemberModel {
-
     return MethodModel(
             name = name,
             parameters = parameters,
@@ -92,9 +91,10 @@ private operator fun ClassLikeModel.plus(b: ModuleModel): ClassLikeModel {
     }
 }
 
-private fun ModuleModel.fetchDeclarations(): List<ClassLikeModel> {
-    return declarations.filterIsInstance(ClassLikeModel::class.java).map {
+private fun ModuleModel.fetchDeclarations(): List<MemberModel> {
+    return declarations.filterIsInstance<MemberModel>().map {
         when (it) {
+            is EnumModel -> it.copy(external = false)
             is ClassModel -> it.copy(external = false)
             is InterfaceModel -> it.copy(external = false)
             else -> it

@@ -773,13 +773,23 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
     return "${translateAnnotations(annotations)}${tokens.joinToString(" ")}$space${typeParams}${varName}${type}${body}"
 }
 
-private fun EnumModel.translate(): String {
-    val res = mutableListOf("${KEYWORD_EXTERNAL} enum class ${name.translate()} {")
-    res.add(values.map { value ->
+private fun EnumModel.translate(padding: Int = 0): String {
+    val modifiers = mutableListOf<String>()
+
+    if (external) {
+        modifiers.add(KEYWORD_EXTERNAL)
+    }
+
+    val space = if (modifiers.isEmpty()) "" else " "
+    val res = mutableListOf("${modifiers.joinToString(" ")}${space}enum class ${name.translate()} {")
+    val members = values.map { value ->
         val metaClause = if (value.meta.isEmpty()) "" else " /* = ${value.meta} */"
-        "    ${value.value}${metaClause}"
-    }.joinToString(",${LINE_SEPARATOR}"))
-    res.add("}")
+        "${FORMAT_TAB.repeat(padding + 1)}${value.value}${metaClause}"
+    }
+
+    res.add(members.joinToString(",${LINE_SEPARATOR}"))
+    res.add("${FORMAT_TAB.repeat(padding)}}")
+
     return res.joinToString(LINE_SEPARATOR)
 }
 
@@ -805,6 +815,7 @@ private fun MemberModel.translate(): List<String> {
         is ConstructorModel -> translate()
         is InitBlockModel -> translate()
         is ClassModel -> listOf(translate(1))
+        is EnumModel -> listOf(translate(1))
         is InterfaceModel -> listOf(translate(1))
         else -> raiseConcern("can not translate MemberModel ${this}") { listOf("") }
     }
