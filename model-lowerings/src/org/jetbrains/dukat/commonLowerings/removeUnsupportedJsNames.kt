@@ -40,11 +40,37 @@ private fun NameEntity.contains(str: String): Boolean {
     }
 }
 
+private fun Char.isLetterOrDigitOrUnderscore(): Boolean {
+   return isLetterOrDigit() || equals('_')
+}
+
+private fun String.isEscaped(): Boolean {
+    return startsWith('`') && endsWith('`')
+}
+
+private fun String.unescaped(): String {
+    return when {
+        isEscaped() -> substring(1 until lastIndex)
+        else -> this
+    }
+}
+
+private fun IdentifierEntity.isValidForJs(): Boolean {
+    return with(value.unescaped()) {
+        isNotEmpty() && all(Char::isLetterOrDigitOrUnderscore) && !first().isDigit()
+    }
+}
 
 private val STARTS_WITH_NUMBER = "^`\\d+".toRegex()
 
 private fun NameEntity.isInvalidJsName(): Boolean {
-    return contains(STARTS_WITH_NUMBER) || contains("-") || startsWith("`:") || startsWith("`.")
+    return when (this) {
+        is IdentifierEntity -> !isValidForJs()
+        is QualifierEntity -> contains(STARTS_WITH_NUMBER) ||
+                contains("-") ||
+                startsWith("`:") ||
+                startsWith("`.")
+    }
 }
 
 private fun MemberModel.getType(): TypeModel? {
@@ -87,7 +113,7 @@ private class UnsupportedJsNamesLowering : ModelWithOwnerTypeLowering {
                 else -> null
             }
 
-            name?.startsWith("`") == true && name.isInvalidJsName()
+            name?.isInvalidJsName() == true
         }
 
         val commonType = resolveCommonType(unsupportedMembers)

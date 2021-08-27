@@ -465,9 +465,7 @@ private class IdlFileConverter(
                         IdentifierExpressionModel(
                                 IdentifierEntity("o")
                         ),
-                        IdentifierExpressionModel(
-                                IdentifierEntity("\"$name\"")
-                        )
+                        StringLiteralExpressionModel(name)
                 ),
                 IdentifierExpressionModel(
                         IdentifierEntity(name)
@@ -477,22 +475,36 @@ private class IdlFileConverter(
 
     fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
         val functionBody: MutableList<StatementModel> = mutableListOf(
-                AssignmentStatementModel(
-                        //TODO: change to honest variable creation
-                        IdentifierExpressionModel(
-                                IdentifierEntity("val o")
-                        ),
-                        CallExpressionModel(
-                                IdentifierExpressionModel(
-                                        IdentifierEntity("js")
-                                ),
-                                listOf(
-                                        StringLiteralExpressionModel(
-                                                "({})"
-                                        )
-                                )
+            VariableModel(
+                name = IdentifierEntity("o"),
+                immutable = true,
+                inline = false,
+                external = false,
+                get = null,
+                set = null,
+                extend = null,
+                comment = null,
+                explicitlyDeclaredType = false,
+                typeParameters = listOf(),
+                annotations = mutableListOf(),
+                visibilityModifier = VisibilityModifierModel.DEFAULT,
+                type = TypeValueModel(
+                    value = IdentifierEntity("dynamic"),
+                    params = listOf(),
+                    fqName = null,
+                    metaDescription = null,
+                ),
+                initializer = CallExpressionModel(
+                    IdentifierExpressionModel(
+                        IdentifierEntity("js")
+                    ),
+                    listOf(
+                        StringLiteralExpressionModel(
+                            "({})"
                         )
+                    )
                 )
+            )
         )
         functionBody.addAll(members.map { it.convertToAssignmentStatementModel() })
         functionBody.add(
