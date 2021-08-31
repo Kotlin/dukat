@@ -810,6 +810,11 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                     memberModel,
                     parent
             )
+            is EnumModel -> translateEnum(
+                    memberModel,
+                    parent,
+                    isTopLevel = false
+            )
             is ClassLikeModel -> translateClassLike(
                     memberModel,
                     parent,
@@ -961,7 +966,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
         return objectDescriptor
     }
 
-    private fun translateEnum(enumModel: EnumModel, parent: PackageFragmentDescriptor): ClassDescriptor {
+    private fun translateEnum(enumModel: EnumModel, parent: DeclarationDescriptor, isTopLevel: Boolean = true): ClassDescriptor {
         val enumDescriptor = CustomClassDescriptor(
                 parent = parent,
                 name = enumModel.name,
@@ -987,7 +992,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         )
                 ),
                 isCompanion = false,
-                isTopLevel = true,
+                isTopLevel = isTopLevel,
                 companionObject = null,
                 typeParameters = listOf(),
                 annotations = Annotations.EMPTY
