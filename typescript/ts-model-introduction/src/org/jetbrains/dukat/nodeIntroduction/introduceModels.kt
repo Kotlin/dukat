@@ -11,6 +11,7 @@ import org.jetbrains.dukat.astCommon.appendLeft
 import org.jetbrains.dukat.astCommon.process
 import org.jetbrains.dukat.astCommon.rightMost
 import org.jetbrains.dukat.astCommon.toNameEntity
+import org.jetbrains.dukat.astCommon.ReccurentEntitiesDetector
 import org.jetbrains.dukat.astModel.AnnotationModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -186,6 +187,7 @@ private class DocumentConverter(
         private val ownerPackageName: NameEntity?
 ) {
     private val imports = mutableListOf<ImportModel>()
+    private val recursionDetector = ReccurentEntitiesDetector<TypeAliasDeclaration>()
     private val expressionConverter = ExpressionConverter { typeNode ->
         typeNode.process()
     }
@@ -347,16 +349,23 @@ private class DocumentConverter(
             }
             is TypeDeclaration -> {
                 val node = uidToNameMapper[typeReference?.uid]?.node
-                if ((node is TypeAliasDeclaration) && (node.typeReference.convertToNode().process().isDynamic())) {
-                    dynamicType("typealias ${node.aliasName} = dynamic")
-                } else {
-                    TypeValueModel(
+                val typeAliasNode = node as? TypeAliasDeclaration
+
+                recursionDetector.with(typeAliasNode)  { isAlreadyProcessed ->
+                    val dynamic = dynamicType("typealias ${typeAliasNode?.aliasName} = dynamic")
+
+                    if (node is TypeAliasDeclaration && (isAlreadyProcessed || node.typeReference.convertToNode().process().isDynamic())) {
+                        dynamic
+                    } else {
+                        TypeValueModel(
                             value,
-                            params.map { param -> param.process(context) }.map { TypeParameterModel(it, listOf()) },
+                            params.map { it.process(context) }.map { TypeParameterModel(it, listOf()) },
                             meta.processMeta(),
                             getFqName(),
                             nullable
-                    )
+                        )
+                            .let { if (recursionDetector.wasRecursionFoundIn(typeAliasNode)) dynamic else it }
+                    }
                 }
             }
             is FunctionTypeDeclaration -> {
@@ -830,7 +839,7 @@ private class DocumentConverter(
             }
             is TypeAliasDeclaration -> {
                 val typeReferenceResolved = typeReference.convertToNode().process()
-                if (typeReferenceResolved.isDynamic() || isRedundant(typeReferenceResolved)) {
+                if (recursionDetector.wasRecursionFoundIn(this) || typeReferenceResolved.isDynamic() || isRedundant(typeReferenceResolved)) {
                     null
                 } else {
                     TypeAliasModel(
