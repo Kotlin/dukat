@@ -14,6 +14,7 @@ import org.jetbrains.dukat.commonLowerings.RemoveUnusedGeneratedInterfaces
 import org.jetbrains.dukat.commonLowerings.ReplaceSimpleGeneratedInterfacesWithLambdas
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
 import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
+import org.jetbrains.dukat.commonLowerings.RemoveInitializersFromExternals
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
 import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
@@ -124,6 +125,7 @@ open class TypescriptLowerer(
                         SeparateNonExternalEntities(),
                         ReplaceSimpleGeneratedInterfacesWithLambdas(),
                         RemoveUnusedGeneratedInterfaces(),
+                        RemoveInitializersFromExternals(),
                         AddImports(),
                         AddStandardImportsAndAnnotations(addSuppressAnnotations)
                 )

@@ -43,6 +43,7 @@ import org.jetbrains.dukat.astModel.expressions.IsExpressionModel
 import org.jetbrains.dukat.astModel.expressions.LambdaExpressionModel
 import org.jetbrains.dukat.astModel.expressions.NonNullExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ParenthesizedExpressionModel
+import org.jetbrains.dukat.astModel.expressions.DefinedExternallyExpressionModel
 import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.SuperExpressionModel
 import org.jetbrains.dukat.astModel.expressions.ThisExpressionModel
@@ -432,6 +433,9 @@ private fun ExpressionModel.translate(): String {
         is PropertyAccessExpressionModel -> "${left.translate()}.${right.translate()}"
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
+        is DefinedExternallyExpressionModel -> previousExpression?.translate().let {
+           "${if (it != null) "/* $it */ " else ""}${identifier.translate()}"
+        }
         is UnaryExpressionModel -> if (isPrefix) {
             "${operator.translate()}${operand.translate()}"
         } else {
