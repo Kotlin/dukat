@@ -309,6 +309,8 @@ export class AstConverter {
           res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.EXPORT))
         } else if (modifier.kind == ts.SyntaxKind.DefaultKeyword) {
           res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.DEFAULT))
+        } else if (modifier.kind == ts.SyntaxKind.ReadonlyKeyword) {
+          res.push(this.astFactory.createModifierDeclaration(MODIFIER_KIND.READONLY))
         }
       });
     }
