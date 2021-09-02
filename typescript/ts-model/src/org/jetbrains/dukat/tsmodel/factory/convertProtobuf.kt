@@ -203,6 +203,7 @@ fun ModifierDeclarationProto.convert(): ModifierDeclaration? {
         ModifierDeclarationProto.MODIFIER_KIND.DEFAULT -> ModifierDeclaration.DEFAULT_KEYWORD
         ModifierDeclarationProto.MODIFIER_KIND.EXPORT -> ModifierDeclaration.EXPORT_KEYWORD
         ModifierDeclarationProto.MODIFIER_KIND.STATIC -> ModifierDeclaration.STATIC_KEYWORD
+        ModifierDeclarationProto.MODIFIER_KIND.READONLY -> ModifierDeclaration.SYNTH_IMMUTABLE
         ModifierDeclarationProto.MODIFIER_KIND.SYNTH_EXPORT_ASSIGNMENT -> ModifierDeclaration.SYNTH_EXPORT_ASSIGNMENT
         else -> null
     }
