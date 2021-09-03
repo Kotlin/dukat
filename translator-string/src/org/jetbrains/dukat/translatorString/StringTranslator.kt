@@ -434,7 +434,7 @@ private fun ExpressionModel.translate(): String {
         is IndexExpressionModel -> "${array.translate()}[${index.translate()}]"
         is CallExpressionModel -> translate()
         is DefinedExternallyExpressionModel -> previousExpression?.translate().let {
-           "${if (it != null) "/* $it */ " else ""}${identifier.translate()}"
+           "${identifier.translate()}${if (it != null) " /* $it */" else ""}"
         }
         is UnaryExpressionModel -> if (isPrefix) {
             "${operator.translate()}${operand.translate()}"
