@@ -24,54 +24,54 @@ private val CONTAINS_ONLY_UNDERSCORES = "_+".toRegex()
 private val STARTS_WITH_NUMBER = "^\\d+".toRegex()
 
 private val RESERVED_WORDS = setOf(
-        "as",
-        "break",
-        "class",
-        "continue",
-        "do",
-        "else",
-        "false",
-        "for",
-        "fun",
-        "if",
-        "in",
-        "interface",
-        "is",
-        "null",
-        "object",
-        "package",
-        "return",
-        "super",
-        "this",
-        "throw",
-        "true",
-        "try",
-        "typealias",
-        "typeof",
-        "val",
-        "var",
-        "when",
-        "while"
+    "as",
+    "break",
+    "class",
+    "continue",
+    "do",
+    "else",
+    "false",
+    "for",
+    "fun",
+    "if",
+    "in",
+    "interface",
+    "is",
+    "null",
+    "object",
+    "package",
+    "return",
+    "super",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "typealias",
+    "typeof",
+    "val",
+    "var",
+    "when",
+    "while"
 )
 
 private val RENAME_PARAM_MAP = mapOf(
-        Pair("this", "self"),
+    Pair("this", "self"),
 
-        Pair("as", "param_as"),
-        Pair("class", "param_class"),
-        Pair("fun", "param_fun"),
-        Pair("in", "param_in"),
-        Pair("interface", "param_interface"),
-        Pair("in", "param_in"),
-        Pair("is", "param_is"),
-        Pair("object", "obj"),
-        Pair("package", "param_package"),
-        Pair("return", "param_return"),
-        Pair("throw", "param_throw"),
-        Pair("try", "param_try"),
-        Pair("typealias", "param_typealias"),
-        Pair("val", "param_val"),
-        Pair("when", "param_when")
+    Pair("as", "param_as"),
+    Pair("class", "param_class"),
+    Pair("fun", "param_fun"),
+    Pair("in", "param_in"),
+    Pair("interface", "param_interface"),
+    Pair("in", "param_in"),
+    Pair("is", "param_is"),
+    Pair("object", "obj"),
+    Pair("package", "param_package"),
+    Pair("return", "param_return"),
+    Pair("throw", "param_throw"),
+    Pair("try", "param_try"),
+    Pair("typealias", "param_typealias"),
+    Pair("val", "param_val"),
+    Pair("when", "param_when")
 )
 
 private fun String.renameAsParameter(): String {
@@ -85,18 +85,26 @@ private fun NameEntity.renameAsParameter(): NameEntity {
     }
 }
 
-private fun String.shouldEscape(): Boolean {
-    val isReservedWord = RESERVED_WORDS.contains(this)
-    val containsDollarSign = this.contains("$")
-    val containsMinusSign = this.contains("-")
-    val containsOnlyUnderscores = CONTAINS_ONLY_UNDERSCORES.matches(this)
-    val startsWithNumber = this.contains(STARTS_WITH_NUMBER)
-    val isEscapedAlready = this.startsWith("`")
-    val isStartingWithColon = this.startsWith(":")
-    val isStartingWithDot = this.startsWith(".")
+private fun Char.isLetterOrDigitOrUnderscore(): Boolean {
+    return isLetterOrDigit() || equals('_')
+}
 
-    return !isEscapedAlready &&
-            (isReservedWord || containsDollarSign || containsOnlyUnderscores || containsMinusSign || startsWithNumber || isStartingWithColon || isStartingWithDot)
+private fun String.isValidKotlinIdentifier(): Boolean {
+    return isNotEmpty() &&
+            all(Char::isLetterOrDigitOrUnderscore) &&
+            (!startsWith('_') || any { it != '_' })
+}
+
+private fun String.isEscaped(): Boolean {
+    return startsWith('`') && endsWith('`')
+}
+
+private fun String.isReservedKeyword(): Boolean {
+    return RESERVED_WORDS.contains(this)
+}
+
+private fun String.shouldEscape(): Boolean {
+    return !isEscaped() && (isReservedKeyword() || !isValidKotlinIdentifier())
 }
 
 private fun String.escape(): String {
@@ -139,12 +147,12 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         return super.lowerTypeValueModel(
-                ownerContext.copy(
-                        node = ownerContext.node.copy(
-                                value = ownerContext.node.value.escape(),
-                                fqName = ownerContext.node.fqName?.escape()
-                        )
+            ownerContext.copy(
+                node = ownerContext.node.copy(
+                    value = ownerContext.node.value.escape(),
+                    fqName = ownerContext.node.fqName?.escape()
                 )
+            )
         )
     }
 
@@ -160,14 +168,21 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerFunctionModel(ownerContext: NodeOwner<FunctionModel>, parentModule: ModuleModel): FunctionModel {
         val declaration = ownerContext.node
-        return super.lowerFunctionModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape()
-        )), parentModule)
+        return super.lowerFunctionModel(
+            ownerContext.copy(
+                node = declaration.copy(
+                    name = declaration.name.escape()
+                )
+            ), parentModule
+        )
     }
 
     override fun lowerVariableModel(ownerContext: NodeOwner<VariableModel>, parentModule: ModuleModel?): VariableModel {
         val declaration = ownerContext.node
-        return super.lowerVariableModel(ownerContext.copy(node = declaration.copy(name = declaration.name.escape())), parentModule)
+        return super.lowerVariableModel(
+            ownerContext.copy(node = declaration.copy(name = declaration.name.escape())),
+            parentModule
+        )
     }
 
 
@@ -184,27 +199,45 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
     }
 
 
-    override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
+    override fun lowerInterfaceModel(
+        ownerContext: NodeOwner<InterfaceModel>,
+        parentModule: ModuleModel
+    ): InterfaceModel {
         val declaration = ownerContext.node
-        return super.lowerInterfaceModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape()
-        )), parentModule)
+        return super.lowerInterfaceModel(
+            ownerContext.copy(
+                node = declaration.copy(
+                    name = declaration.name.escape()
+                )
+            ), parentModule
+        )
     }
 
     override fun lowerClassModel(ownerContext: NodeOwner<ClassModel>, parentModule: ModuleModel): ClassModel {
         val declaration = ownerContext.node
 
-        return super.lowerClassModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape()
-        )), parentModule)
+        return super.lowerClassModel(
+            ownerContext.copy(
+                node = declaration.copy(
+                    name = declaration.name.escape()
+                )
+            ), parentModule
+        )
     }
 
-    override fun lowerTypeAliasModel(ownerContext: NodeOwner<TypeAliasModel>, parentModule: ModuleModel): TypeAliasModel {
+    override fun lowerTypeAliasModel(
+        ownerContext: NodeOwner<TypeAliasModel>,
+        parentModule: ModuleModel
+    ): TypeAliasModel {
         val declaration = ownerContext.node
 
-        return super.lowerTypeAliasModel(ownerContext.copy(node = declaration.copy(
-                name = declaration.name.escape()
-        )), parentModule)
+        return super.lowerTypeAliasModel(
+            ownerContext.copy(
+                node = declaration.copy(
+                    name = declaration.name.escape()
+                )
+            ), parentModule
+        )
     }
 
     override fun lowerEnumModel(ownerContext: NodeOwner<EnumModel>, parentModule: ModuleModel): EnumModel {
@@ -214,10 +247,10 @@ private class EscapeIdentificatorsTypeLowering : ModelWithOwnerTypeLowering {
 
     override fun lowerRoot(moduleModel: ModuleModel, ownerContext: NodeOwner<ModuleModel>): ModuleModel {
         return moduleModel.copy(
-                name = moduleModel.name.escape(),
-                shortName = moduleModel.shortName.escape(),
-                declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
-                submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, ownerContext.wrap(submodule)) }
+            name = moduleModel.name.escape(),
+            shortName = moduleModel.shortName.escape(),
+            declarations = lowerTopLevelDeclarations(moduleModel.declarations, ownerContext, moduleModel),
+            submodules = moduleModel.submodules.map { submodule -> lowerRoot(submodule, ownerContext.wrap(submodule)) }
         )
     }
 }
