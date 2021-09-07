@@ -73,9 +73,13 @@ private fun ObjectModel?.merge(module: ModuleModel): ObjectModel? {
 }
 
 private fun ModuleModel.mergeClassLikesAndModuleDeclarations(classLikes: Map<NameEntity, MergeClassLikeData>): ModuleModel {
-    val declarationLowered = declarations.map { declaration ->
-        classLikes[name.appendLeft(declaration.name)]?.model ?: declaration
-    }
+    val declarationLowered = declarations
+        .map { declaration ->
+            when (declaration) {
+                is ClassLikeModel -> classLikes[name.appendLeft(declaration.name)]?.model ?: declaration
+                else -> declaration
+            }
+        }
     val submodulesLowered = submodules.filter {
         !classLikes.containsKey(it.mergeClassLikesAndModuleDeclarations(classLikes).name)
     }.map { it.mergeClassLikesAndModuleDeclarations(classLikes) }
