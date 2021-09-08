@@ -979,7 +979,8 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
 
     val hasMembers = members.isNotEmpty()
     val hasStaticMembers = staticMembers.isNotEmpty()
-    val isBlock = hasMembers || hasStaticMembers
+    val hasCompanionParent = companionObjectHeritages.isNotEmpty()
+    val isBlock = hasMembers || hasStaticMembers || hasCompanionParent
 
     output(classDeclaration + if (isBlock) " {" else "")
 
