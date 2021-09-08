@@ -47,6 +47,7 @@ import org.jetbrains.dukat.tsLowerings.ProcessForOfStatements
 import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
 import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
+import org.jetbrains.dukat.tsLowerings.RemoveConstructSignature
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
 import org.jetbrains.dukat.tsLowerings.ReplaceExpressionExtension
 import org.jetbrains.dukat.tsLowerings.ResolveCollections
@@ -70,6 +71,7 @@ open class TypescriptLowerer(
         val declarations = sourceSet
                 .lower(
                         ReplaceExpressionExtension(),
+                        RemoveConstructSignature(),
                         IntroduceMissingConstructors(),
                         RemoveThisParameters(),
                         MergeModules(),
