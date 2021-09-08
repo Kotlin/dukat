@@ -440,6 +440,7 @@ export class AstConverter {
     }
 
     let typeReference: ReferenceEntity | null = null;
+
     if (ts.isImportSpecifier(declaration)) {
       let uid = this.createUid(declaration.name);
       if (uid) {
@@ -638,6 +639,12 @@ export class AstConverter {
         member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
         this.convertTypeParams(member.typeParameters)
       )
+    } else if (ts.isConstructSignatureDeclaration(member)) {
+        return this.astFactory.createConstructSignatureDeclaration(
+            this.convertParameterDeclarations(member.parameters),
+            member.type ? this.convertType(member.type) : this.createTypeDeclaration("Unit"),
+            this.convertTypeParams(member.typeParameters)
+        )
     }
 
     return null;
@@ -768,7 +775,7 @@ export class AstConverter {
 
     if (Array.isArray(symbol.declarations)) {
       return symbol.declarations.find(decl => !ts.isModuleDeclaration(decl) &&
-              !ts.isVariableDeclaration(decl) && !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
+              !ts.isPropertyDeclaration(decl) && !ts.isPropertySignature(decl) &&
               !ts.isFunctionLike(decl))
     }
 

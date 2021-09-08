@@ -1,6 +1,6 @@
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.toposort.toposort
-import org.jetbrains.dukat.tsLowerings.ResolveTypeParamsInConstructor
+import org.jetbrains.dukat.tsLowerings.ApplyTypeParameters
 import org.jetbrains.dukat.tsLowerings.TopLevelDeclarationResolver
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
@@ -30,11 +30,11 @@ class IntroduceMissingConstructors : TopLevelDeclarationLowering {
         when {
             classDeclaration.typeParameters.isEmpty() -> constructors
             else -> {
-                val typesMapping = classDeclaration.typeParameters.withIndex().map { (index, type) ->
+                val typesMapping = classDeclaration.typeParameters.withIndex().associate { (index, type) ->
                     val resolvedType = actualTypes.getOrNull(index) ?: type.defaultValue
                     type.name to resolvedType!!
-                }.toMap()
-                val resolver = ResolveTypeParamsInConstructor(typesMapping)
+                }
+                val resolver = ApplyTypeParameters(typesMapping)
                 constructors.map { resolver.lowerConstructorDeclaration(it, null) }
             }
         }

@@ -975,6 +975,7 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
 
     val members = members
     val staticMembers = companionObject?.members.orEmpty()
+    val companionObjectHeritages = translateHeritagModels(companionObject?.parentEntities.orEmpty())
 
     val hasMembers = members.isNotEmpty()
     val hasStaticMembers = staticMembers.isNotEmpty()
@@ -992,7 +993,7 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
         if (hasMembers) {
             output("")
         }
-        output(FORMAT_TAB.repeat(depth + 1) + "companion object${if (!hasStaticMembers) "" else " {"}")
+        output(FORMAT_TAB.repeat(depth + 1) + "companion object${companionObjectHeritages}${if (!hasStaticMembers) "" else " {"}")
     }
     if (hasStaticMembers) {
         staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(depth + 2) + it }).forEach {

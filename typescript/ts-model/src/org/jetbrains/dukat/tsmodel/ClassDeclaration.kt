@@ -10,5 +10,6 @@ data class ClassDeclaration(
         override val parentEntities: List<HeritageClauseDeclaration>,
         override val modifiers: Set<ModifierDeclaration>,
         override val definitionsInfo: List<DefinitionInfoDeclaration>,
-        override val uid: String
+        override val uid: String,
+        val staticallyInherited: List<HeritageClauseDeclaration> = emptyList()
 ) : ClassLikeDeclaration, ExpressionDeclaration, WithModifiersDeclaration

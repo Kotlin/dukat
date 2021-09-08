@@ -12,6 +12,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.CaseDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ContinueStatementDeclaration
 import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
 import org.jetbrains.dukat.tsmodel.EnumDeclaration
@@ -113,6 +114,7 @@ import org.jetbrains.dukat.tsmodelproto.CaseDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ClassDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConditionalExpressionDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ConstructorDeclarationProto
+import org.jetbrains.dukat.tsmodelproto.ConstructSignatureDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ContinueStatementDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.DefinitionInfoDeclarationProto
 import org.jetbrains.dukat.tsmodelproto.ElementAccessExpressionDeclarationProto
@@ -512,6 +514,14 @@ fun CallSignatureDeclarationProto.convert(): CallSignatureDeclaration {
     )
 }
 
+fun ConstructSignatureDeclarationProto.convert(): ConstructSignatureDeclaration {
+    return ConstructSignatureDeclaration(
+        parametersList.map { it.convert() },
+        type.convert(),
+        typeParametersList.map { it.convert() }
+    )
+}
+
 fun MemberDeclarationProto.convert(): MemberDeclaration {
     return when {
         hasConstructorDeclaration() -> constructorDeclaration.convert()
@@ -519,6 +529,7 @@ fun MemberDeclarationProto.convert(): MemberDeclaration {
         hasProperty() -> property.convert()
         hasIndexSignature() -> indexSignature.convert()
         hasCallSignature() -> callSignature.convert()
+        hasConstructSignature() -> constructSignature.convert()
         hasMethod() -> method.convert()
         else -> throw Exception("unknown MemberEntityProto: ${this}")
     }
@@ -814,7 +825,7 @@ fun ExpressionDeclarationProto.convert(): ExpressionDeclaration {
         hasParenthesizedExpression() -> parenthesizedExpression.convert()
         hasSpreadExpression() -> spreadExpression.convert()
         hasUnknownExpression() -> unknownExpression.convert()
-        else -> throw Exception("unknown expression: ${this}")
+        else -> throw Exception("unknown expression: $this")
     }
 }
 
@@ -833,7 +844,7 @@ fun StatementDeclarationProto.convert(): StatementDeclaration {
         hasForStatement() -> forStatement.convert()
         hasSwitchStatement() -> switchStatement.convert()
         hasForOfStatement() -> forOfStatement.convert()
-        else -> throw Exception("unknown statement: ${this}")
+        else -> throw Exception("unknown statement: $this")
     }
 }
 
