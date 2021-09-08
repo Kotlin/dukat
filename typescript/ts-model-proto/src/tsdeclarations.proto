@@ -97,6 +97,12 @@ message CallSignatureDeclarationProto {
     repeated TypeParameterDeclarationProto typeParameters = 3;
 }
 
+message ConstructSignatureDeclarationProto {
+    repeated ParameterDeclarationProto parameters = 1;
+    ParameterValueDeclarationProto type = 2;
+    repeated TypeParameterDeclarationProto typeParameters = 3;
+}
+
 message ConstructorDeclarationProto {
     repeated ParameterDeclarationProto parameters = 1;
     repeated TypeParameterDeclarationProto typeParameters = 2;
@@ -180,6 +186,7 @@ message MemberDeclarationProto {
         MethodSignatureDeclarationProto methodSignature = 4;
         PropertyDeclarationProto property = 5;
         MethodDeclarationProto method = 6;
+        ConstructSignatureDeclarationProto constructSignature = 7;
     }
 }
 

@@ -32,7 +32,7 @@ import {
     TypeParameterDeclarationProto,
     TypeParamReferenceDeclarationProto,
     TypeReferenceDeclarationProto,
-    VariableDeclarationProto
+    VariableDeclarationProto, ConstructSignatureDeclarationProto
 } from "declarations";
 import {IdentifierDeclarationProto, NameDeclarationProto} from "common_declarations";
 
@@ -41,6 +41,7 @@ export type BindingElementDeclaration = BindingElementDeclarationProto;
 export type CallSignatureDeclaration = CallSignatureDeclarationProto;
 export type ClassDeclaration = ClassDeclarationProto;
 export type ConstructorDeclaration = ConstructorDeclarationProto;
+export type ConstructSignatureDeclaration = ConstructSignatureDeclarationProto;
 export type DefinitionInfoDeclaration = DefinitionInfoDeclarationProto;
 export type EnumDeclaration = EnumDeclarationProto;
 export type EnumTokenDeclaration = EnumTokenDeclarationProto;

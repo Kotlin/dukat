@@ -677,16 +677,17 @@ private class DocumentConverter(
         val members = processMembers()
 
         val parentModelEntities = convertParentEntities(parentEntities)
+        val staticParentModelEntities = convertParentEntities(staticallyInherited)
 
         val external = rootIsDeclaration || hasDeclareModifier()
         return ClassModel(
                 name = name,
                 members = members.ownMembers,
-                companionObject = if (members.staticMembers.isNotEmpty()) {
+                companionObject = if (members.staticMembers.isNotEmpty() || staticallyInherited.isNotEmpty()) {
                     ObjectModel(
                             IdentifierEntity(""),
                             members.staticMembers,
-                            emptyList(),
+                            staticParentModelEntities,
                             VisibilityModifierModel.DEFAULT,
                             null,
                             external

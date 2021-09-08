@@ -48,6 +48,7 @@ import org.jetbrains.dukat.tsLowerings.ProcessNullabilityChecks
 import org.jetbrains.dukat.tsLowerings.ProcessOptionalMethods
 import org.jetbrains.dukat.tsLowerings.RemoveThisParameters
 import org.jetbrains.dukat.tsLowerings.RenameImpossibleDeclarations
+import org.jetbrains.dukat.tsLowerings.ReplaceExpressionExtension
 import org.jetbrains.dukat.tsLowerings.ResolveCollections
 import org.jetbrains.dukat.tsLowerings.ResolveDefaultTypeParams
 import org.jetbrains.dukat.tsLowerings.ResolveLambdaParents
@@ -68,6 +69,7 @@ open class TypescriptLowerer(
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
                 .lower(
+                        ReplaceExpressionExtension(),
                         IntroduceMissingConstructors(),
                         RemoveThisParameters(),
                         MergeModules(),

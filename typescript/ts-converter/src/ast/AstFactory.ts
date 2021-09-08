@@ -81,7 +81,7 @@ import {
   UnionTypeDeclarationProto,
   VariableDeclarationProto,
   VariableLikeDeclarationProto,
-  WhileStatementDeclarationProto
+  WhileStatementDeclarationProto, ConstructSignatureDeclarationProto
 } from "declarations";
 import {tsInternals} from "../TsInternals";
 import * as ts from "../../.tsdeclarations/typescript";
@@ -140,6 +140,17 @@ export class AstFactory {
 
     let memberProto = new MemberDeclarationProto();
     memberProto.setCallsignature(callSignature);
+    return memberProto;
+  }
+
+  createConstructSignatureDeclaration(parameters: Array<ParameterDeclaration>, type: TypeDeclaration, typeParams: Array<TypeParameter>): MemberDeclaration {
+    let constructorSignature = new ConstructSignatureDeclarationProto();
+    constructorSignature.setParametersList(parameters);
+    constructorSignature.setType(type);
+    constructorSignature.setTypeparametersList(typeParams);
+
+    let memberProto = new MemberDeclarationProto();
+    memberProto.setConstructsignature(constructorSignature);
     return memberProto;
   }
 

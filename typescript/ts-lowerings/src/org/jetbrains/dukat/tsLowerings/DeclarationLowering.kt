@@ -8,6 +8,7 @@ import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
 import org.jetbrains.dukat.tsmodel.ClassLikeDeclaration
 import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
+import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.Declaration
 import org.jetbrains.dukat.tsmodel.FunctionDeclaration
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceDeclaration
@@ -58,6 +59,16 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         )
     }
 
+    fun lowerConstructSignatureDeclaration(declaration: ConstructSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): ConstructSignatureDeclaration {
+        return declaration.copy(
+            type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
+            parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
+            typeParameters = declaration.typeParameters.map { typeParameter ->
+                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
+            }
+        )
+    }
+
     fun lowerCallSignatureDeclaration(declaration: CallSignatureDeclaration, owner: NodeOwner<MemberDeclaration>?): CallSignatureDeclaration {
         return declaration.copy(
                 type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
@@ -81,6 +92,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         return when (declaration) {
             is PropertyDeclaration -> lowerPropertyDeclaration(declaration, newOwner)
             is ConstructorDeclaration -> lowerConstructorDeclaration(declaration, newOwner)
+            is ConstructSignatureDeclaration -> lowerConstructSignatureDeclaration(declaration, newOwner)
             is MethodSignatureDeclaration -> lowerMethodSignatureDeclaration(declaration, newOwner)
             is MethodDeclaration -> lowerMethodDeclaration(declaration, newOwner)
             is CallSignatureDeclaration -> lowerCallSignatureDeclaration(declaration, newOwner)
@@ -226,7 +238,10 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
                 },
                 typeParameters = declaration.typeParameters.map { typeParameter ->
                     lowerTypeParameter(typeParameter, owner.wrap(declaration))
-                }
+                },
+                staticallyInherited = declaration.staticallyInherited.map { heritageClause ->
+                    lowerHeritageClause(heritageClause, owner.wrap(declaration))
+                },
         )
     }
 
