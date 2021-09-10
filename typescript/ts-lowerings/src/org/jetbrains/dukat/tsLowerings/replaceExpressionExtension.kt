@@ -121,7 +121,7 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
     private fun ConstructSignatureDeclaration.convertToConstructorDeclaration(): ConstructorDeclaration {
         return ConstructorDeclaration(
             parameters = parameters,
-            typeParameters = emptyList(),
+            typeParameters = typeParameters,
             modifiers = emptySet(),
             body = null
         )
