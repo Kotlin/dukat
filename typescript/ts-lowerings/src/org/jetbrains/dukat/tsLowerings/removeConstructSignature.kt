@@ -18,7 +18,7 @@ private class RemoveConstructSignatureLowering : DeclarationLowering {
         owner: NodeOwner<ModuleDeclaration>?
     ): TopLevelDeclaration? {
         return super.lowerClassLikeDeclaration(
-            declaration.copy(newMembers = declaration.members.filterConstructSignatures()),
+            declaration.copy(newMembers = declaration.members.filterNotConstructSignatures()),
             owner
         )
     }
@@ -28,13 +28,13 @@ private class RemoveConstructSignatureLowering : DeclarationLowering {
         owner: NodeOwner<ParameterOwnerDeclaration>?
     ): ParameterValueDeclaration {
         return super.lowerObjectLiteralDeclaration(
-            declaration.copy(members = declaration.members.filterConstructSignatures()),
+            declaration.copy(members = declaration.members.filterNotConstructSignatures()),
             owner
         )
     }
 
-    private fun List<MemberDeclaration>.filterConstructSignatures(): List<MemberDeclaration> {
-        return filter { it !is ConstructSignatureDeclaration }
+    private fun List<MemberDeclaration>.filterNotConstructSignatures(): List<MemberDeclaration> {
+        return filterNot { it is ConstructSignatureDeclaration }
     }
 }
 

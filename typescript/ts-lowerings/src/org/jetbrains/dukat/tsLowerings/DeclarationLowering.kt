@@ -52,9 +52,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
     fun lowerConstructorDeclaration(declaration: ConstructorDeclaration, owner: NodeOwner<MemberDeclaration>?): ConstructorDeclaration {
         return declaration.copy(
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
-                typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
-                },
+                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) },
                 body = declaration.body?.let { lowerBlockStatement(it) }
         )
     }
@@ -63,9 +61,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         return declaration.copy(
             type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
             parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
-            typeParameters = declaration.typeParameters.map { typeParameter ->
-                typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
-            }
+            typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) }
         )
     }
 
@@ -73,9 +69,7 @@ interface DeclarationLowering : TopLevelDeclarationLowering, DeclarationStatemen
         return declaration.copy(
                 type = lowerParameterValue(declaration.type, owner.wrap(declaration)),
                 parameters = declaration.parameters.map { parameter -> lowerParameterDeclaration(parameter, owner.wrap(declaration)) },
-                typeParameters = declaration.typeParameters.map { typeParameter ->
-                    typeParameter.copy(constraints = typeParameter.constraints.map { constraint -> lowerParameterValue(constraint, owner.wrap(declaration)) })
-                }
+                typeParameters = declaration.typeParameters.map { typeParameter -> lowerTypeParameter(typeParameter, owner.wrap(declaration)) }
         )
     }
 

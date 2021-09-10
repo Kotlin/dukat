@@ -11,7 +11,8 @@ import {
     FunctionDeclarationProto,
     HeritageClauseDeclarationProto,
     ImportClauseDeclarationProto,
-    ImportEqualsDeclarationProto, ImportSpecifierDeclarationProto,
+    ImportEqualsDeclarationProto,
+    ImportSpecifierDeclarationProto,
     IndexSignatureDeclarationProto,
     InterfaceDeclarationProto,
     LiteralExpressionDeclarationProto,
@@ -32,7 +33,8 @@ import {
     TypeParameterDeclarationProto,
     TypeParamReferenceDeclarationProto,
     TypeReferenceDeclarationProto,
-    VariableDeclarationProto, ConstructSignatureDeclarationProto
+    VariableDeclarationProto,
+    ConstructSignatureDeclarationProto
 } from "declarations";
 import {IdentifierDeclarationProto, NameDeclarationProto} from "common_declarations";
 
