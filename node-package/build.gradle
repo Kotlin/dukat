@@ -4,13 +4,18 @@ plugins {
 
 def PROPERTY_REGISTRY = "dukat.npm.registry"
 def PROPERTY_PACKAGE = "dukat.npm.packageVersion"
+def COMMIT_HASH = "build.vcs.number"
+
+def headCommitHash = project.hasProperty(COMMIT_HASH)
+        ? project.findProperty(COMMIT_HASH).substring(0, 8)
+        : "git rev-parse --short HEAD".execute().text.trim()
 
 def DISTRIB_PATH = "${project.buildDir}/distrib"
 def TYPESCRIPT_VERSION = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 def PACKAGE_VERSION = hasProperty(PROPERTY_PACKAGE) ? getProperty(PROPERTY_PACKAGE)
                                                         .replace("__DEFAULT__", gradle.defaultNpmPackageVersion)
                                                         .replace("__TIMESTAMP__", new Date().format("yyyyMMdd"))
-                                                        .replace("__HEAD__", "git rev-parse --short HEAD".execute().text.trim())
+                                                        .replace("__HEAD__", headCommitHash)
                                                          : gradle.defaultNpmPackageVersion
 configurations {
     cliBinary
