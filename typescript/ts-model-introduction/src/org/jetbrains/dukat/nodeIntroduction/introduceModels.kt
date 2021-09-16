@@ -53,6 +53,7 @@ import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
+import org.jetbrains.dukat.stdlib.asKotlinType
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -383,7 +384,7 @@ private class DocumentConverter(
                     is TranslationContext.PROPERTY -> typeParameters.map {
                         TypeParameterModel(
                                 type = TypeValueModel(
-                                        IdentifierEntity("Any"),
+                                        "Any".asKotlinType(),
                                         emptyList(),
                                         null,
                                         null,

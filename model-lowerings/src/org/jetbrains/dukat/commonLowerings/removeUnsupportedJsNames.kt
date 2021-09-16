@@ -18,6 +18,7 @@ import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.ModelLowering
 import org.jetbrains.dukat.model.commonLowerings.ModelWithOwnerTypeLowering
 import org.jetbrains.dukat.ownerContext.NodeOwner
+import org.jetbrains.dukat.stdlib.asKotlinType
 
 private fun NameEntity.startsWith(prefix: String): Boolean {
     return when (this) {
@@ -89,7 +90,7 @@ private fun resolveCommonType(members: List<MemberModel>): TypeModel {
         if (members.all { member -> member.getType() == firstMemberType }) {
             firstType
         } else null
-    } ?: TypeValueModel(IdentifierEntity("Any"), emptyList(), null, null, true)
+    } ?: TypeValueModel("Any".asKotlinType(), emptyList(), null, null, true)
 }
 
 private fun TypeModel.makeNullable(): TypeModel {

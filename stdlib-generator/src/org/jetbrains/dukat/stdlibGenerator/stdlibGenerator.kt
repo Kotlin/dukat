@@ -34,6 +34,7 @@ import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
+import org.jetbrains.dukat.stdlib.isAny
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoots
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -235,7 +236,7 @@ private fun ClassDescriptor.extractParents(): List<HeritageModel> {
     return typeConstructor.supertypes.mapNotNull {
         val value = it.convertToTypeModel()
         if (value is TypeValueModel) {
-            if (value.value == IdentifierEntity("Any")) {
+            if (value.value.isAny()) {
                 null
             } else {
                 HeritageModel(

@@ -3,6 +3,7 @@ package org.jetbrains.dukat.nodeIntroduction
 import org.jetbrains.dukat.ast.model.nodes.metadata.IntersectionMetadata
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MetaData
+import org.jetbrains.dukat.stdlib.asKotlinType
 import org.jetbrains.dukat.tsmodel.GeneratedInterfaceReferenceDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterDeclaration
 import org.jetbrains.dukat.tsmodel.types.FunctionTypeDeclaration
@@ -101,7 +102,7 @@ fun ParameterValueDeclaration.convertToNodeNullable(metaData: MetaData? = null):
     }
 }
 
-private val TYPE_ANY = TypeDeclaration(IdentifierEntity("Any"), emptyList(), null, false)
+private val TYPE_ANY = TypeDeclaration("Any".asKotlinType(), emptyList(), null, false)
 
 fun ParameterValueDeclaration.convertToNode(meta: MetaData? = null): ParameterValueDeclaration {
     return convertToNodeNullable(meta) ?: TYPE_ANY

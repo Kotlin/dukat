@@ -36,8 +36,7 @@ private fun TypeDeclaration.isPrimitive(primitive: String): Boolean {
     }
 }
 
-
-private class PrimitivesLowering : DeclarationLowering {
+private class PrimitivesLowering(val localCollisions: LocalCollisions) : DeclarationLowering {
     override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
         if (declaration.value == IdentifierEntity("Function")) {
             return declaration.copy(params = listOf(TypeDeclaration(IdentifierEntity("*"), emptyList())))
@@ -56,7 +55,7 @@ private class PrimitivesLowering : DeclarationLowering {
         }
 
         return declaration.copy(
-                value = value,
+                value = localCollisions.escapeCollisionFor(value),
                 params = declaration.params.map { lowerParameterValue(it, owner.wrap(declaration)) },
                 typeReference = if (value != declaration.value) {
                     null
@@ -69,16 +68,22 @@ private class PrimitivesLowering : DeclarationLowering {
     }
 }
 
-private fun ModuleDeclaration.lowerPrimitives(): ModuleDeclaration {
-    return PrimitivesLowering().lowerSourceDeclaration(this)
+private fun ModuleDeclaration.lowerPrimitives(localCollisions: LocalCollisions): ModuleDeclaration {
+    return PrimitivesLowering(localCollisions).lowerSourceDeclaration(this)
 }
 
-private fun SourceSetDeclaration.lowerPrimitives(): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = it.root.lowerPrimitives()) })
+private fun SourceSetDeclaration.lowerPrimitives(globalCollisions: CollisionMap): SourceSetDeclaration {
+    return copy(sources = sources.map {
+        val localCollisions = globalCollisions.getCollisionsForTheFile(it.root)
+        it.copy(root = it.root.lowerPrimitives(localCollisions))
+    })
 }
 
 class LowerPrimitives : TsLowering {
+    private val globalCollisions: CollisionMap = mutableMapOf()
+
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
-        return source.lowerPrimitives()
+        source.collectionCollisionsWithStdlib(globalCollisions)
+        return source.lowerPrimitives(globalCollisions)
     }
 }

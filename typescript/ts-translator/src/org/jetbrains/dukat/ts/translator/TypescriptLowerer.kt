@@ -78,7 +78,6 @@ open class TypescriptLowerer(
                         ResolveTypescriptUtilityTypes(),
                         ResolveDefaultTypeParams(),
                         ConvertKeyOfsAndLookups(),
-                        LowerPrimitives(),
                         GenerateInterfaceReferences(),
                         FixImpossibleInheritance(),
                         LowerPartialOf(),
@@ -91,6 +90,7 @@ open class TypescriptLowerer(
                         ProcessOptionalMethods(),
                         ProcessForOfStatements(),
                         ProcessNullabilityChecks(),
+                        LowerPrimitives(),
                         EscapeLiterals(),
                         MoveIllegalAliases()
                 )

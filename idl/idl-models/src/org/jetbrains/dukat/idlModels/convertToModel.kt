@@ -74,6 +74,8 @@ import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
 import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isAny
+import org.jetbrains.dukat.stdlib.isDynamic
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
@@ -182,9 +184,9 @@ private class IdlFileConverter(
         )
 
         return typeModel.copy(
-                nullable = when (typeModel.value) {
-                    IdentifierEntity("dynamic") -> false
-                    IdentifierEntity("Any") -> true
+                nullable = when {
+                    typeModel.value.isDynamic() -> false
+                    typeModel.value.isAny() -> true
                     else -> nullable
                 }
         )

@@ -19,6 +19,9 @@ import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.toposort.Graph
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.asKotlinType
+import org.jetbrains.dukat.stdlib.isAny
+import org.jetbrains.dukat.stdlib.isNumber
 import org.jetbrains.dukat.stdlibGenerator.generated.stdlibClassMethodsMap
 
 private data class MemberData(val fqName: NameEntity?, val memberModel: MemberModel, val ownerModel: ClassLikeModel)
@@ -148,7 +151,7 @@ private class ClassLikeOverrideResolver(
                         it.ownerModel
                     )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
                 }?.filterIrrelevantParentMembers()?.mapNotNull { it.fqName }?.distinct() ?: if (isSpecialCase()) {
-                    parents.ifEmpty { listOf(IdentifierEntity("Any")) }
+                    parents.ifEmpty { listOf("Any".asKotlinType()) }
                 } else null
 
                 when {
@@ -291,13 +294,13 @@ private class ClassLikeOverrideResolver(
 
         if (name == IdentifierEntity("equals") && parameters.size == 1) {
             val firstParameterType = parameters[0].type
-            if (firstParameterType is TypeValueModel && firstParameterType.value == IdentifierEntity("Any") && firstParameterType.nullable) {
+            if (firstParameterType is TypeValueModel && firstParameterType.value.isAny() && firstParameterType.nullable) {
                 return true
             }
         }
 
-        if (name == IdentifierEntity("hashCode") && parameters.isEmpty() &&
-                returnType is TypeValueModel && returnType.value == IdentifierEntity("Number")) {
+        if (name == IdentifierEntity("hashCode") && parameters.isEmpty() &&t
+                returnType is TypeValueModel && returnType.value.isNumber()) {
             return true
         }
 

@@ -18,9 +18,11 @@ import org.jetbrains.dukat.astModel.TypeParameterReferenceModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 import org.jetbrains.dukat.stdlib.KLIBROOT
+import org.jetbrains.dukat.stdlib.isAny
+import org.jetbrains.dukat.stdlib.isDynamic
 
 private fun TypeModel.isAny(): Boolean {
-    return this is TypeValueModel && value == IdentifierEntity("Any")
+    return this is TypeValueModel && value.isAny()
 }
 
 internal class OverrideTypeChecker(
@@ -31,7 +33,7 @@ internal class OverrideTypeChecker(
 ) {
 
     private fun TypeModel.isDynamic(): Boolean {
-        return (this is TypeValueModel && value == IdentifierEntity("dynamic"))
+        return this is TypeValueModel && value.isDynamic()
     }
 
     private fun TypeModel.resolveAsTypeParam(): TypeParameterModel? {

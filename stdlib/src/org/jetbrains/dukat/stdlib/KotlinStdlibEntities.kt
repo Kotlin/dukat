@@ -1,9 +1,6 @@
 package org.jetbrains.dukat.stdlib
 
-import org.jetbrains.dukat.astCommon.IdentifierEntity
-import org.jetbrains.dukat.astCommon.NameEntity
-import org.jetbrains.dukat.astCommon.leftMost
-import org.jetbrains.dukat.astCommon.rightMost
+import org.jetbrains.dukat.astCommon.*
 
 val KotlinStdlibEntities = setOf(
         IdentifierEntity("Any"),
@@ -554,4 +551,25 @@ val KotlinBuiltInEntities = setOf(
 fun isStdLibEntity(fqName: NameEntity): Boolean {
     val isLib = fqName.isTsStdlibPrefixed() || fqName.isKotlinStdlibPrefixed()
     return isLib && KotlinStdlibEntities.contains(fqName.rightMost())
+}
+
+
+fun NameEntity.isKotlinType(fqName: NameEntity): Boolean {
+    return equals(fqName) || (fqName.isKotlinStdlibPrefixed() && equals(fqName.rightMost()))
+}
+
+fun NameEntity.isAny(): Boolean {
+    return isKotlinType(IdentifierEntity("Any"))
+}
+
+fun NameEntity.isDynamic(): Boolean {
+    return isKotlinType(IdentifierEntity("dynamic"))
+}
+
+fun NameEntity.isNumber(): Boolean {
+    return isKotlinType(IdentifierEntity("Number"))
+}
+
+fun String.asKotlinType(): NameEntity {
+    return QualifierEntity(KLIBROOT, IdentifierEntity(this))
 }
