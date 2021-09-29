@@ -10,5 +10,6 @@ dependencies {
     implementation(project(":ts-model"))
     implementation(project(":toposort"))
     implementation(project(":panic"))
-
+    implementation(project(":stdlib"))
+    implementation(project(":model-lowerings-common"))
 }

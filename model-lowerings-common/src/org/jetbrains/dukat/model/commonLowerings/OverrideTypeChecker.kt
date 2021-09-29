@@ -24,8 +24,7 @@ private fun TypeModel.isAny(): Boolean {
 }
 
 internal class OverrideTypeChecker(
-    private val context: ModelContext,
-    private val inheritanceContext: InheritanceContext,
+    private val translationContext: TranslationContext,
     private val declaration: ClassLikeModel,
     private val parent: ClassLikeModel
 ) {
@@ -53,8 +52,8 @@ internal class OverrideTypeChecker(
     }
 
     private fun TypeValueModel.isEquivalent(modelB: TypeValueModel): Boolean {
-        val a = context.unalias(this)
-        val b = context.unalias(modelB)
+        val a = translationContext.modelContext.unalias(this)
+        val b = translationContext.modelContext.unalias(modelB)
 
         return if ((a is TypeValueModel) && (b is TypeValueModel)) {
             a.namesAreEquivalent(b) && typeParamsAreEquivalent(a.params, b.params) && a.nullable == b.nullable
@@ -94,7 +93,7 @@ internal class OverrideTypeChecker(
                 val classLikeB = b.type.resolveClassLike()
 
                 if (classLikeA != null && classLikeB != null) {
-                    inheritanceContext.areRelated(classLikeA.classLike, classLikeB.classLike)
+                    translationContext.inheritanceContext.areRelated(classLikeA.classLike, classLikeB.classLike)
                 } else {
                     val aType = a.type.normalize()
                     val bType = b.type.normalize()
@@ -124,7 +123,7 @@ internal class OverrideTypeChecker(
     }
 
     private fun TypeValueModel.resolveClassLike(): ResolvedClassLike<out ClassLikeModel>? {
-        return context.resolve(this.fqName)
+        return translationContext.modelContext.resolve(this.fqName)
     }
 
     private fun CallableModel<*>.isOverriding(otherCallableModel: CallableModel<*>): MemberOverrideStatus {
@@ -181,7 +180,7 @@ internal class OverrideTypeChecker(
                 val isSameClass = classLikeA === classLikeB
 
                 if (params.isEmpty() && otherParameterType.params.isEmpty()) {
-                    if (isSameClass || inheritanceContext.isDescendant(classLikeA, classLikeB)) {
+                    if (isSameClass || translationContext.inheritanceContext.isDescendant(classLikeA, classLikeB)) {
                         return true
                     }
                 } else if (params.size == otherParameterType.params.size) {
@@ -189,7 +188,7 @@ internal class OverrideTypeChecker(
                         return params.zip(otherParameterType.params).all { (paramA, paramB) ->
                             paramA.type.isOverridingReturnType(paramB.type, this)
                         }
-                    } else if (inheritanceContext.isDescendant(classLikeA, classLikeB)) {
+                    } else if (translationContext.inheritanceContext.isDescendant(classLikeA, classLikeB)) {
                         return params.zip(otherParameterType.params).all { (paramA, paramB) ->
                             paramA.type.isEquivalent(paramB.type)
                         }
@@ -248,7 +247,7 @@ internal class OverrideTypeChecker(
             val classLikeA = type.resolveClassLike()?.classLike
             val classLikeB = otherPropertyModel.type.resolveClassLike()?.classLike
 
-            return ((classLikeA != null) && (classLikeA === classLikeB)) || inheritanceContext.isDescendant(declaration, classLikeB)
+            return ((classLikeA != null) && (classLikeA === classLikeB)) || translationContext.inheritanceContext.isDescendant(declaration, classLikeB)
         }
         return (!type.nullable && otherPropertyModel.type.nullable)
     }

@@ -17,18 +17,7 @@ import org.jetbrains.dukat.commonLowerings.SubstituteTsStdLibEntities
 import org.jetbrains.dukat.commonLowerings.RemoveInitializersFromExternals
 import org.jetbrains.dukat.commonLowerings.merge.MergeClassLikesAndModuleDeclarations
 import org.jetbrains.dukat.commonLowerings.merge.MergeVarsAndInterfaces
-import org.jetbrains.dukat.model.commonLowerings.AddStandardImportsAndAnnotations
-import org.jetbrains.dukat.model.commonLowerings.CorrectStdLibTypes
-import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
-import org.jetbrains.dukat.model.commonLowerings.IntroduceAmbiguousInterfaceMembers
-import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
-import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
-import org.jetbrains.dukat.model.commonLowerings.RearrangeConstructors
-import org.jetbrains.dukat.model.commonLowerings.RemoveConflictingOverloads
-import org.jetbrains.dukat.model.commonLowerings.RemoveKotlinBuiltIns
-import org.jetbrains.dukat.model.commonLowerings.RemoveRedundantTypeParams
-import org.jetbrains.dukat.model.commonLowerings.ResolveOverloadResolutionAmbiguity
-import org.jetbrains.dukat.model.commonLowerings.lower
+import org.jetbrains.dukat.model.commonLowerings.*
 import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.nodeIntroduction.introduceModels
 import org.jetbrains.dukat.tsLowerings.ConvertKeyOfsAndLookups
@@ -57,6 +46,7 @@ import org.jetbrains.dukat.tsLowerings.ResolveLoops
 import org.jetbrains.dukat.tsLowerings.ResolveTypeAliases
 import org.jetbrains.dukat.tsLowerings.ResolveTypescriptUtilityTypes
 import org.jetbrains.dukat.tsLowerings.SpecifyUnionType
+import org.jetbrains.dukat.tsLowerings.CollectKotlinStdlibCollision
 import org.jetbrains.dukat.tsLowerings.lower
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
 
@@ -64,8 +54,9 @@ open class TypescriptLowerer(
         private val moduleNameResolver: ModuleNameResolver,
         private val packageName: NameEntity?,
         private val addSuppressAnnotations: Boolean,
-        private val kotlinStdLib: SourceSetModel? = null
+        private val kotlinStdLib: SourceSetModel? = null,
 ) : ECMAScriptLowerer {
+    private val translationContext: TranslationContext = TranslationContext()
 
     override fun lower(sourceSet: SourceSetDeclaration): SourceSetModel {
         val declarations = sourceSet
@@ -82,7 +73,8 @@ open class TypescriptLowerer(
                         ResolveTypescriptUtilityTypes(),
                         ResolveDefaultTypeParams(),
                         ConvertKeyOfsAndLookups(),
-                        LowerPrimitives(),
+                        CollectKotlinStdlibCollision(translationContext),
+                        LowerPrimitives(translationContext),
                         GenerateInterfaceReferences(),
                         FixImpossibleInheritance(),
                         LowerPartialOf(),
@@ -113,13 +105,9 @@ open class TypescriptLowerer(
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         ExtractNestedInheritedInterfaces(),
-                        ModelContextAwareLowering()
-                                .lower { context, inheritanceContext ->
-                                    IntroduceAmbiguousInterfaceMembers(context, inheritanceContext)
-                                }
-                                .lower { context, inheritanceContext ->
-                                    LowerOverrides(context, inheritanceContext)
-                                },
+                        ModelContextAwareLowering(translationContext),
+                        IntroduceAmbiguousInterfaceMembers(translationContext),
+                        LowerOverrides(translationContext),
                         AddExplicitGettersAndSetters(),
                         AnyfyUnresolvedTypes(),
                         RemoveKotlinBuiltIns(),
