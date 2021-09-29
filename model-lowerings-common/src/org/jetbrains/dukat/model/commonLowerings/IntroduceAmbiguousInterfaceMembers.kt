@@ -8,7 +8,7 @@ import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.model.commonLowerings.overrides.InheritanceContext
 import org.jetbrains.dukat.ownerContext.NodeOwner
 
-private class AmbiguousInterfaceLowering(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelWithOwnerTypeLowering {
+private class AmbiguousInterfaceLowering(private val translationContext: TranslationContext) : ModelWithOwnerTypeLowering {
 
     private fun MemberModel.asKey(): NameEntity? {
         return when (this) {
@@ -19,7 +19,7 @@ private class AmbiguousInterfaceLowering(private val modelContext: ModelContext,
 
     override fun lowerInterfaceModel(ownerContext: NodeOwner<InterfaceModel>, parentModule: ModuleModel): InterfaceModel {
         val node = ownerContext.node
-        val parents = modelContext.getParents(node)
+        val parents = translationContext.modelContext.getParents(node)
 
         if (parents.size < 2) {
             return super.lowerInterfaceModel(ownerContext, parentModule)
@@ -40,8 +40,8 @@ private class AmbiguousInterfaceLowering(private val modelContext: ModelContext,
     }
 }
 
-class IntroduceAmbiguousInterfaceMembers(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelLowering {
+class IntroduceAmbiguousInterfaceMembers(private val translationContext: TranslationContext) : ModelLowering {
     override fun lower(module: ModuleModel): ModuleModel {
-        return AmbiguousInterfaceLowering(modelContext, inheritanceContext).lowerRoot(module, NodeOwner(module, null))
+        return AmbiguousInterfaceLowering(translationContext).lowerRoot(module, NodeOwner(module, null))
     }
 }

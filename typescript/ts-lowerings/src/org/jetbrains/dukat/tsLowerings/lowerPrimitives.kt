@@ -2,6 +2,9 @@ package org.jetbrains.dukat.tsLowerings
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astCommon.QualifierEntity
+import org.jetbrains.dukat.model.commonLowerings.LocalCollisions
+import org.jetbrains.dukat.model.commonLowerings.TranslationContext
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
@@ -37,8 +40,11 @@ private fun TypeDeclaration.isPrimitive(primitive: String): Boolean {
 }
 
 
-private class PrimitivesLowering : DeclarationLowering {
-    override fun lowerTypeDeclaration(declaration: TypeDeclaration, owner: NodeOwner<ParameterOwnerDeclaration>?): TypeDeclaration {
+private class PrimitivesLowering(private val localCollisions: LocalCollisions) : DeclarationLowering {
+    override fun lowerTypeDeclaration(
+        declaration: TypeDeclaration,
+        owner: NodeOwner<ParameterOwnerDeclaration>?
+    ): TypeDeclaration {
         if (declaration.value == IdentifierEntity("Function")) {
             return declaration.copy(params = listOf(TypeDeclaration(IdentifierEntity("*"), emptyList())))
         }
@@ -56,29 +62,40 @@ private class PrimitivesLowering : DeclarationLowering {
         }
 
         return declaration.copy(
-                value = value,
-                params = declaration.params.map { lowerParameterValue(it, owner.wrap(declaration)) },
-                typeReference = if (value != declaration.value) {
-                    null
-                } else {
-                    declaration.typeReference
-                },
-                nullable = nullable,
-                meta = meta
+            value = value.escapeCollisionIn(localCollisions),
+            params = declaration.params.map { lowerParameterValue(it, owner.wrap(declaration)) },
+            typeReference = if (value != declaration.value) {
+                null
+            } else {
+                declaration.typeReference
+            },
+            nullable = nullable,
+            meta = meta
         )
+    }
+
+    private fun NameEntity.escapeCollisionIn(localCollisions: LocalCollisions): NameEntity {
+        return if (this is IdentifierEntity && localCollisions.contains(value)) {
+            QualifierEntity(IdentifierEntity("kotlin"), this)
+        } else {
+            this
+        }
     }
 }
 
-private fun ModuleDeclaration.lowerPrimitives(): ModuleDeclaration {
-    return PrimitivesLowering().lowerSourceDeclaration(this)
+private fun ModuleDeclaration.lowerPrimitives(localCollisions: LocalCollisions): ModuleDeclaration {
+    return PrimitivesLowering(localCollisions).lowerSourceDeclaration(this)
 }
 
-private fun SourceSetDeclaration.lowerPrimitives(): SourceSetDeclaration {
-    return copy(sources = sources.map { it.copy(root = it.root.lowerPrimitives()) })
+private fun SourceSetDeclaration.lowerPrimitives(translationContext: TranslationContext): SourceSetDeclaration {
+    return copy(sources = sources.map {
+        val localCollisions = translationContext.collisionContext.getCollisionsForTheFile(it.root.uid)
+        it.copy(root = it.root.lowerPrimitives(localCollisions))
+    })
 }
 
-class LowerPrimitives : TsLowering {
+class LowerPrimitives(private val translationContext: TranslationContext) : TsLowering {
     override fun lower(source: SourceSetDeclaration): SourceSetDeclaration {
-        return source.lowerPrimitives()
+        return source.lowerPrimitives(translationContext)
     }
 }

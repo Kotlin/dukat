@@ -49,8 +49,7 @@ private fun <T : ClassLikeModel> ResolvedClassLike<T>.existsOnlyInTsStdlib(membe
 }
 
 private class ClassLikeOverrideResolver(
-        private val context: ModelContext,
-        private val inheritanceContext: InheritanceContext,
+        private val translationContext: TranslationContext,
         private val classLike: ClassLikeModel
 ) {
 
@@ -109,7 +108,7 @@ private class ClassLikeOverrideResolver(
     }
 
     private fun ClassLikeModel.getKnownParents(): List<ResolvedClassLike<out ClassLikeModel>> {
-        return context.getAllParents(this)
+        return translationContext.modelContext.getAllParents(this)
     }
 
     private fun MethodModel.removeDefaultParamValues(override: List<NameEntity>?): MethodModel {
@@ -131,8 +130,7 @@ private class ClassLikeOverrideResolver(
                     if (parentModel is PropertyModel) {
                         val parentModelToMethod = parentModel.toMethod()
                         (parentModelToMethod != null) && (with(OverrideTypeChecker(
-                            context,
-                            inheritanceContext,
+                            translationContext,
                             classLike,
                             it.ownerModel
                         )) { isOverriding(parentModelToMethod) } == MemberOverrideStatus.IS_OVERRIDE)
@@ -143,8 +141,7 @@ private class ClassLikeOverrideResolver(
 
                 val overridden = allSuperDeclarations[name]?.filter {
                     (it.memberModel is MethodModel) && (with(OverrideTypeChecker(
-                        context,
-                        inheritanceContext,
+                        translationContext,
                         classLike,
                         it.ownerModel
                     )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
@@ -162,8 +159,7 @@ private class ClassLikeOverrideResolver(
                     else -> {
                         val related = allSuperDeclarations[name]?.filter {
                             (it.memberModel is MethodModel) && (with(OverrideTypeChecker(
-                                context,
-                                inheritanceContext,
+                                translationContext,
                                 classLike,
                                 it.ownerModel
                             )) { isOverriding(it.memberModel) } == MemberOverrideStatus.IS_RELATED)
@@ -187,8 +183,7 @@ private class ClassLikeOverrideResolver(
                     allSuperDeclarations[name]?.filter { parent ->
                         (parent.memberModel is MethodModel) &&
                                 (with(OverrideTypeChecker(
-                                    context,
-                                    inheritanceContext,
+                                    translationContext,
                                     classLike,
                                     parent.ownerModel
                                 )) { method.isOverriding(parent.memberModel) } == MemberOverrideStatus.IS_OVERRIDE)
@@ -196,8 +191,7 @@ private class ClassLikeOverrideResolver(
                 }
 
                 val overrideData = allSuperDeclarations[name]?.asSequence()?.map { Pair(it, with(OverrideTypeChecker(
-                    context,
-                    inheritanceContext,
+                    translationContext,
                     classLike,
                     it.ownerModel
                 )) { isOverriding(it.memberModel) }) }?.filter { (_, status) ->
@@ -213,8 +207,7 @@ private class ClassLikeOverrideResolver(
                             MemberOverrideStatus.IS_OVERRIDE -> {
                                 if (with(
                                         OverrideTypeChecker(
-                                            context,
-                                            inheritanceContext,
+                                            translationContext,
                                             classLike,
                                             method.ownerModel
                                         )
@@ -244,7 +237,7 @@ private class ClassLikeOverrideResolver(
                     }
                 }
             }
-            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(context, inheritanceContext, this).resolve())
+            is ClassLikeModel -> listOf(ClassLikeOverrideResolver(translationContext, this).resolve())
             else -> listOf(this)
         }
     }
@@ -260,10 +253,10 @@ private class ClassLikeOverrideResolver(
     private fun MemberData.isRelevantParentMember(otherMembers: List<MemberData>): Boolean {
         return when (memberModel) {
             is PropertyModel -> otherMembers.none { other ->
-                other.memberModel is PropertyModel && inheritanceContext.isDescendant(other.ownerModel, ownerModel)
+                other.memberModel is PropertyModel && translationContext.inheritanceContext.isDescendant(other.ownerModel, ownerModel)
             }
             is MethodModel -> otherMembers.none { other ->
-                other.memberModel is MethodModel && inheritanceContext.isDescendant(other.ownerModel, ownerModel)
+                other.memberModel is MethodModel && translationContext.inheritanceContext.isDescendant(other.ownerModel, ownerModel)
             }
             else -> true
         }
@@ -313,7 +306,7 @@ private class ClassLikeOverrideResolver(
         val parentMembers = classLike.allParentMembers()
 
         val membersLowered = classLike.members.flatMap { member ->
-            member.lowerOverrides(parentMembers, context.getParents(classLike).mapNotNull { it.fqName })
+            member.lowerOverrides(parentMembers, translationContext.modelContext.getParents(classLike).mapNotNull { it.fqName })
         }
 
         val companionObject = classLike.companionObject?.let {
@@ -330,11 +323,11 @@ private class ClassLikeOverrideResolver(
 
 }
 
-private class OverrideResolver(private val context: ModelContext, private val inheritanceContext: InheritanceContext) {
+private class OverrideResolver(private val translationContext: TranslationContext) {
     fun lowerOverrides(moduleModel: ModuleModel): ModuleModel {
         val loweredDeclarations = moduleModel.declarations.map { declaration ->
             when (declaration) {
-                is ClassLikeModel -> ClassLikeOverrideResolver(context, inheritanceContext, declaration).resolve()
+                is ClassLikeModel -> ClassLikeOverrideResolver(translationContext, declaration).resolve()
                 else -> {
                     declaration
                 }
@@ -345,9 +338,9 @@ private class OverrideResolver(private val context: ModelContext, private val in
     }
 }
 
-class LowerOverrides(private val modelContext: ModelContext, private val inheritanceContext: InheritanceContext) : ModelLowering {
+class LowerOverrides(private val translationContext: TranslationContext) : ModelLowering {
 
     override fun lower(module: ModuleModel): ModuleModel {
-        return OverrideResolver(modelContext, inheritanceContext).lowerOverrides(module)
+        return OverrideResolver(translationContext).lowerOverrides(module)
     }
 }

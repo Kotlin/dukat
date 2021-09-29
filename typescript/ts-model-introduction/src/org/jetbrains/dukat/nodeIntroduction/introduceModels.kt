@@ -53,6 +53,7 @@ import org.jetbrains.dukat.moduleNameResolver.ModuleNameResolver
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.stdlib.KotlinStdlibEntities
+import org.jetbrains.dukat.stdlib.isKotlinStdlibPrefixed
 import org.jetbrains.dukat.translatorString.translate
 import org.jetbrains.dukat.tsmodel.CallSignatureDeclaration
 import org.jetbrains.dukat.tsmodel.ClassDeclaration
@@ -256,7 +257,15 @@ private class DocumentConverter(
     private fun TypeAliasDeclaration.isRedundant(typeResolved: TypeModel): Boolean {
         return typeResolved is TypeValueModel &&
                 typeResolved.params.isEmpty() && typeParameters.isEmpty() && !typeResolved.nullable &&
-                typeResolved.value == aliasName
+                typeResolved.value.asKotlinTypeRef() == aliasName
+    }
+
+    private fun NameEntity.asKotlinTypeRef(): NameEntity {
+       return if (isKotlinStdlibPrefixed()) {
+           rightMost()
+       } else {
+           this
+       }
     }
 
     private fun ReferenceEntity.getFqName(): NameEntity? {

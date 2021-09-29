@@ -22,6 +22,7 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.convertToModel
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
+import org.jetbrains.dukat.model.commonLowerings.TranslationContext
 import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
 import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
 import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
@@ -35,6 +36,7 @@ private fun alwaysPublic(): VisibilityModifierResolver = object : VisibilityModi
 }
 
 class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : InputTranslator<String> {
+    private val translationContext: TranslationContext = TranslationContext()
 
     fun translateSet(fileName: String): SourceSetModel {
         return parseIDL(fileName, nameResolver)
@@ -52,10 +54,8 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : Inpu
                 .addOverloadsForCallbacks()
                 .convertToModel()
                 .lower(
-                        ModelContextAwareLowering()
-                                .lower { context, inheritanceContext ->
-                                    LowerOverrides(context, inheritanceContext)
-                                },
+                        ModelContextAwareLowering(translationContext),
+                        LowerOverrides(translationContext),
                         EscapeIdentificators(),
                         AddExplicitGettersAndSetters()
                 )

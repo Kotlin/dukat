@@ -179,14 +179,14 @@ private fun translateLambdaParameters(parameters: List<LambdaParameterModel>): S
 fun TypeModel.translate(): String {
     return when (this) {
         is TypeParameterReferenceModel -> {
-            val res = mutableListOf(name.translate())
+            val res = mutableListOf(name.translate(false))
             if (nullable) {
                 res.add("?")
             }
             res.joinToString("")
         }
         is TypeValueModel -> {
-            val res = mutableListOf(value.translate())
+            val res = mutableListOf(value.translate(false))
             if (isGeneric()) {
                 res.add(translateTypeParameters(params))
             }

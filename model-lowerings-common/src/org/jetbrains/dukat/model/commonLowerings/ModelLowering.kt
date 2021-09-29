@@ -12,14 +12,6 @@ interface ModelLowering : Lowering<SourceSetModel, SourceSetModel> {
     }
 }
 
-interface ComposableModelLowering : Lowering<SourceSetModel, SourceSetModel> {
-    val lowerings: List<ModelLowering>
-
-    override fun lower(source: SourceSetModel): SourceSetModel {
-        return lowerings.fold(source) { m, lowering -> lowering.lower(m)  }
-    }
-}
-
 fun SourceSetModel.lower(vararg lowerings: Lowering<SourceSetModel, SourceSetModel>): SourceSetModel {
     return lowerings.fold(this) { sourceSet, lowering -> lowering.lower(sourceSet) }
 }
