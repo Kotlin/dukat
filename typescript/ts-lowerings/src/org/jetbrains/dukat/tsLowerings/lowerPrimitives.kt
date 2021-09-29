@@ -7,6 +7,7 @@ import org.jetbrains.dukat.model.commonLowerings.LocalCollisions
 import org.jetbrains.dukat.model.commonLowerings.TranslationContext
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
+import org.jetbrains.dukat.stdlib.KLIBROOT
 import org.jetbrains.dukat.tsmodel.ModuleDeclaration
 import org.jetbrains.dukat.tsmodel.ParameterOwnerDeclaration
 import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
@@ -76,7 +77,7 @@ private class PrimitivesLowering(private val localCollisions: LocalCollisions) :
 
     private fun NameEntity.escapeCollisionIn(localCollisions: LocalCollisions): NameEntity {
         return if (this is IdentifierEntity && localCollisions.contains(value)) {
-            QualifierEntity(IdentifierEntity("kotlin"), this)
+            QualifierEntity(KLIBROOT, this)
         } else {
             this
         }
