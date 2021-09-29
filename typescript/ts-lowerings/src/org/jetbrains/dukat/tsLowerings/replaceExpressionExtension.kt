@@ -3,21 +3,12 @@ package org.jetbrains.dukat.tsLowerings
 import TopLevelDeclarationLowering
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.ownerContext.NodeOwner
-import org.jetbrains.dukat.tsmodel.ClassDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructorDeclaration
-import org.jetbrains.dukat.tsmodel.ConstructSignatureDeclaration
-import org.jetbrains.dukat.tsmodel.DefinitionInfoDeclaration
-import org.jetbrains.dukat.tsmodel.InterfaceDeclaration
-import org.jetbrains.dukat.tsmodel.HeritageClauseDeclaration
-import org.jetbrains.dukat.tsmodel.ModifierDeclaration
-import org.jetbrains.dukat.tsmodel.ModuleDeclaration
-import org.jetbrains.dukat.tsmodel.SourceSetDeclaration
-import org.jetbrains.dukat.tsmodel.TopLevelDeclaration
-import org.jetbrains.dukat.tsmodel.VariableDeclaration
+import org.jetbrains.dukat.tsmodel.*
 import org.jetbrains.dukat.tsmodel.types.ParameterValueDeclaration
 import org.jetbrains.dukat.tsmodel.types.TypeDeclaration
 
-private class ReplaceExpressionExtensionLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver) : TopLevelDeclarationLowering {
+private class ReplaceExpressionExtensionLowering(private val topLevelDeclarationResolver: TopLevelDeclarationResolver) :
+    TopLevelDeclarationLowering {
     override fun lowerTopLevelDeclaration(
         declaration: TopLevelDeclaration,
         owner: NodeOwner<ModuleDeclaration>?
@@ -29,22 +20,22 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
     }
 
     private fun VariableDeclaration.tryLowerToClassDeclaration(owner: NodeOwner<ModuleDeclaration>?): TopLevelDeclaration? {
-        val topLevelDeclaration = type.getTopLevelDeclaration()
-        val constructorSignatureDeclarations = topLevelDeclaration.findAllConstructSignatureDeclarations()
+        val typeDeclaration = type.getTopLevelDeclaration()
+        val constructorSignatureDeclarations = typeDeclaration.findAllConstructSignatureDeclarations()
 
         if (constructorSignatureDeclarations.isEmpty()) {
             return super.lowerVariableDeclaration(this, owner)
         }
 
-        val typeParameters = type.getTypeParameters()
-        val appliedTypeParameters = topLevelDeclaration.getAppliedTypeParametersMap(typeParameters)
-
         val classDeclaration = createClassWith(
             uid = uid,
             name = name,
             owner = owner,
-            constructSignatures = constructorSignatureDeclarations.applyTypeParameters(appliedTypeParameters),
-            staticallyInheritedFrom = type as? TypeDeclaration
+            staticallyInheritedFrom = type as? TypeDeclaration,
+            constructSignatures = constructorSignatureDeclarations.replaceTypeVariablesWith(
+                exactTypes = type.getTypeParameters(),
+                typeDeclaration = typeDeclaration
+            ),
         )
 
         return super.lowerClassDeclaration(classDeclaration, owner);
@@ -63,6 +54,15 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
             ?: emptyList()
     }
 
+    private fun List<ConstructSignatureDeclaration>.replaceTypeVariablesWith(
+        exactTypes: List<ParameterValueDeclaration>,
+        typeDeclaration: TopLevelDeclaration?
+    ): List<ConstructSignatureDeclaration> {
+        val appliedTypeParameters = typeDeclaration.getAppliedTypeParametersMap(exactTypes)
+        val typeParametersResolver = ApplyTypeParameters(appliedTypeParameters)
+        return map { typeParametersResolver.lowerConstructSignatureDeclaration(it, null) }
+    }
+
     private fun TopLevelDeclaration?.getAppliedTypeParametersMap(typeParameters: List<ParameterValueDeclaration>): TypeMapping {
         val interfaceDeclaration = this as? InterfaceDeclaration ?: return emptyMap()
         return interfaceDeclaration.typeParameters.withIndex().associate { (index, type) ->
@@ -73,11 +73,6 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
 
             type.name to resolvedType!!
         }
-    }
-
-    private fun List<ConstructSignatureDeclaration>.applyTypeParameters(typeMapping: TypeMapping): List<ConstructSignatureDeclaration> {
-        val typeParametersResolver = ApplyTypeParameters(typeMapping)
-        return map { typeParametersResolver.lowerConstructSignatureDeclaration(it, null) }
     }
 
     private fun createClassWith(
@@ -93,14 +88,17 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
         val parentEntities = constructSignatures.map { it.generateHeritageClauseDeclaration() }
         val staticallyInherited = staticallyInheritedFrom?.generateHeritageClauseDeclaration()
 
+        val overriddenInstanceMembers = parentEntities.flatMap { it.getOverriddenMembers() }
+        val overriddenStaticMembers = staticallyInherited?.getOverriddenMembers() ?: emptyList()
+
         return ClassDeclaration(
             uid = uid,
             name = IdentifierEntity(name),
-            members = constructorDeclarations,
-            typeParameters = genericConstructor?.typeParameters ?: emptyList(),
             parentEntities = parentEntities,
             modifiers = setOf(ModifierDeclaration.DECLARE_KEYWORD),
+            typeParameters = genericConstructor?.typeParameters ?: emptyList(),
             staticallyInherited = staticallyInherited?.let { listOf(it) } ?: emptyList(),
+            members = constructorDeclarations + overriddenInstanceMembers + overriddenStaticMembers,
             definitionsInfo = listOf(DefinitionInfoDeclaration(uid, owner?.node?.sourceName ?: "")),
         )
     }
@@ -110,12 +108,12 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
     }
 
     private fun TypeDeclaration?.generateHeritageClauseDeclaration(): HeritageClauseDeclaration {
-       return HeritageClauseDeclaration(
-           extending = false,
-           name = this?.value ?: IdentifierEntity(""),
-           typeArguments = this?.params ?: emptyList(),
-           typeReference = this?.typeReference
-       )
+        return HeritageClauseDeclaration(
+            extending = false,
+            name = this?.value ?: IdentifierEntity(""),
+            typeArguments = this?.params ?: emptyList(),
+            typeReference = this?.typeReference
+        )
     }
 
     private fun ConstructSignatureDeclaration.convertToConstructorDeclaration(): ConstructorDeclaration {
@@ -127,6 +125,12 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
         )
     }
 
+    private fun HeritageClauseDeclaration.getOverriddenMembers(): List<MemberDeclaration> {
+        return when (val typeDeclaration = topLevelDeclarationResolver.resolve(typeReference)) {
+            is ClassLikeDeclaration -> typeDeclaration.members + typeDeclaration.parentEntities.flatMap { it.getOverriddenMembers() }
+            else -> emptyList()
+        }
+    }
 }
 
 class ReplaceExpressionExtension : TsLowering {
