@@ -64,6 +64,7 @@ interface TopLevelModelLowering : ModelStatementLowering, ModelLowering {
         return when (val declaration = ownerContext.node) {
             is InterfaceModel -> lowerInterfaceModel(NodeOwner(declaration, ownerContext), parentModule)
             is ClassModel -> lowerClassModel(NodeOwner(declaration, ownerContext), parentModule)
+            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext), parentModule)
             else -> declaration
         }
     }
@@ -73,7 +74,6 @@ interface TopLevelModelLowering : ModelStatementLowering, ModelLowering {
             is VariableModel -> lowerVariableModel(NodeOwner(declaration, ownerContext), parentModule)
             is FunctionModel -> lowerFunctionModel(NodeOwner(declaration, ownerContext), parentModule)
             is ClassLikeModel -> lowerClassLikeModel(NodeOwner(declaration, ownerContext), parentModule)
-            is ObjectModel -> lowerObjectModel(NodeOwner(declaration, ownerContext), parentModule)
             is EnumModel -> lowerEnumModel(NodeOwner(declaration, ownerContext), parentModule)
             is TypeAliasModel -> lowerTypeAliasModel(NodeOwner(declaration, ownerContext), parentModule)
             else -> raiseConcern("unknown TopLevelDeclaration ${declaration}") { declaration }

@@ -102,6 +102,7 @@ private val logger = Logging.logger("introduceModels")
 private fun MemberDeclaration.isStatic() = when (this) {
     is MethodDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     is PropertyDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
+    is MethodSignatureDeclaration -> modifiers.contains(ModifierDeclaration.STATIC_KEYWORD)
     else -> false
 }
 
