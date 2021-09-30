@@ -89,7 +89,7 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
         val staticallyInherited = staticallyInheritedFrom?.generateHeritageClauseDeclaration()
 
         val overriddenInstanceMembers = parentEntities.flatMap { it.getOverriddenMembers() }
-        val overriddenStaticMembers = staticallyInherited?.getOverriddenMembers() ?: emptyList()
+        val overriddenStaticMembers = staticallyInherited?.getOverriddenMembers()?.map { it.asStatic() } ?: emptyList()
 
         return ClassDeclaration(
             uid = uid,
@@ -126,9 +126,19 @@ private class ReplaceExpressionExtensionLowering(private val topLevelDeclaration
     }
 
     private fun HeritageClauseDeclaration.getOverriddenMembers(): List<MemberDeclaration> {
-        return when (val typeDeclaration = topLevelDeclarationResolver.resolve(typeReference)) {
-            is ClassLikeDeclaration -> typeDeclaration.members + typeDeclaration.parentEntities.flatMap { it.getOverriddenMembers() }
-            else -> emptyList()
+        val typeDeclaration =
+            topLevelDeclarationResolver.resolve(typeReference) as? ClassLikeDeclaration ?: return emptyList()
+        val members =
+            typeDeclaration.members.filter { it !is ConstructSignatureDeclaration && it !is ConstructorDeclaration }
+        return members + typeDeclaration.parentEntities.flatMap { it.getOverriddenMembers() }
+    }
+
+    private fun MemberDeclaration.asStatic(): MemberDeclaration {
+        return when (this) {
+            is MethodSignatureDeclaration -> copy(modifiers = modifiers + ModifierDeclaration.STATIC_KEYWORD)
+            is MethodDeclaration -> copy(modifiers = modifiers + ModifierDeclaration.STATIC_KEYWORD)
+            is PropertyDeclaration -> copy(modifiers = modifiers + ModifierDeclaration.STATIC_KEYWORD)
+            else -> this
         }
     }
 }

@@ -54,6 +54,7 @@ interface ModelVisitor {
         when (declaration) {
             is InterfaceModel -> processInterfaceModel(declaration)
             is ClassModel -> processClassModel(declaration)
+            is ObjectModel -> processObjectModel(declaration)
         }
     }
 
@@ -62,7 +63,6 @@ interface ModelVisitor {
             is VariableModel -> processVariableModel(declaration)
             is FunctionModel -> processFunctionModel(declaration)
             is ClassLikeModel -> processClassLikeModel(declaration)
-            is ObjectModel -> processObjectModel(declaration)
             is EnumModel -> processEnumNode(declaration)
             is TypeAliasModel -> processTypeAliasModel(declaration)
             else -> raiseConcern("unable to process TopLevelDeclaration ${declaration}") {  }

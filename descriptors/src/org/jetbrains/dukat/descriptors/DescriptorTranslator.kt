@@ -527,7 +527,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                 translateType(methodModel.type),
                 when (parent.kind) {
                     ClassKind.INTERFACE -> Modality.ABSTRACT
-                    ClassKind.OBJECT -> Modality.FINAL
+                    ClassKind.OBJECT -> if (methodModel.override.isNullOrEmpty() || !methodModel.open) Modality.FINAL else Modality.OPEN
                     else -> if (methodModel.open) Modality.OPEN else Modality.FINAL
                 },
                 DescriptorVisibilities.PUBLIC
@@ -638,7 +638,7 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         propertyModel.getter || propertyModel.setter -> Modality.OPEN
                         else -> Modality.ABSTRACT
                     }
-                    parent.kind == ClassKind.OBJECT -> Modality.FINAL
+                    parent.kind == ClassKind.OBJECT && propertyModel.override.isNullOrEmpty() -> Modality.FINAL
                     propertyModel.open -> Modality.OPEN
                     else -> Modality.FINAL
                 },

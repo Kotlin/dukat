@@ -5,6 +5,7 @@ import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astCommon.hasPrefix
 import org.jetbrains.dukat.astModel.ClassLikeModel
 import org.jetbrains.dukat.astModel.ClassModel
+import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.FunctionTypeModel
 import org.jetbrains.dukat.astModel.InterfaceModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
@@ -315,9 +316,14 @@ private class ClassLikeOverrideResolver(
             member.lowerOverrides(parentMembers, context.getParents(classLike).mapNotNull { it.fqName })
         }
 
+        val companionObject = classLike.companionObject?.let {
+            ClassLikeOverrideResolver(context, inheritanceContext, it).resolve() as ObjectModel
+        }
+
         return when (classLike) {
-            is InterfaceModel -> classLike.copy(members = membersLowered)
-            is ClassModel -> classLike.copy(members = membersLowered)
+            is InterfaceModel -> classLike.copy(members = membersLowered, companionObject = companionObject)
+            is ClassModel -> classLike.copy(members = membersLowered, companionObject = companionObject)
+            is ObjectModel -> classLike.copy(members = membersLowered)
             else -> classLike
         }
     }
