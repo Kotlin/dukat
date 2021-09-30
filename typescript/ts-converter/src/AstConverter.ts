@@ -593,13 +593,14 @@ export class AstConverter {
     let name = this.convertName(node.name);
 
     if (name !== null) {
-      return this.createProperty(
+      return this.astFactory.declareProperty(
           name,
           node.initializer ?
               this.astExpressionConverter.convertExpression(node.initializer) : null,
           this.convertType(node.type),
           [],
           !!node.questionToken,
+          this.convertModifiers(node.modifiers),
           node.type != undefined
       );
     }
