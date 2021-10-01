@@ -310,7 +310,7 @@ private class ClassLikeOverrideResolver(
         }
 
         val companionObject = classLike.companionObject?.let {
-            ClassLikeOverrideResolver(context, inheritanceContext, it).resolve() as ObjectModel
+            ClassLikeOverrideResolver(translationContext, it).resolve() as ObjectModel
         }
 
         return when (classLike) {
