@@ -15,9 +15,9 @@ function resolveName(node: ts.Node): string | null {
 }
 
 export function resolveDeclarations(node: ts.Identifier, typeChecker: ts.TypeChecker): Array<ts.Node> {
-  let symbolAtLocation = typeChecker.getSymbolAtLocation(node);
-  if (symbolAtLocation) {
+  const symbolAtLocation = typeChecker.getSymbolAtLocation(node);
 
+  if (symbolAtLocation) {
     if (symbolAtLocation.flags & ts.SymbolFlags.TypeParameter) {
       return [];
     }
@@ -44,7 +44,9 @@ export function resolveDeclarations(node: ts.Identifier, typeChecker: ts.TypeChe
     }
   }
 
-  let symbol = typeChecker.getTypeAtLocation(node).symbol;
+  const type = typeChecker.getTypeAtLocation(node)
+  const symbol = type.aliasSymbol || type.symbol;
+
   if (symbol && Array.isArray(symbol.declarations)) {
     return symbol.declarations;
   }
