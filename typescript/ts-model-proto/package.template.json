@@ -8,7 +8,7 @@
   },
   "author": "",
   "dependencies": {
-    "ts-protoc-gen": "0.12.0"
+    "ts-protoc-gen": "0.15.0"
   },
   "license": "UNLICENSED"
 }
