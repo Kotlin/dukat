@@ -1,11 +1,14 @@
 package org.jetbrains.dukat.compiler.tests.extended
 
+import org.jetbrains.dukat.compiler.tests.core.ResolvePanicMode
 import org.jetbrains.dukat.compiler.tests.core.TestConfig.TOPN_DIR
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
+@ExtendWith(ResolvePanicMode::class, CliTestsStarted::class, CliTestsEnded::class)
 class TopNCompilationTests : CompilationTests() {
 
     @DisplayName("core test set compile")
