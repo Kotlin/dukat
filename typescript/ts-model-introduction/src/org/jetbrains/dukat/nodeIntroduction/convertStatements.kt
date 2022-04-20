@@ -126,7 +126,7 @@ class ExpressionConverter(private val typeConverter: (ParameterValueDeclaration)
                 value
             )
             is NumericLiteralExpressionDeclaration -> NumericLiteralExpressionModel(
-                value.toInt()
+                if (value.contains('.')) value.toDouble() else value.toInt()
             )
             is BooleanLiteralExpressionDeclaration -> BooleanLiteralExpressionModel(
                 value
