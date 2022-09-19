@@ -99,7 +99,8 @@ private data class CliOptions(
         val tsDefaultLib: String,
         val generateDescriptors: Boolean,
         val generateDescriptorsJar: Boolean,
-        val tsConfig: String?
+        val tsConfig: String?,
+        val dynamicAsType: Boolean
 )
 
 
@@ -118,6 +119,7 @@ private fun process(args: List<String>): CliOptions? {
     var generateDescriptors = false
     var generateDescriptorsJar = false
     var tsConfig: String? = null
+    var dynamicAsType = false
 
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
@@ -179,6 +181,9 @@ private fun process(args: List<String>): CliOptions? {
                     return null
                 }
             }
+            "--dynamic-as-type" -> {
+                dynamicAsType = true
+            }
 
             else -> when {
                 arg == "-" -> sources.add("-")
@@ -217,7 +222,8 @@ following file extensions are supported:
         tsDefaultLib,
         generateDescriptors,
         generateDescriptorsJar,
-        tsConfig
+        tsConfig,
+        dynamicAsType,
         )
 }
 
@@ -264,7 +270,7 @@ fun main(vararg args: String) {
             }
 
             isIdlTranslation -> {
-                translateIdlSources(options.sources)
+                translateIdlSources(options.sources, options.dynamicAsType)
             }
 
             else -> {
