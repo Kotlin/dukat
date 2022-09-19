@@ -30,10 +30,6 @@ import org.jetbrains.dukat.astModel.TypeParameterModel
 import org.jetbrains.dukat.astModel.TypeValueModel
 import org.jetbrains.dukat.astModel.VariableModel
 import org.jetbrains.dukat.astModel.Variance
-import org.jetbrains.dukat.astModel.expressions.CallExpressionModel
-import org.jetbrains.dukat.astModel.expressions.IdentifierExpressionModel
-import org.jetbrains.dukat.astModel.expressions.IndexExpressionModel
-import org.jetbrains.dukat.astModel.expressions.PropertyAccessExpressionModel
 import org.jetbrains.dukat.astModel.expressions.literals.StringLiteralExpressionModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -42,35 +38,9 @@ import org.jetbrains.dukat.astModel.statements.ExpressionStatementModel
 import org.jetbrains.dukat.astModel.statements.ReturnStatementModel
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astModel.LambdaParameterModel
+import org.jetbrains.dukat.astModel.expressions.*
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
-import org.jetbrains.dukat.idlDeclarations.IDLArgumentDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLAttributeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLConstructorDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLDictionaryMemberDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLEnumDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLFileDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLFunctionTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLGetterDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLImplementsStatementDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLIncludesStatementDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLInterfaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLMemberDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLNamespaceDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLOperationDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSetterDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSingleTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLSourceSetDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTopLevelDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypeDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLTypedefDeclaration
-import org.jetbrains.dukat.idlDeclarations.IDLUnionDeclaration
-import org.jetbrains.dukat.idlDeclarations.InterfaceKind
-import org.jetbrains.dukat.idlDeclarations.changeComment
-import org.jetbrains.dukat.idlDeclarations.processEnumMember
-import org.jetbrains.dukat.idlDeclarations.toNullable
-import org.jetbrains.dukat.idlDeclarations.toNullableIfNotPrimitive
+import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
@@ -327,16 +297,19 @@ private class IdlFileConverter(
                 ),
                 body = BlockStatementModel(listOf(
                         ReturnStatementModel(
-                                IndexExpressionModel(
-                                        CallExpressionModel(
-                                                IdentifierExpressionModel(
-                                                        IdentifierEntity("asDynamic")
+                                AsExpressionModel(
+                                        expression = IndexExpressionModel(
+                                                CallExpressionModel(
+                                                        IdentifierExpressionModel(
+                                                                IdentifierEntity("asDynamic")
+                                                        ),
+                                                        listOf()
                                                 ),
-                                                listOf()
+                                                IdentifierExpressionModel(
+                                                        IdentifierEntity(key.name)
+                                                )
                                         ),
-                                        IdentifierExpressionModel(
-                                                IdentifierEntity(key.name)
-                                        )
+                                        type = valueType.toNullableIfNotPrimitive().convertToModel()
                                 )
                         )
                 )),
@@ -446,11 +419,27 @@ private class IdlFileConverter(
                 name = name,
                 type = type.toNullable().changeComment(null).convertToModel(),
                 initializer = if (defaultValue != null && !required) {
-                    ExpressionStatementModel(
-                            IdentifierExpressionModel(
-                                    IdentifierEntity(defaultValue!!)
-                            )
+                    val defaultValueModel = IdentifierExpressionModel(
+                        IdentifierEntity(defaultValue!!)
                     )
+                    if (type.toFqName()?.rightMost()?.value == "dynamic") {
+                        ExpressionStatementModel(
+                            PropertyAccessExpressionModel(
+                                defaultValueModel,
+                                CallExpressionModel(
+                                    IdentifierExpressionModel(
+                                        IdentifierEntity("unsafeCast")
+                                    ),
+                                    listOf(),
+                                    typeParameters = listOf(
+                                        type.toNotNullable().changeComment(null).convertToModel()
+                                    )
+                                )
+                            )
+                        )
+                    } else {
+                        ExpressionStatementModel(defaultValueModel)
+                    }
                 } else {
                     null
                 },
@@ -509,9 +498,17 @@ private class IdlFileConverter(
         functionBody.addAll(members.map { it.convertToAssignmentStatementModel() })
         functionBody.add(
                 ReturnStatementModel(
-                        IdentifierExpressionModel(
-                                IdentifierEntity("o")
+                    AsExpressionModel(
+                        expression = IdentifierExpressionModel(
+                            IdentifierEntity("o")
+                        ),
+                        type = TypeValueModel(
+                            value = IdentifierEntity(name),
+                            params = listOf(),
+                            metaDescription = null,
+                            fqName = toFqName()
                         )
+                    )
                 )
         )
         return functionBody
