@@ -22,20 +22,14 @@ import org.jetbrains.dukat.idlLowerings.specifyEventHandlerTypes
 import org.jetbrains.dukat.idlModels.convertToModel
 import org.jetbrains.dukat.idlParser.parseIDL
 import org.jetbrains.dukat.idlReferenceResolver.IdlReferencesResolver
-import org.jetbrains.dukat.model.commonLowerings.TranslationContext
-import org.jetbrains.dukat.model.commonLowerings.EscapeIdentificators
-import org.jetbrains.dukat.model.commonLowerings.LowerOverrides
-import org.jetbrains.dukat.model.commonLowerings.ModelContextAwareLowering
-import org.jetbrains.dukat.model.commonLowerings.VisibilityModifierResolver
-import org.jetbrains.dukat.model.commonLowerings.lower
-import org.jetbrains.dukat.model.commonLowerings.resolveTopLevelVisibility
+import org.jetbrains.dukat.model.commonLowerings.*
 import org.jetbrains.dukat.translator.InputTranslator
 
 private fun alwaysPublic(): VisibilityModifierResolver = object : VisibilityModifierResolver {
     override fun resolve(): VisibilityModifierModel = VisibilityModifierModel.PUBLIC
 }
 
-class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : InputTranslator<String> {
+class IdlInputTranslator(private val nameResolver: IdlReferencesResolver, private val dynamicAsType: Boolean = false) : InputTranslator<String> {
     private val translationContext: TranslationContext = TranslationContext()
 
     fun translateSet(fileName: String): SourceSetModel {
@@ -57,8 +51,9 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver) : Inpu
                         ModelContextAwareLowering(translationContext),
                         LowerOverrides(translationContext),
                         EscapeIdentificators(),
-                        AddExplicitGettersAndSetters()
+                        AddExplicitGettersAndSetters(),
                 )
+                .let { if (dynamicAsType) it.lower(ReplaceDynamics()) else it }
                 .addKDocs()
                 .relocateDeclarations()
                 .resolveTopLevelVisibility(alwaysPublic())
