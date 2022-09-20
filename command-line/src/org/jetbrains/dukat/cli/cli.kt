@@ -100,7 +100,8 @@ private data class CliOptions(
         val generateDescriptors: Boolean,
         val generateDescriptorsJar: Boolean,
         val tsConfig: String?,
-        val dynamicAsType: Boolean
+        val dynamicAsType: Boolean,
+        val useStaticGetters: Boolean
 )
 
 
@@ -120,6 +121,7 @@ private fun process(args: List<String>): CliOptions? {
     var generateDescriptorsJar = false
     var tsConfig: String? = null
     var dynamicAsType = false
+    var useStaticGetters = false
 
     while (argsIterator.hasNext()) {
         val arg = argsIterator.next()
@@ -184,6 +186,9 @@ private fun process(args: List<String>): CliOptions? {
             "--dynamic-as-type" -> {
                 dynamicAsType = true
             }
+            "--use-static-getters" -> {
+                useStaticGetters = true
+            }
 
             else -> when {
                 arg == "-" -> sources.add("-")
@@ -224,6 +229,7 @@ following file extensions are supported:
         generateDescriptorsJar,
         tsConfig,
         dynamicAsType,
+        useStaticGetters,
         )
 }
 
@@ -270,7 +276,7 @@ fun main(vararg args: String) {
             }
 
             isIdlTranslation -> {
-                translateIdlSources(options.sources, options.dynamicAsType)
+                translateIdlSources(options.sources, options.dynamicAsType, options.useStaticGetters)
             }
 
             else -> {

@@ -29,7 +29,9 @@ private fun alwaysPublic(): VisibilityModifierResolver = object : VisibilityModi
     override fun resolve(): VisibilityModifierModel = VisibilityModifierModel.PUBLIC
 }
 
-class IdlInputTranslator(private val nameResolver: IdlReferencesResolver, private val dynamicAsType: Boolean = false) : InputTranslator<String> {
+class IdlInputTranslator(private val nameResolver: IdlReferencesResolver,
+                         private val dynamicAsType: Boolean = false,
+                         private val useStaticGetters: Boolean = false) : InputTranslator<String> {
     private val translationContext: TranslationContext = TranslationContext()
 
     fun translateSet(fileName: String): SourceSetModel {
@@ -46,7 +48,7 @@ class IdlInputTranslator(private val nameResolver: IdlReferencesResolver, privat
                 .markAbstractOrOpen()
                 .addMissingMembers()
                 .addOverloadsForCallbacks()
-                .convertToModel()
+                .convertToModel(useStaticGetters)
                 .lower(
                         ModelContextAwareLowering(translationContext),
                         LowerOverrides(translationContext),
