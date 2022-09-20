@@ -44,6 +44,7 @@ import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
 
@@ -65,7 +66,8 @@ private val INLINE_ONLY_ANNOTATION = AnnotationModel(
 
 private class IdlFileConverter(
         private val fileDeclaration: IDLFileDeclaration,
-        private val typeMap: Map<String, NameEntity?>
+        private val typeMap: Map<String, NameEntity?>,
+        private val useStaticGetters: Boolean,
 ) {
 
     private companion object {
@@ -113,6 +115,32 @@ private class IdlFileConverter(
                 "unsignedshort" to "Short",
                 "void" to "Unit"
         )
+    }
+
+    private val staticConverterNames = setOf(
+            "Boolean", "Byte", "Short", "Char", "Int", "Long", "Float", "Double", "String" )
+
+    private fun NameEntity.staticConverter(): String? {
+        return when (this) {
+            is QualifierEntity -> if (isTsStdlibPrefixed() && staticConverterNames.contains(right.value)) "get${right.value}" else null
+            is IdentifierEntity -> if (staticConverterNames.contains(value)) "get$value" else null
+        }
+    }
+
+    private fun createGetterForDynamic(expression: ExpressionModel, type: TypeModel, key: String): ExpressionModel {
+        val identifierExpression = IdentifierExpressionModel(IdentifierEntity(key))
+        return if (!useStaticGetters) {
+            IndexExpressionModel(expression, identifierExpression)
+        } else {
+            val converter = IdentifierEntity((type as? TypeValueModel)?.value?.staticConverter() ?: "getAny")
+            PropertyAccessExpressionModel(
+                    left = expression,
+                    right = CallExpressionModel(
+                            expression = IdentifierExpressionModel(converter),
+                            arguments = listOf(identifierExpression),
+                    )
+            )
+        }
     }
 
     private fun String.stdFqName(): NameEntity? {
@@ -297,19 +325,15 @@ private class IdlFileConverter(
                 ),
                 body = BlockStatementModel(listOf(
                         ReturnStatementModel(
-                                AsExpressionModel(
-                                        expression = IndexExpressionModel(
-                                                CallExpressionModel(
-                                                        IdentifierExpressionModel(
-                                                                IdentifierEntity("asDynamic")
-                                                        ),
-                                                        listOf()
-                                                ),
+                                createGetterForDynamic(
+                                        expression = CallExpressionModel(
                                                 IdentifierExpressionModel(
-                                                        IdentifierEntity(key.name)
-                                                )
+                                                        IdentifierEntity("asDynamic")
+                                                ),
+                                                listOf()
                                         ),
-                                        type = valueType.toNullableIfNotPrimitive().convertToModel()
+                                        type = valueType.toNullableIfNotPrimitive().convertToModel(),
+                                        key = key.name,
                                 )
                         )
                 )),
@@ -420,22 +444,22 @@ private class IdlFileConverter(
                 type = type.toNullable().changeComment(null).convertToModel(),
                 initializer = if (defaultValue != null && !required) {
                     val defaultValueModel = IdentifierExpressionModel(
-                        IdentifierEntity(defaultValue!!)
+                            IdentifierEntity(defaultValue!!)
                     )
                     if (type.toFqName()?.rightMost()?.value == "dynamic") {
                         ExpressionStatementModel(
-                            PropertyAccessExpressionModel(
-                                defaultValueModel,
-                                CallExpressionModel(
-                                    IdentifierExpressionModel(
-                                        IdentifierEntity("unsafeCast")
-                                    ),
-                                    listOf(),
-                                    typeParameters = listOf(
-                                        type.toNotNullable().changeComment(null).convertToModel()
-                                    )
+                                PropertyAccessExpressionModel(
+                                        defaultValueModel,
+                                        CallExpressionModel(
+                                                IdentifierExpressionModel(
+                                                        IdentifierEntity("unsafeCast")
+                                                ),
+                                                listOf(),
+                                                typeParameters = listOf(
+                                                        type.toNotNullable().changeComment(null).convertToModel()
+                                                )
+                                        )
                                 )
-                            )
                         )
                     } else {
                         ExpressionStatementModel(defaultValueModel)
@@ -464,51 +488,51 @@ private class IdlFileConverter(
 
     fun IDLDictionaryDeclaration.generateFunctionBody(): List<StatementModel> {
         val functionBody: MutableList<StatementModel> = mutableListOf(
-            VariableModel(
-                name = IdentifierEntity("o"),
-                immutable = true,
-                inline = false,
-                external = false,
-                get = null,
-                set = null,
-                extend = null,
-                comment = null,
-                explicitlyDeclaredType = false,
-                typeParameters = listOf(),
-                annotations = mutableListOf(),
-                visibilityModifier = VisibilityModifierModel.DEFAULT,
-                type = TypeValueModel(
-                    value = IdentifierEntity("dynamic"),
-                    params = listOf(),
-                    fqName = null,
-                    metaDescription = null,
-                ),
-                initializer = CallExpressionModel(
-                    IdentifierExpressionModel(
-                        IdentifierEntity("js")
-                    ),
-                    listOf(
-                        StringLiteralExpressionModel(
-                            "({})"
+                VariableModel(
+                        name = IdentifierEntity("o"),
+                        immutable = true,
+                        inline = false,
+                        external = false,
+                        get = null,
+                        set = null,
+                        extend = null,
+                        comment = null,
+                        explicitlyDeclaredType = false,
+                        typeParameters = listOf(),
+                        annotations = mutableListOf(),
+                        visibilityModifier = VisibilityModifierModel.DEFAULT,
+                        type = TypeValueModel(
+                                value = IdentifierEntity("dynamic"),
+                                params = listOf(),
+                                fqName = null,
+                                metaDescription = null,
+                        ),
+                        initializer = CallExpressionModel(
+                                IdentifierExpressionModel(
+                                        IdentifierEntity("js")
+                                ),
+                                listOf(
+                                        StringLiteralExpressionModel(
+                                                "({})"
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         )
         functionBody.addAll(members.map { it.convertToAssignmentStatementModel() })
         functionBody.add(
                 ReturnStatementModel(
-                    AsExpressionModel(
-                        expression = IdentifierExpressionModel(
-                            IdentifierEntity("o")
-                        ),
-                        type = TypeValueModel(
-                            value = IdentifierEntity(name),
-                            params = listOf(),
-                            metaDescription = null,
-                            fqName = toFqName()
+                        AsExpressionModel(
+                                expression = IdentifierExpressionModel(
+                                        IdentifierEntity("o")
+                                ),
+                                type = TypeValueModel(
+                                        value = IdentifierEntity(name),
+                                        params = listOf(),
+                                        metaDescription = null,
+                                        fqName = toFqName()
+                                )
                         )
-                    )
                 )
         )
         return functionBody
@@ -633,10 +657,10 @@ private class IdlFileConverter(
                                             listOf(),
                                             typeParameters = listOf(
                                                     TypeValueModel(
-                                                        value = IdentifierEntity(name),
-                                                        params = listOf(),
-                                                        metaDescription = null,
-                                                        fqName = null
+                                                            value = IdentifierEntity(name),
+                                                            params = listOf(),
+                                                            metaDescription = null,
+                                                            fqName = null
                                                     )
                                             )
                                     )
@@ -721,6 +745,7 @@ private class IdlFileConverter(
                     explicitlyDeclaredType = true,
                     lateinit = false
             )
+
             is IDLOperationDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
                     parameters = arguments.map { it.convertToParameterModel() },
@@ -733,24 +758,27 @@ private class IdlFileConverter(
                     open = false,
                     body = null
             )
+
             is IDLConstructorDeclaration -> ConstructorModel(
                     parameters = arguments.map { it.convertToParameterModel() },
                     typeParameters = listOf()
             )
+
             is IDLDictionaryMemberDeclaration -> PropertyModel(
-                name = IdentifierEntity(name),
-                type = type.toNullable().convertToModel(),
-                typeParameters = listOf(),
-                static = false,
-                override = null,
-                immutable = false,
-                initializer = null,
-                getter = !required,
-                setter = !required,
-                open = false,
-                explicitlyDeclaredType = true,
-                lateinit = false
+                    name = IdentifierEntity(name),
+                    type = type.toNullable().convertToModel(),
+                    typeParameters = listOf(),
+                    static = false,
+                    override = null,
+                    immutable = false,
+                    initializer = null,
+                    getter = !required,
+                    setter = !required,
+                    open = false,
+                    explicitlyDeclaredType = true,
+                    lateinit = false
             )
+
             is IDLGetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
                     parameters = listOf(key.convertToParameterModel()),
@@ -763,6 +791,7 @@ private class IdlFileConverter(
                     open = false,
                     body = null
             )
+
             is IDLSetterDeclaration -> MethodModel(
                     name = IdentifierEntity(name),
                     parameters = listOf(key.convertToParameterModel(), value.convertToParameterModel()),
@@ -780,6 +809,7 @@ private class IdlFileConverter(
                     open = false,
                     body = null
             )
+
             else -> raiseConcern("unprocessed member declaration: ${this}") { null }
         }
     }
@@ -829,7 +859,7 @@ private class IDLReferenceVisitor(private val visit: (IDLDeclaration, NameEntity
     }
 }
 
-fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
+fun IDLSourceSetDeclaration.convertToModel(useStaticGetters: Boolean): SourceSetModel {
 
     val typeMap = mutableMapOf<String, NameEntity?>()
     IDLReferenceVisitor { declaration, packageName ->
@@ -840,6 +870,6 @@ fun IDLSourceSetDeclaration.convertToModel(): SourceSetModel {
 
     return SourceSetModel(
             listOf("<IRRELEVANT>"),
-            sources = files.map { IdlFileConverter(it, typeMap).convert() }
+            sources = files.map { IdlFileConverter(it, typeMap, useStaticGetters).convert() }
     )
 }
