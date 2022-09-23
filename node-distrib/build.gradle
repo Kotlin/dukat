@@ -4,32 +4,7 @@ import  org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 def NODE_DISTRIB_DIR = new File(gradle.gradleUserHomeDir, "node-distrib/unpacked").absolutePath
 
 def getDistribName(version) {
-    OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
-    Architecture architecture = DefaultNativePlatform.currentArchitecture
-
-    if (!architecture.amd64) {
-        throw new GradleException("unkown architecture ${architecture.displayName}")
-    }
-
-    String distribName = null
-
-    if (os.macOsX) {
-        distribName = "node-v${version}-darwin-x64"
-    }
-
-    if (os.linux) {
-        distribName = "node-v${version}-linux-x64"
-    }
-
-    if (os.windows) {
-        distribName = "node-v${version}-win-x64"
-    }
-
-    if (distribName == null) {
-        throw new GradleException("unkown architecture and/or operating system ${architecture.displayName} : ${os.displayName}")
-    }
-
-    return distribName
+    return "node-v${version}-darwin-arm64"
 }
 
 def existsOnlyAsZip() {
