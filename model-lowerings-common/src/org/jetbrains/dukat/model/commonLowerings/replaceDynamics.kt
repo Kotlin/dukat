@@ -6,7 +6,7 @@ import org.jetbrains.dukat.astCommon.QualifierEntity
 import org.jetbrains.dukat.astModel.*
 import org.jetbrains.dukat.ownerContext.NodeOwner
 import org.jetbrains.dukat.ownerContext.wrap
-import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
+import org.jetbrains.dukat.stdlib.isDynamic
 
 private class ReplaceDynamicsTypeLowering : ModelWithOwnerTypeLowering {
     private fun NameEntity.renameDynamic(): NameEntity {
@@ -16,12 +16,6 @@ private class ReplaceDynamicsTypeLowering : ModelWithOwnerTypeLowering {
             is IdentifierEntity -> IdentifierEntity(value = "Dynamic")
         }
     }
-
-    private val NameEntity.isDynamic: Boolean
-        get() = when (this) {
-            is QualifierEntity -> isTsStdlibPrefixed() && right.value == "dynamic"
-            is IdentifierEntity -> this.value == "dynamic"
-        }
 
     override fun lowerTypeValueModel(ownerContext: NodeOwner<TypeValueModel>): TypeValueModel {
         val type = ownerContext.node
