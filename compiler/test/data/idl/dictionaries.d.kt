@@ -40,7 +40,7 @@ public inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean?
     o["preserveDrawingBuffer"] = preserveDrawingBuffer
     o["preferLowPowerToHighPerformance"] = preferLowPowerToHighPerformance
     o["failIfMajorPerformanceCaveat"] = failIfMajorPerformanceCaveat
-    return o
+    return o as WebGLContextAttributes
 }
 
 public external interface PointerEventInit {
@@ -90,7 +90,7 @@ public inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, he
     o["twist"] = twist
     o["pointerType"] = pointerType
     o["isPrimary"] = isPrimary
-    return o
+    return o as PointerEventInit
 }
 
 public external abstract class A {
@@ -110,7 +110,7 @@ public inline fun UndefinedMemberDictionary(str: String?, str2: String? = undefi
     val o = js("({})")
     o["str"] = str
     o["str2"] = str2
-    return o
+    return o as UndefinedMemberDictionary
 }
 
 public external interface NullableMemberDictionary {
@@ -128,5 +128,5 @@ public inline fun NullableMemberDictionary(value1: Int? = 0, value2: Int? = null
     val o = js("({})")
     o["value1"] = value1
     o["value2"] = value2
-    return o
+    return o as NullableMemberDictionary
 }

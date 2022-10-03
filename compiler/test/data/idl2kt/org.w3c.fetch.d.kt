@@ -109,7 +109,7 @@ public inline fun RequestInit(method: String? = undefined, headers: dynamic = un
     o["integrity"] = integrity
     o["keepalive"] = keepalive
     o["window"] = window
-    return o
+    return o as RequestInit
 }
 
 /**
@@ -158,7 +158,7 @@ public inline fun ResponseInit(status: Short? = 200, statusText: String? = "OK",
     o["status"] = status
     o["statusText"] = statusText
     o["headers"] = headers
-    return o
+    return o as ResponseInit
 }
 
 /* please, don't implement this interface! */

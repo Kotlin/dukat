@@ -61,7 +61,7 @@ public inline fun SVGBoundingBoxOptions(fill: Boolean? = true, stroke: Boolean? 
     o["stroke"] = stroke
     o["markers"] = markers
     o["clipped"] = clipped
-    return o
+    return o as SVGBoundingBoxOptions
 }
 
 /**
