@@ -44,6 +44,7 @@ import org.jetbrains.dukat.idlDeclarations.*
 import org.jetbrains.dukat.idlLowerings.IDLLowering
 import org.jetbrains.dukat.panic.raiseConcern
 import org.jetbrains.dukat.stdlib.TSLIBROOT
+import org.jetbrains.dukat.stdlib.isDynamic
 import org.jetbrains.dukat.stdlib.isTsStdlibPrefixed
 import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 import java.io.File
@@ -439,14 +440,15 @@ private class IdlFileConverter(
     }
 
     private fun IDLDictionaryMemberDeclaration.convertToParameterModel(): ParameterModel {
+        val type = type.toNullable().changeComment(null).convertToModel()
         return ParameterModel(
                 name = name,
-                type = type.toNullable().changeComment(null).convertToModel(),
+                type = type,
                 initializer = if (defaultValue != null && !required) {
                     val defaultValueModel = IdentifierExpressionModel(
                             IdentifierEntity(defaultValue!!)
                     )
-                    if (type.toFqName()?.rightMost()?.value == "dynamic") {
+                    if (defaultValue != "undefined" && type is TypeValueModel && type.value.isDynamic) {
                         ExpressionStatementModel(
                                 PropertyAccessExpressionModel(
                                         defaultValueModel,
@@ -455,9 +457,7 @@ private class IdlFileConverter(
                                                         IdentifierEntity("unsafeCast")
                                                 ),
                                                 listOf(),
-                                                typeParameters = listOf(
-                                                        type.toNotNullable().changeComment(null).convertToModel()
-                                                )
+                                                typeParameters = listOf(type)
                                         )
                                 )
                         )
