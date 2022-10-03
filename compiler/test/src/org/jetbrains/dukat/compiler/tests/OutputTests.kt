@@ -60,8 +60,8 @@ abstract class OutputTests {
         val translated = output(tsPath, getTranslator())
 
         assertNormalizedContentEquals(
-                translated.trimEnd(),
-                File(ktPath).readText().trimEnd()
+            expected = File(ktPath).readText().trimEnd(),
+            actual = translated.trimEnd()
         )
     }
 

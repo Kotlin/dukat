@@ -63,7 +63,7 @@ public inline fun RegistrationOptions(scope: String? = undefined, type: WorkerTy
     val o = js("({})")
     o["scope"] = scope
     o["type"] = type
-    return o
+    return o as RegistrationOptions
 }
 
 /**
@@ -114,7 +114,7 @@ public inline fun ServiceWorkerMessageEventInit(data: Any? = undefined, origin: 
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ServiceWorkerMessageEventInit
 }
 
 /**
@@ -179,7 +179,7 @@ public inline fun ClientQueryOptions(includeUncontrolled: Boolean? = false, type
     val o = js("({})")
     o["includeUncontrolled"] = includeUncontrolled
     o["type"] = type
-    return o
+    return o as ClientQueryOptions
 }
 
 /**
@@ -205,7 +205,7 @@ public inline fun ExtendableEventInit(bubbles: Boolean? = false, cancelable: Boo
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ExtendableEventInit
 }
 
 /**
@@ -233,7 +233,7 @@ public inline fun ForeignFetchOptions(scopes: Array<String>?, origins: Array<Str
     val o = js("({})")
     o["scopes"] = scopes
     o["origins"] = origins
-    return o
+    return o as ForeignFetchOptions
 }
 
 /**
@@ -273,7 +273,7 @@ public inline fun FetchEventInit(request: Request?, clientId: String? = null, is
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as FetchEventInit
 }
 
 public external open class ForeignFetchEvent(type: String, eventInitDict: ForeignFetchEventInit) : ExtendableEvent {
@@ -305,7 +305,7 @@ public inline fun ForeignFetchEventInit(request: Request?, origin: String? = "nu
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ForeignFetchEventInit
 }
 
 public external interface ForeignFetchResponse {
@@ -325,7 +325,7 @@ public inline fun ForeignFetchResponse(response: Response?, origin: String? = un
     o["response"] = response
     o["origin"] = origin
     o["headers"] = headers
-    return o
+    return o as ForeignFetchResponse
 }
 
 /**
@@ -376,7 +376,7 @@ public inline fun ExtendableMessageEventInit(data: Any? = undefined, origin: Str
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ExtendableMessageEventInit
 }
 
 /**
@@ -415,7 +415,7 @@ public inline fun CacheQueryOptions(ignoreSearch: Boolean? = false, ignoreMethod
     o["ignoreMethod"] = ignoreMethod
     o["ignoreVary"] = ignoreVary
     o["cacheName"] = cacheName
-    return o
+    return o as CacheQueryOptions
 }
 
 public external interface CacheBatchOperation {
@@ -441,7 +441,7 @@ public inline fun CacheBatchOperation(type: String? = undefined, request: Reques
     o["request"] = request
     o["response"] = response
     o["options"] = options
-    return o
+    return o as CacheBatchOperation
 }
 
 /**

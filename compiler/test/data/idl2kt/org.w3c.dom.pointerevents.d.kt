@@ -79,7 +79,7 @@ public inline fun PointerEventInit(pointerId: Int? = 0, width: Double? = 1.0, he
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as PointerEventInit
 }
 
 /**

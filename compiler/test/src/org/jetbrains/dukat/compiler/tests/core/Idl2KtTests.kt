@@ -13,25 +13,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
-class Idl2KtTests : OutputTests() {
+class Idl2KtTests : Idl2KtTestBase() {
 
     @DisplayName("idl2kt test set")
     @ParameterizedTest(name = "{0}")
     @MethodSource("idl2ktSet")
     fun withValueSource(name: String, tsPath: String, ktPath: String) {
         assertContentEquals(name, tsPath, ktPath)
-    }
-
-    override fun concatenate(fileName: String, translated: List<TranslationUnitResult>): String {
-
-        val (successfullTranslations, failedTranslations) = translated.partition { it is ModuleTranslationUnit }
-
-        if (failedTranslations.isNotEmpty()) {
-            throw Exception("translation failed")
-        }
-        val units = successfullTranslations.filterIsInstance(ModuleTranslationUnit::class.java)
-        return units.find { File(it.fileName).canonicalFile == File(fileName).canonicalFile }?.
-                content ?: "//NO DECLARATIONS"
     }
 
     override fun getTranslator(): InputTranslator<String> = translator

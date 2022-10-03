@@ -120,7 +120,7 @@ public inline fun MediaTrackSupportedConstraints(width: Boolean? = true, height:
     o["channelCount"] = channelCount
     o["deviceId"] = deviceId
     o["groupId"] = groupId
-    return o
+    return o as MediaTrackSupportedConstraints
 }
 
 public external interface MediaTrackCapabilities {
@@ -194,7 +194,7 @@ public inline fun MediaTrackCapabilities(width: ULongRange? = undefined, height:
     o["channelCount"] = channelCount
     o["deviceId"] = deviceId
     o["groupId"] = groupId
-    return o
+    return o as MediaTrackCapabilities
 }
 
 /**
@@ -227,7 +227,7 @@ public inline fun MediaTrackConstraints(advanced: Array<MediaTrackConstraintSet>
     o["channelCount"] = channelCount
     o["deviceId"] = deviceId
     o["groupId"] = groupId
-    return o
+    return o as MediaTrackConstraints
 }
 
 public external interface MediaTrackConstraintSet {
@@ -301,7 +301,7 @@ public inline fun MediaTrackConstraintSet(width: dynamic = undefined, height: dy
     o["channelCount"] = channelCount
     o["deviceId"] = deviceId
     o["groupId"] = groupId
-    return o
+    return o as MediaTrackConstraintSet
 }
 
 /**
@@ -378,7 +378,7 @@ public inline fun MediaTrackSettings(width: Int? = undefined, height: Int? = und
     o["channelCount"] = channelCount
     o["deviceId"] = deviceId
     o["groupId"] = groupId
-    return o
+    return o as MediaTrackSettings
 }
 
 /**
@@ -407,7 +407,7 @@ public inline fun MediaStreamTrackEventInit(track: MediaStreamTrack?, bubbles: B
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as MediaStreamTrackEventInit
 }
 
 public external open class OverconstrainedErrorEvent(type: String, eventInitDict: OverconstrainedErrorEventInit) : Event {
@@ -429,13 +429,13 @@ public external interface OverconstrainedErrorEventInit : EventInit {
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
-public inline fun OverconstrainedErrorEventInit(error: dynamic = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): OverconstrainedErrorEventInit {
+public inline fun OverconstrainedErrorEventInit(error: dynamic = null.unsafeCast<dynamic>(), bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): OverconstrainedErrorEventInit {
     val o = js("({})")
     o["error"] = error
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as OverconstrainedErrorEventInit
 }
 
 /**
@@ -477,11 +477,11 @@ public external interface MediaStreamConstraints {
 
 @Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 @kotlin.internal.InlineOnly
-public inline fun MediaStreamConstraints(video: dynamic = false, audio: dynamic = false): MediaStreamConstraints {
+public inline fun MediaStreamConstraints(video: dynamic = false.unsafeCast<dynamic>(), audio: dynamic = false.unsafeCast<dynamic>()): MediaStreamConstraints {
     val o = js("({})")
     o["video"] = video
     o["audio"] = audio
-    return o
+    return o as MediaStreamConstraints
 }
 
 public external interface ConstrainablePattern {
@@ -512,7 +512,7 @@ public inline fun DoubleRange(max: Double? = undefined, min: Double? = undefined
     val o = js("({})")
     o["max"] = max
     o["min"] = min
-    return o
+    return o as DoubleRange
 }
 
 public external interface ConstrainDoubleRange : DoubleRange {
@@ -532,7 +532,7 @@ public inline fun ConstrainDoubleRange(exact: Double? = undefined, ideal: Double
     o["ideal"] = ideal
     o["max"] = max
     o["min"] = min
-    return o
+    return o as ConstrainDoubleRange
 }
 
 public external interface ULongRange {
@@ -550,7 +550,7 @@ public inline fun ULongRange(max: Int? = undefined, min: Int? = undefined): ULon
     val o = js("({})")
     o["max"] = max
     o["min"] = min
-    return o
+    return o as ULongRange
 }
 
 public external interface ConstrainULongRange : ULongRange {
@@ -570,7 +570,7 @@ public inline fun ConstrainULongRange(exact: Int? = undefined, ideal: Int? = und
     o["ideal"] = ideal
     o["max"] = max
     o["min"] = min
-    return o
+    return o as ConstrainULongRange
 }
 
 /**
@@ -591,7 +591,7 @@ public inline fun ConstrainBooleanParameters(exact: Boolean? = undefined, ideal:
     val o = js("({})")
     o["exact"] = exact
     o["ideal"] = ideal
-    return o
+    return o as ConstrainBooleanParameters
 }
 
 /**
@@ -612,7 +612,7 @@ public inline fun ConstrainDOMStringParameters(exact: dynamic = undefined, ideal
     val o = js("({})")
     o["exact"] = exact
     o["ideal"] = ideal
-    return o
+    return o as ConstrainDOMStringParameters
 }
 
 public external interface Capabilities
@@ -621,7 +621,7 @@ public external interface Capabilities
 @kotlin.internal.InlineOnly
 public inline fun Capabilities(): Capabilities {
     val o = js("({})")
-    return o
+    return o as Capabilities
 }
 
 public external interface Settings
@@ -630,7 +630,7 @@ public external interface Settings
 @kotlin.internal.InlineOnly
 public inline fun Settings(): Settings {
     val o = js("({})")
-    return o
+    return o as Settings
 }
 
 public external interface ConstraintSet
@@ -639,7 +639,7 @@ public external interface ConstraintSet
 @kotlin.internal.InlineOnly
 public inline fun ConstraintSet(): ConstraintSet {
     val o = js("({})")
-    return o
+    return o as ConstraintSet
 }
 
 public external interface Constraints : ConstraintSet {
@@ -653,7 +653,7 @@ public external interface Constraints : ConstraintSet {
 public inline fun Constraints(advanced: Array<ConstraintSet>? = undefined): Constraints {
     val o = js("({})")
     o["advanced"] = advanced
-    return o
+    return o as Constraints
 }
 
 /* please, don't implement this interface! */
@@ -705,4 +705,3 @@ public inline val MediaDeviceKind.Companion.AUDIOINPUT: MediaDeviceKind get() = 
 public inline val MediaDeviceKind.Companion.AUDIOOUTPUT: MediaDeviceKind get() = "audiooutput".asDynamic().unsafeCast<MediaDeviceKind>()
 
 public inline val MediaDeviceKind.Companion.VIDEOINPUT: MediaDeviceKind get() = "videoinput".asDynamic().unsafeCast<MediaDeviceKind>()
-

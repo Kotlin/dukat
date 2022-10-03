@@ -9,7 +9,7 @@ public external interface B : D, UnionAOrBOrC
 @kotlin.internal.InlineOnly
 public inline fun B(): B {
     val o = js("({})")
-    return o
+    return o as B
 }
 
 public external abstract class E {

@@ -19,7 +19,7 @@ public inline fun ClipboardEventInit(clipboardData: DataTransfer? = null, bubble
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ClipboardEventInit
 }
 
 /**
@@ -57,6 +57,6 @@ public external interface ClipboardPermissionDescriptor {
 public inline fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = false): ClipboardPermissionDescriptor {
     val o = js("({})")
     o["allowWithoutGesture"] = allowWithoutGesture
-    return o
+    return o as ClipboardPermissionDescriptor
 }
 

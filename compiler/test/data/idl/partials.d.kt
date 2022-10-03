@@ -27,7 +27,7 @@ public inline fun B(a: Boolean? = true, b: Boolean? = false): B {
     val o = js("({})")
     o["a"] = a
     o["b"] = b
-    return o
+    return o as B
 }
 
 public external object C {

@@ -16,7 +16,7 @@ public inline fun A(a: Int? = 0, b: Int? = 1): A {
     val o = js("({})")
     o["a"] = a
     o["b"] = b
-    return o
+    return o as A
 }
 
 public external interface B : A {
@@ -36,5 +36,5 @@ public inline fun B(c: Int? = 2, d: Int? = 3, a: Int? = 0, b: Int? = 1): B {
     o["d"] = d
     o["a"] = a
     o["b"] = b
-    return o
+    return o as B
 }
