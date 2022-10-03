@@ -43,7 +43,7 @@ public inline fun WebGLContextAttributes(alpha: Boolean? = true, depth: Boolean?
     o["preserveDrawingBuffer"] = preserveDrawingBuffer
     o["preferLowPowerToHighPerformance"] = preferLowPowerToHighPerformance
     o["failIfMajorPerformanceCaveat"] = failIfMajorPerformanceCaveat
-    return o
+    return o as WebGLContextAttributes
 }
 
 public external abstract class WebGLObject
@@ -891,7 +891,7 @@ public inline fun WebGLContextEventInit(statusMessage: String? = "", bubbles: Bo
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as WebGLContextEventInit
 }
 
 public external interface TexImageSource

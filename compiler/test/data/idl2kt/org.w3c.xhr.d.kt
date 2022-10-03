@@ -107,7 +107,7 @@ public inline fun ProgressEventInit(lengthComputable: Boolean? = false, loaded: 
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as ProgressEventInit
 }
 
 /* please, don't implement this interface! */

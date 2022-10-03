@@ -113,7 +113,7 @@ public inline fun NotificationOptions(dir: NotificationDirection? = Notification
     o["sticky"] = sticky
     o["data"] = data
     o["actions"] = actions
-    return o
+    return o as NotificationOptions
 }
 
 public external interface NotificationAction {
@@ -131,7 +131,7 @@ public inline fun NotificationAction(action: String?, title: String?, icon: Stri
     o["action"] = action
     o["title"] = title
     o["icon"] = icon
-    return o
+    return o as NotificationAction
 }
 
 public external interface GetNotificationOptions {
@@ -145,7 +145,7 @@ public external interface GetNotificationOptions {
 public inline fun GetNotificationOptions(tag: String? = ""): GetNotificationOptions {
     val o = js("({})")
     o["tag"] = tag
-    return o
+    return o as GetNotificationOptions
 }
 
 /**
@@ -179,7 +179,7 @@ public inline fun NotificationEventInit(notification: Notification?, action: Str
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as NotificationEventInit
 }
 
 /* please, don't implement this interface! */
@@ -207,4 +207,3 @@ public inline val NotificationDirection.Companion.AUTO: NotificationDirection ge
 public inline val NotificationDirection.Companion.LTR: NotificationDirection get() = "ltr".asDynamic().unsafeCast<NotificationDirection>()
 
 public inline val NotificationDirection.Companion.RTL: NotificationDirection get() = "rtl".asDynamic().unsafeCast<NotificationDirection>()
-

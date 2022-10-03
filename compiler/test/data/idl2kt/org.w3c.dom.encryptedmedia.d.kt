@@ -43,7 +43,7 @@ public inline fun MediaKeySystemConfiguration(label: String? = "", initDataTypes
     o["distinctiveIdentifier"] = distinctiveIdentifier
     o["persistentState"] = persistentState
     o["sessionTypes"] = sessionTypes
-    return o
+    return o as MediaKeySystemConfiguration
 }
 
 public external interface MediaKeySystemMediaCapability {
@@ -61,7 +61,7 @@ public inline fun MediaKeySystemMediaCapability(contentType: String? = "", robus
     val o = js("({})")
     o["contentType"] = contentType
     o["robustness"] = robustness
-    return o
+    return o as MediaKeySystemMediaCapability
 }
 
 /**
@@ -136,7 +136,7 @@ public inline fun MediaKeyMessageEventInit(messageType: MediaKeyMessageType?, me
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as MediaKeyMessageEventInit
 }
 
 public external open class MediaEncryptedEvent(type: String, eventInitDict: MediaEncryptedEventInit = definedExternally) : Event {
@@ -169,7 +169,7 @@ public inline fun MediaEncryptedEventInit(initDataType: String? = "", initData: 
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
     o["composed"] = composed
-    return o
+    return o as MediaEncryptedEventInit
 }
 
 /* please, don't implement this interface! */
