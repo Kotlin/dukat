@@ -18,7 +18,7 @@ private class RemoveConstructSignatureLowering : DeclarationLowering {
         owner: NodeOwner<ModuleDeclaration>?
     ): TopLevelDeclaration? {
         return super.lowerClassLikeDeclaration(
-            declaration.copy(newMembers = declaration.members.filterNotConstructSignatures()),
+            declaration.copy(members = declaration.members.filterNotConstructSignatures()),
             owner
         )
     }
