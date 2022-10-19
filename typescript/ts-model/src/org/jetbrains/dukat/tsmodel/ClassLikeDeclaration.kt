@@ -10,11 +10,15 @@ interface ClassLikeDeclaration : TopLevelDeclaration, MemberOwnerDeclaration, Me
     val parentEntities: List<HeritageClauseDeclaration>
 }
 
-fun ClassLikeDeclaration.copy(newMembers: List<MemberDeclaration>): ClassLikeDeclaration {
+fun ClassLikeDeclaration.copy(
+    parentEntities: List<HeritageClauseDeclaration> = this.parentEntities,
+    typeParameters: List<TypeParameterDeclaration> = this.typeParameters,
+    members: List<MemberDeclaration> = this.members
+): ClassLikeDeclaration {
     return when (this) {
-        is ClassDeclaration -> copy(members = newMembers)
-        is InterfaceDeclaration -> copy(members = newMembers)
-        is GeneratedInterfaceDeclaration -> copy(members = newMembers)
+        is ClassDeclaration -> copy(members = members, parentEntities = parentEntities, typeParameters = typeParameters)
+        is InterfaceDeclaration -> copy(members = members, parentEntities = parentEntities, typeParameters = typeParameters)
+        is GeneratedInterfaceDeclaration -> copy(members = members, parentEntities = parentEntities, typeParameters = typeParameters)
         else -> this
     }
 }

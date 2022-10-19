@@ -96,7 +96,7 @@ private class ProcessOptionalMethodsLowering(private val context: GeneratedInter
                 member
             }
         }
-        return declaration.copy(newMembers = newMembers)
+        return declaration.copy(members = newMembers)
     }
 
 }
