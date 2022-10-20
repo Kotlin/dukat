@@ -51,7 +51,7 @@ task execConfig {
         def distribPath = "dukat-${PACKAGE_VERSION}.tgz"
 
         def registry = project.findProperty(PROPERTY_REGISTRY) ?: "registry.npmjs.org"
-        def npmArgs = [project(":node-distrib").config.npmPath, "publish",  distribPath,  "--registry", "http://${registry}"]
+        def npmArgs = [project(":node-distrib").config.npmPath, "publish",  distribPath,  "--registry", "https://${registry}"]
 
         if (project.hasProperty("dukat.npm.tag")) {
             npmArgs += ["--tag", project.getProperty("dukat.npm.tag") as String]
