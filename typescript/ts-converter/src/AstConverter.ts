@@ -1155,6 +1155,6 @@ export class AstConverter {
   }
 
   private convertModule(module: ts.ModuleDeclaration, filter?: (node: ts.Node) => boolean): TopLevelDeclarationProto | null {
-    return this.convertModuleBody(module.body, filter);
+    return module.body && this.convertModuleBody(module.body, filter);
   }
 }
