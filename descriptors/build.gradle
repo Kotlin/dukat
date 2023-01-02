@@ -15,5 +15,5 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:$gradle.kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$gradle.kotlinVersion")
-    implementation("net.java.dev.jna:jna-platform:5.6.0")
+    implementation("net.java.dev.jna:jna-platform:5.12.1")
 }
