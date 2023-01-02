@@ -7,14 +7,20 @@ def getDistribName(version) {
     OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
     Architecture architecture = DefaultNativePlatform.currentArchitecture
 
-    if (!architecture.amd64) {
-        throw new GradleException("unkown architecture ${architecture.displayName}")
-    }
 
     String distribName = null
 
     if (os.macOsX) {
-        distribName = "node-v${version}-darwin-x64"
+        if (architecture.amd64)
+            distribName = "node-v${version}-darwin-x64"
+        else if (architecture.name == "aarch64")
+            distribName = "node-v${version}-darwin-arm64"
+        else
+            throw new GradleException("unkown MacOS architecture ${architecture.displayName}")
+    } else {
+        if (!architecture.amd64) {
+            throw new GradleException("unkown architecture ${architecture.displayName}")
+        }
     }
 
     if (os.linux) {
