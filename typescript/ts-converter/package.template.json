@@ -10,8 +10,8 @@
   "dependencies": {
     "typescript": "__TS_VERSION__",
     "google-protobuf": "__PROTOBUF_VERSION__",
-    "webpack": "4.42.0",
-    "webpack-cli": "3.3.6",
+    "webpack": "5.75.0",
+    "webpack-cli": "5.0.1",
     "@types/node": "12.7.1"
   },
   "license": "UNLICENSED"
