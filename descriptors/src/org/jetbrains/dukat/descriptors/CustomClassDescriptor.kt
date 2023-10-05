@@ -46,7 +46,7 @@ open class CustomClassDescriptor(
         LockBasedStorageManager.NO_LOCKS
     ) {
 
-    private val typeConstructor by lazy {
+    private var typeConstructor = lazy<TypeConstructor> {
         ClassTypeConstructorImpl(this, typeParameters, parentTypes, LockBasedStorageManager.NO_LOCKS)
     }
 
@@ -69,7 +69,11 @@ open class CustomClassDescriptor(
     }
 
     override fun getTypeConstructor(): TypeConstructor {
-        return typeConstructor
+        return typeConstructor.value
+    }
+
+    fun setTypeConstructor(value: TypeConstructor) {
+        typeConstructor = lazy { value }
     }
 
     override fun getConstructors(): Collection<ClassConstructorDescriptor> {

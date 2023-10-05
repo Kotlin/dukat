@@ -5,7 +5,9 @@ import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.AbbreviatedType
+import org.jetbrains.kotlin.types.ClassTypeConstructorImpl
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.getAbbreviation
 import org.jetbrains.kotlin.types.isError
@@ -38,6 +40,15 @@ internal fun MemberScope.removeErrorDescriptors() {
     classes.forEach { clazz ->
         clazz.unsubstitutedMemberScope.removeErrorDescriptors()
         clazz.removeConstructors(clazz.constructors.filter { it.containsError() })
+        val typeConstructor = clazz.typeConstructor
+        if (typeConstructor.supertypes.any { it.containsError() }) {
+            clazz.typeConstructor = ClassTypeConstructorImpl(
+                clazz,
+                typeConstructor.parameters,
+                typeConstructor.supertypes.filter { !it.containsError() },
+                LockBasedStorageManager.NO_LOCKS
+            )
+        }
     }
 
     val membersToRemove = callableMembers.filter { it.containsError() } +
