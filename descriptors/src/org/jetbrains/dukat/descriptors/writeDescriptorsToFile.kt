@@ -113,6 +113,7 @@ fun writeDescriptorsToFile(sourceSet: SourceSetModel, stdLib: String, outputDirP
 
     return convertToDescriptors(sourceSet, stdLib).map { outputFile ->
         val output = outputDir.resolve(outputFile.relativePath)
+        output.parentFile.mkdirs()
         output.writeBytes(outputFile.asByteArray())
         outputFile.relativePath
     }
