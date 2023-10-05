@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.AbbreviatedType
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.getAbbreviation
 import org.jetbrains.kotlin.types.isError
 
 private fun KotlinType.containsError(): Boolean {
@@ -20,7 +21,7 @@ private fun TypeParameterDescriptor.containsError(): Boolean {
 }
 
 private fun CallableMemberDescriptor.containsError(): Boolean {
-    return (valueParameters.map { it.type } + returnType).filterNotNull().any { it.containsError() } ||
+    return (valueParameters.map { it.type } + returnType + returnType?.getAbbreviation()).filterNotNull().any { it.containsError() } ||
             typeParameters.any { it.containsError() }
 }
 
