@@ -13,6 +13,7 @@ import org.jetbrains.dukat.moduleNameResolver.ConstNameResolver
 import org.jetbrains.dukat.panic.PanicMode
 import org.jetbrains.dukat.panic.setPanicMode
 import org.jetbrains.dukat.translatorString.D_TS_DECLARATION_EXTENSION
+import org.jetbrains.dukat.translatorString.D_MTS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.IDL_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.JS_DECLARATION_EXTENSION
 import org.jetbrains.dukat.translatorString.TS_DECLARATION_EXTENSION
@@ -192,7 +193,9 @@ private fun process(args: List<String>): CliOptions? {
 
             else -> when {
                 arg == "-" -> sources.add("-")
-                arg.endsWith(D_TS_DECLARATION_EXTENSION) || arg.endsWith(TS_DECLARATION_EXTENSION) -> {
+                arg.endsWith(D_TS_DECLARATION_EXTENSION)
+                        || arg.endsWith(TS_DECLARATION_EXTENSION)
+                        || arg.endsWith(D_MTS_DECLARATION_EXTENSION) -> {
                     sources.add(arg)
                 }
                 arg.endsWith(JS_DECLARATION_EXTENSION) -> {
@@ -206,7 +209,7 @@ private fun process(args: List<String>): CliOptions? {
                     printError(
                             """
 following file extensions are supported:
-    *.d.ts - for TypeScript declarations
+    *.d.ts, *.d.mts - for TypeScript declarations
     *.idl, *.webidl - for Web IDL declarations                            
                 """.trimIndent()
                     )
@@ -255,7 +258,9 @@ fun main(vararg args: String) {
             exitProcess(1)
         }
 
-        val isTypescriptDeclarationTranslation = options.sources.all { it.endsWith(D_TS_DECLARATION_EXTENSION) }
+        val isTypescriptDeclarationTranslation = options.sources.all {
+            it.endsWith(D_TS_DECLARATION_EXTENSION) || it.endsWith(D_MTS_DECLARATION_EXTENSION)
+        }
         val isTypescriptTranslation = options.sources.all { it.endsWith(TS_DECLARATION_EXTENSION) }
         val isJavascriptTranslation = options.sources.all { it.endsWith(JS_DECLARATION_EXTENSION) }
         val isIdlTranslation =

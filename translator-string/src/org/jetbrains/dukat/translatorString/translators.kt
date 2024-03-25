@@ -67,6 +67,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
     val ktFileNamePrefix =
             when {
                 sourceFileName.endsWith(D_TS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(D_TS_DECLARATION_EXTENSION)
+                sourceFileName.endsWith(D_MTS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(D_MTS_DECLARATION_EXTENSION)
                 sourceFileName.endsWith(TS_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(TS_DECLARATION_EXTENSION)
                 sourceFileName.endsWith(IDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(IDL_DECLARATION_EXTENSION)
                 sourceFileName.endsWith(WEBIDL_DECLARATION_EXTENSION) -> sourceFileName.removeSuffix(WEBIDL_DECLARATION_EXTENSION)
@@ -146,6 +147,7 @@ fun translateByteArray(data: ByteArray, translator: InputTranslator<ByteArray>):
 fun translateFile(fileName: String, translator: InputTranslator<String>): List<TranslationUnitResult> {
     if (!fileName.endsWith(TS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(D_TS_DECLARATION_EXTENSION) &&
+        !fileName.endsWith(D_MTS_DECLARATION_EXTENSION) &&
         !fileName.endsWith(IDL_DECLARATION_EXTENSION) &&
         !fileName.endsWith(WEBIDL_DECLARATION_EXTENSION)) {
         return listOf(TranslationErrorInvalidFile(fileName))
@@ -164,7 +166,7 @@ fun translateFile(fileName: String, translator: InputTranslator<String>): List<T
 
 private fun TranslationUnitResult.resolveAsError(source: String): String {
     return when (this) {
-        is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.ts extension can be processed"
+        is TranslationErrorInvalidFile -> "invalid file name: ${fileName} - only typescript declarations, that is, files with *.d.[m]ts extension can be processed"
         is TranslationErrorFileNotFound -> "file not found: ${fileName}"
         else -> "failed to translate ${source} for unknown reason"
     }
