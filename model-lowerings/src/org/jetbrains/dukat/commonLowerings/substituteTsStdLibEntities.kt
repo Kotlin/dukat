@@ -50,6 +50,7 @@ private fun TypeValueModel.createStdType(name: String): TypeValueModel {
 private enum class SubstitutedEntities(val value: IdentifierEntity) {
     NON_NULLABLE(IdentifierEntity("NonNullable")),
     EXCLUDE(IdentifierEntity("Exclude")),
+    PICK(IdentifierEntity("Pick")),
     REQUIRED(IdentifierEntity("Required")),
     READONLY_ARRAY(IdentifierEntity("ReadonlyArray")),
     TEMPLATE_STRINGS_ARRAY(IdentifierEntity("TemplateStringsArray")),
@@ -59,7 +60,13 @@ private enum class SubstitutedEntities(val value: IdentifierEntity) {
 private fun TypeValueModel.resolveAsSubstitution(): TypeValueModel? {
     val isLibReference = isLibReference()
 
-    return if (value == SubstitutedEntities.NON_NULLABLE.value || value == SubstitutedEntities.EXCLUDE.value || value == SubstitutedEntities.REQUIRED.value || value == SubstitutedEntities.OBJECT.value) {
+    return if (
+        value == SubstitutedEntities.NON_NULLABLE.value ||
+        value == SubstitutedEntities.EXCLUDE.value ||
+        value == SubstitutedEntities.PICK.value ||
+        value == SubstitutedEntities.REQUIRED.value ||
+        value == SubstitutedEntities.OBJECT.value
+    ) {
         if (isLibReference) {
             createStdType("Any")
         } else null
