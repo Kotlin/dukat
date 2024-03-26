@@ -9,7 +9,6 @@ import org.jetbrains.dukat.commonLowerings.AnyfyUnresolvedTypes
 import org.jetbrains.dukat.commonLowerings.ExtractNestedInheritedInterfaces
 import org.jetbrains.dukat.commonLowerings.RemoveDuplicateMembers
 import org.jetbrains.dukat.commonLowerings.RemoveParentAny
-import org.jetbrains.dukat.commonLowerings.RemoveUnsupportedJsNames
 import org.jetbrains.dukat.commonLowerings.RemoveUnusedGeneratedInterfaces
 import org.jetbrains.dukat.commonLowerings.ReplaceSimpleGeneratedInterfacesWithLambdas
 import org.jetbrains.dukat.commonLowerings.SeparateNonExternalEntities
@@ -101,7 +100,6 @@ open class TypescriptLowerer(
                         SubstituteTsStdLibEntities(),
                         RemoveParentAny(),
                         EscapeIdentificators(),
-                        RemoveUnsupportedJsNames(),
                         MergeClassLikesAndModuleDeclarations(),
                         MergeVarsAndInterfaces(),
                         ExtractNestedInheritedInterfaces(),
