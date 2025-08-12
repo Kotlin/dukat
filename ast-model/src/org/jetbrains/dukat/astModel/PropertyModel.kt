@@ -2,6 +2,7 @@ package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 
 data class PropertyModel(
         override val name: NameEntity,
@@ -21,5 +22,7 @@ data class PropertyModel(
 
         val explicitlyDeclaredType: Boolean,
 
-        val lateinit: Boolean
-) : MemberModel, NamedModel
+        val lateinit: Boolean,
+
+        override val expectActualModifier: ExpectActualModifier? = null
+) : MemberModel, CanBeExpectActual, NamedModel

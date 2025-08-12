@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class ObjectModel(
@@ -13,6 +14,7 @@ data class ObjectModel(
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
         override val external: Boolean,
+        override val expectActualModifier: ExpectActualModifier? = null
 ) : ClassLikeModel, CanHaveExternalModifierModel {
     override val annotations: List<AnnotationModel> = emptyList()
     override val typeParameters: List<TypeParameterModel> = emptyList()

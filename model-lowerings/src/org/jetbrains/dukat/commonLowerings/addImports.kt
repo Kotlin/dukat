@@ -112,7 +112,6 @@ private fun NameEntity.normalize(): NameEntity? {
     }
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 private fun ModuleModel.addImports(): ModuleModel {
 
     val nameVisitor = ImportResolver(name, buildMap<NameEntity, NameEntity> {

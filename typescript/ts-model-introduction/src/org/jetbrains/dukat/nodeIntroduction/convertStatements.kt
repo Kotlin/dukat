@@ -455,7 +455,7 @@ class ExpressionConverter(private val typeConverter: (ParameterValueDeclaration)
     }
 
     private fun BlockDeclaration.countReturns(): Int {
-        return statements.sumBy { when (it) {
+        return statements.sumOf { when (it) {
             is ReturnStatementDeclaration -> if (it.expression == null) {
                 2
             } else {
@@ -466,7 +466,7 @@ class ExpressionConverter(private val typeConverter: (ParameterValueDeclaration)
             }
             is WhileStatementDeclaration -> it.statement.countReturns()
             is ForOfStatementDeclaration -> it.body.countReturns()
-            is SwitchStatementDeclaration -> it.cases.sumBy { case -> case.body.countReturns() }
+            is SwitchStatementDeclaration -> it.cases.sumOf { case -> case.body.countReturns() }
             is BlockDeclaration -> it.countReturns()
             else -> 0
         } }

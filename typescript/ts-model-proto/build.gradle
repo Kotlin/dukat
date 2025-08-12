@@ -30,7 +30,7 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
     ignoreExitValue true
 
     doLast {
-        if (execResult.exitValue > 0) {
+        if (executionResult.get().exitValue > 0) {
             throw new GradleException(errorOutput.toString())
         }
     }
@@ -39,6 +39,10 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
 task copyGeneratedTs(type: Copy) {
     from "$targetMainDir/ts"
     into "$targetMainDir/js"
+}
+
+compileJava.configure {
+   dependsOn(copyGeneratedTs)
 }
 
 dependencies {
@@ -78,6 +82,7 @@ protobuf {
                 task.dependsOn = [installNpmDependencies]
                 task.finalizedBy(copyGeneratedTs)
             }
+
 
             task.builtins {
                 js {

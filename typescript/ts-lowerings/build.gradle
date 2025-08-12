@@ -2,6 +2,12 @@ plugins {
     id("kotlin")
 }
 
+compileKotlin {
+    kotlinOptions {
+       freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+}
+
 dependencies {
     implementation(project(":ast-common"))
     implementation(project(":itertools"))

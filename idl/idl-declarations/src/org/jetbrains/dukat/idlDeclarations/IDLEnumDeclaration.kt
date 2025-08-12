@@ -18,7 +18,7 @@ private fun String.addUnderscoreIfStartsWithNumber(): String {
 fun processEnumMember(memberName: String): String {
     return memberName
             .removeSurrounding("\"")
-            .toUpperCase()
+            .uppercase()
             .replace('-', '_')
             .replace('/', '_')
             .replace('+', '_')

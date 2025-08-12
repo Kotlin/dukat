@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.CompilerEnvironment
 
 class JsStdlibConfigContext(private val stdLib: String) {
 
@@ -41,7 +42,7 @@ class JsStdlibConfigContext(private val stdLib: String) {
     }
 
     fun generateJSConfig(): JsConfig {
-        return JsConfig(environment.project, environment.configuration)
+        return JsConfig(environment.project, environment.configuration, CompilerEnvironment)
     }
 
     private fun deserializeStdlib(): ModuleDescriptor {

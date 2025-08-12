@@ -70,9 +70,9 @@ task webpack(type: Exec) {
 
 task createJar(type: Zip) {
   dependsOn = [webpack]
-  baseName 'dukatts'
-  extension 'jar'
-  destinationDir file("${project.buildDir}/jar")
+  archiveBaseName.set('dukatts')
+  archiveExtension.set('jar')
+  destinationDirectory.set(file("${project.buildDir}/jar"))
 
   from("${packagePath}/node_modules/typescript/lib/tsserverlibrary.js") {
     into 'ts'

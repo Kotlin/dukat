@@ -101,7 +101,7 @@ private fun SourceFileModel.resolveAsTargetName(packageName: NameEntity, clashMa
         name = name.appendLeft(it.normalize() ?: IdentifierEntity("_"))
     }
 
-    val nameString = name.toString().toLowerCase()
+    val nameString = name.toString().lowercase()
 
     clashMap[nameString] = clashMap.getOrPut(nameString) { 0 } + 1
     clashMap[nameString]?.let { count ->

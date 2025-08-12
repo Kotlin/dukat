@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package org.jetbrains.dukat.descriptors
 
 import org.jetbrains.dukat.astCommon.IdentifierEntity
@@ -75,7 +76,6 @@ import org.jetbrains.kotlin.descriptors.impl.PropertyGetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertySetterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
-import org.jetbrains.kotlin.fir.lightTree.fir.modifier.VisibilityModifier
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.load.java.components.DescriptorResolverUtils
 import org.jetbrains.kotlin.name.FqName
@@ -288,7 +288,8 @@ private class DescriptorTranslator(val context: DescriptorContext) {
                         parameterNames = typeModel.parameters.map {
                             Name.identifier(translateName(IdentifierEntity(it.name ?: "_")))
                         },
-                        returnType = returnType
+                        returnType = returnType,
+                        contextReceiverTypes = emptyList()
                 ).makeNullableAsSpecified(typeModel.nullable)
             }
         }

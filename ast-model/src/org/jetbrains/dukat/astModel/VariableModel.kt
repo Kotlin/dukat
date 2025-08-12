@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astModel.statements.StatementModel
 import org.jetbrains.dukat.astCommon.NameEntity
 import org.jetbrains.dukat.astModel.expressions.ExpressionModel
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 
 data class VariableModel(
@@ -24,5 +25,7 @@ data class VariableModel(
         override val comment: CommentEntity?,
 
         override val metaDescription: String? = null,
-        val explicitlyDeclaredType: Boolean
+        val explicitlyDeclaredType: Boolean,
+
+        override val expectActualModifier: ExpectActualModifier? = null
 ) : TopLevelModel, StatementModel, CanHaveExternalModifierModel, CanBeExtensionModel

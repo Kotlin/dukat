@@ -1,6 +1,7 @@
 package org.jetbrains.dukat.astModel
 
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 
 data class MethodModel(
@@ -16,5 +17,7 @@ data class MethodModel(
 
         val open: Boolean,
 
-        val body: BlockStatementModel?
-) : MemberModel, NamedCallableModel
+        val body: BlockStatementModel?,
+
+        override val expectActualModifier: ExpectActualModifier? = null
+) : MemberModel, CanBeExpectActual, NamedCallableModel

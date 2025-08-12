@@ -28,7 +28,7 @@ dependencies {
     implementation(project(":idl-reference-resolver"))
     implementation(project(":ast-common"))
 
-    runtime files(project.sourceSets.generated.output.classesDirs)
+    runtimeOnly files(project.sourceSets.generated.output.classesDirs)
 }
 
 project.sourceSets.main.antlr.srcDirs = ["src/main/antlr4"]
@@ -42,11 +42,11 @@ task createGeneratedSourcesDir {
 compileGeneratedJava {
     dependsOn(createGeneratedSourcesDir)
     dependsOn(generateGrammarSource)
-    classpath = configurations.compile
+    classpath = configurations.compileClasspath
 }
 
 compileKotlin {
-    source += sourceSets.generated.java
+    source(sourceSets.generated.java)
 }
 
 generateGrammarSource {

@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "listFiles": true,
+    "skipLibCheck": true,
     "listEmittedFiles": true,
     "baseUrl": "./",
     "noImplicitAny": false,

@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.CompilerEnvironment
 import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
 import org.jetbrains.kotlin.serialization.js.JsSerializerProtocol
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil
@@ -66,7 +67,7 @@ private fun convertToDescriptors(sourceSet: SourceSetModel, stdLib: String): Col
             ),
             LanguageVersionSettingsImpl.DEFAULT,
             JsMetadataVersion.INSTANCE,
-            JsConfig(environment.project, environment.configuration).project
+            JsConfig(environment.project, environment.configuration, CompilerEnvironment).project
     )
     val outputMetaJsFile =
             SimpleOutputFile(listOf(), "$name.meta.js", metadata.asString())

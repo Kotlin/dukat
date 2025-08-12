@@ -3,6 +3,7 @@ package org.jetbrains.dukat.astModel
 import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.MemberEntity
 import org.jetbrains.dukat.astCommon.NameEntity
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.BlockStatementModel
 
@@ -22,5 +23,6 @@ data class FunctionModel(
         val body: BlockStatementModel?,
         override val visibilityModifier: VisibilityModifierModel,
         override val comment: CommentEntity?,
-        override val external: Boolean
+        override val external: Boolean,
+        override val expectActualModifier: ExpectActualModifier? = null
 ) : MemberEntity, TopLevelModel, CanHaveExternalModifierModel, NamedCallableModel, CanBeExtensionModel

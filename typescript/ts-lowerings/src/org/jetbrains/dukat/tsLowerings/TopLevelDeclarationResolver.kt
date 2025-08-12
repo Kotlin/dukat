@@ -31,7 +31,6 @@ private fun ModuleDeclaration.scan(topLevelDeclarationsMap: MutableMap<String, T
 }
 
 class TopLevelDeclarationResolver(private val sourceSetDeclaration: SourceSetDeclaration) : Iterable<TopLevelDeclaration> {
-    @OptIn(ExperimentalStdlibApi::class)
     private val declarationMap = buildMap<String, TopLevelDeclaration> {
         sourceSetDeclaration.sources.forEach { it.root.scan(this) }
     }

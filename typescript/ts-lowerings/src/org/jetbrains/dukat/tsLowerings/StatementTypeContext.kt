@@ -73,7 +73,6 @@ internal class StatementTypeContext : DeclarationLowering {
         scopes += Scope()
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun endScope() {
         scopes.removeLast()
     }

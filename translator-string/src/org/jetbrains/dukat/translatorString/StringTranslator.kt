@@ -4,6 +4,7 @@ import org.jetbrains.dukat.astCommon.CommentEntity
 import org.jetbrains.dukat.astCommon.IdentifierEntity
 import org.jetbrains.dukat.astCommon.SimpleCommentEntity
 import org.jetbrains.dukat.astModel.AnnotationModel
+import org.jetbrains.dukat.astModel.CanBeExpectActual
 import org.jetbrains.dukat.astModel.ClassLikeReferenceModel
 import org.jetbrains.dukat.astModel.ClassModel
 import org.jetbrains.dukat.astModel.ConstructorModel
@@ -23,6 +24,7 @@ import org.jetbrains.dukat.astModel.ModuleModel
 import org.jetbrains.dukat.astModel.ObjectModel
 import org.jetbrains.dukat.astModel.ParameterModel
 import org.jetbrains.dukat.astModel.ParameterModifierModel
+import org.jetbrains.dukat.astModel.ParametersOwnerModel
 import org.jetbrains.dukat.astModel.PropertyModel
 import org.jetbrains.dukat.astModel.TypeAliasModel
 import org.jetbrains.dukat.astModel.TypeModel
@@ -91,6 +93,7 @@ import org.jetbrains.dukat.astModel.expressions.templates.StringTemplateTokenMod
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateExpressionModel
 import org.jetbrains.dukat.astModel.expressions.templates.TemplateTokenModel
 import org.jetbrains.dukat.astModel.isGeneric
+import org.jetbrains.dukat.astModel.modifiers.ExpectActualModifier
 import org.jetbrains.dukat.astModel.modifiers.InheritanceModifierModel
 import org.jetbrains.dukat.astModel.modifiers.VisibilityModifierModel
 import org.jetbrains.dukat.astModel.statements.AssignmentStatementModel
@@ -113,6 +116,8 @@ import org.jetbrains.dukat.translator.ROOT_PACKAGENAME
 private const val FORMAT_TAB = "    "
 
 private const val KEYWORD_EXTERNAL = "external"
+private const val KEYWORD_EXPECT = "expect"
+private const val KEYWORD_ACTUAL = "actual"
 private const val KEYWORD_INLINE = "inline"
 private const val KEYWORD_OPERATOR = "operator"
 
@@ -210,7 +215,7 @@ fun TypeModel.translate(): String {
     }
 }
 
-private fun ParameterModel.translate(needsMeta: Boolean = true): String {
+private fun ParameterModel.translate(needsMeta: Boolean = true, skipDefaultValues: Boolean = false): String {
     var res = name + ": " + type.translate()
     if (vararg) {
         res = "vararg $res"
@@ -229,7 +234,7 @@ private fun ParameterModel.translate(needsMeta: Boolean = true): String {
         res += type.translateMeta()
     }
 
-    initializer?.let {
+    initializer.takeIf { !skipDefaultValues }?.let {
         res += " = ${it.translateAsOneLine()}"
         if (needsMeta) {
             res += it.translateMeta()
@@ -270,11 +275,10 @@ private fun translateTypeArguments(typeParameters: List<TypeModel>): String {
     }
 }
 
-
-private fun translateParameters(parameters: List<ParameterModel>, needsMeta: Boolean = true): String {
-    return parameters
-            .map { parameter -> parameter.translate(needsMeta) }
-            .joinToString(", ")
+private fun <T> T.translateParameters(parameters: List<ParameterModel>, needsMeta: Boolean = true): String
+    where T: ParametersOwnerModel<*>, T: CanBeExpectActual {
+        val shouldSkipDefaultValues = expectActualModifier == ExpectActualModifier.ACTUAL
+        return parameters.joinToString(", ") { parameter -> parameter.translate(needsMeta, shouldSkipDefaultValues) }
 }
 
 
@@ -611,6 +615,12 @@ private fun BlockStatementModel?.translateFirstLine(): String {
     }
 }
 
+private val ExpectActualModifier.keyword: String
+    get() = when (this) {
+        ExpectActualModifier.EXPECT -> KEYWORD_EXPECT
+        ExpectActualModifier.ACTUAL -> KEYWORD_ACTUAL
+    }
+
 private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     comment?.translate(output)
 
@@ -625,13 +635,16 @@ private fun FunctionModel.translate(padding: Int, output: (String) -> Unit) {
     }
 
     val tokens = mutableListOf<String>()
-    visibilityModifier.translate()?.let { tokens.add(it) }
+
+    visibilityModifier.keyword?.let(tokens::add)
+    expectActualModifier?.keyword?.let(tokens::add)
 
     val modifier = if (inline) {
         KEYWORD_INLINE
     } else if (external) {
         KEYWORD_EXTERNAL
     } else null
+
     modifier?.let { tokens.add(modifier) }
 
     if (operator) {
@@ -679,6 +692,7 @@ private fun MethodModel.translate(): List<String> {
     }
 
     val operatorModifier = if (operator) "operator " else ""
+    val expectActualModifier = expectActualModifier?.keyword?.let { "${it} " } ?: ""
     val annotations = annotations.map { it.translate() }
 
     val open = !static && open
@@ -704,7 +718,7 @@ private fun MethodModel.translate(): List<String> {
 
     return annotations +
             listOf(
-                    "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${
+                    "$expectActualModifier$overrideClause${operatorModifier}fun${typeParams} ${name.translate()}(${
                         translateParameters(
                                 parameters
                         )
@@ -715,7 +729,7 @@ private fun MethodModel.translate(): List<String> {
 
 private fun ConstructorModel.translate(): List<String> {
     val typeParams = translateTypeParameters(typeParameters)
-    return listOf("constructor${typeParams}(${translateParameters(parameters, false)})")
+    return listOf("${expectActualModifier?.keyword?.plus(" ").orEmpty()}constructor${typeParams}(${translateParameters(parameters, false)})")
 }
 
 private fun InitBlockModel.translate(): List<String> {
@@ -724,7 +738,7 @@ private fun InitBlockModel.translate(): List<String> {
 }
 
 private fun TypeAliasModel.translate(): String {
-    return "typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
+    return "${expectActualModifier?.keyword?.plus(" ").orEmpty()}typealias ${name.translate()}${translateTypeParameters(typeParameters)} = ${typeReference.translate()}"
 }
 
 private fun VariableModel.translate(asDeclaration: Boolean = true): String {
@@ -766,7 +780,9 @@ private fun VariableModel.translate(asDeclaration: Boolean = true): String {
 
     val tokens = mutableListOf<String>()
 
-    visibilityModifier.translate()?.let { tokens.add(it) }
+    visibilityModifier.keyword?.let(tokens::add)
+    expectActualModifier?.keyword?.let(tokens::add)
+
     modifier?.let { tokens.add(it) }
 
     if (variableKeyword != null) {
@@ -784,6 +800,8 @@ private fun EnumModel.translate(padding: Int = 0): String {
         modifiers.add(KEYWORD_EXTERNAL)
     }
 
+    expectActualModifier?.keyword?.let(modifiers::add)
+
     val space = if (modifiers.isEmpty()) "" else " "
     val res = mutableListOf("${modifiers.joinToString(" ")}${space}enum class ${name.translate()} {")
     val members = values.map { value ->
@@ -799,6 +817,7 @@ private fun EnumModel.translate(padding: Int = 0): String {
 
 private fun PropertyModel.translate(): String {
     val open = !static && open
+    val expectActualKeyword = expectActualModifier?.keyword?.plus(" ") ?: ""
     val modifier = if (!override.isNullOrEmpty()) "override " else if (open) "open " else ""
     val lateinitModifier = if (lateinit) "lateinit " else ""
     val varModifier = if (immutable) "val" else "var"
@@ -809,7 +828,7 @@ private fun PropertyModel.translate(): String {
         ""
     }
 
-    return "$modifier$lateinitModifier$varModifier ${name.translate()}$type$initializer"
+    return "$expectActualKeyword$modifier$lateinitModifier$varModifier ${name.translate()}$type$initializer"
 }
 
 private fun MemberModel.translate(): List<String> {
@@ -831,8 +850,8 @@ private fun ImportModel.translate(): String {
 
 private fun PropertyModel.translateSignature(): List<String> {
     val varModifier = if (immutable) "val" else "var"
-    val overrideClause = if (!override.isNullOrEmpty()) "override " else ""
-
+    val overrideClause = if (!override.isNullOrEmpty()) "override " else if (open) "open " else ""
+    val expectActualClause = expectActualModifier?.keyword?.let { "$it " } ?: ""
 
     var typeParams = translateTypeParameters(typeParameters)
     if (typeParams.isNotEmpty()) {
@@ -840,7 +859,7 @@ private fun PropertyModel.translateSignature(): List<String> {
     }
     val metaClause = type.translateMeta()
     val res = mutableListOf(
-            "${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
+            "$expectActualClause${overrideClause}${varModifier}${typeParams} ${name.translate()}: ${type.translate()}${metaClause}"
     )
     if (getter) {
         res.add(FORMAT_TAB + "get() = definedExternally")
@@ -863,10 +882,11 @@ private fun MethodModel.translateSignature(): List<String> {
     val returnsUnit = (type is TypeValueModel) && ((type as TypeValueModel).value == IdentifierEntity("Unit"))
     val returnClause = if (returnsUnit) "" else ": ${type.translate()}"
     val overrideClause = if (!override.isNullOrEmpty()) "override " else ""
+    val expectActualClause = expectActualModifier?.keyword?.let { "$it " } ?: ""
 
     val metaClause = type.translateMeta()
     val methodNodeTranslation =
-            "${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
+            "$expectActualClause${overrideClause}${operatorModifier}fun${typeParams} ${name.translate()}(${translateParameters(parameters)})${returnClause}$metaClause"
     return annotations + listOf(methodNodeTranslation)
 }
 
@@ -925,15 +945,14 @@ private fun ClassModel.translate(depth: Int): String {
     return res.joinToString(LINE_SEPARATOR)
 }
 
-private fun VisibilityModifierModel.translate(): String? {
-    return when (this) {
+private val VisibilityModifierModel.keyword: String?
+    get() = when (this) {
         VisibilityModifierModel.PUBLIC -> "public"
         VisibilityModifierModel.INTERNAL -> "internal"
         VisibilityModifierModel.PRIVATE -> "private"
         VisibilityModifierModel.PROTECTED -> "protected"
         VisibilityModifierModel.DEFAULT -> null
     }
-}
 
 private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     val primaryConstructor = primaryConstructor
@@ -944,17 +963,18 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
     val parents = translateHeritagModels(parentEntities)
     val modifiers = mutableListOf<String>()
 
-    visibilityModifier.translate()?.let { modifiers.add(it) }
+    visibilityModifier.keyword?.let(modifiers::add)
+    expectActualModifier?.keyword?.let(modifiers::add)
 
     if (external) {
         modifiers.add(KEYWORD_EXTERNAL)
     }
 
     val params = if (primaryConstructor == null) "" else
-        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors) "" else "(${
-            translateParameters(
-                    primaryConstructor.parameters
-            )
+        if (primaryConstructor.parameters.isEmpty() && !hasSecondaryConstructors && expectActualModifier == null) "" else "${
+            primaryConstructor.expectActualModifier?.keyword?.let { " $it constructor" } ?: ""
+        }(${
+            primaryConstructor.translateParameters(primaryConstructor.parameters)
         })"
 
     when (inheritanceModifier) {
@@ -994,7 +1014,7 @@ private fun ClassModel.translate(depth: Int, output: (String) -> Unit) {
         if (hasMembers) {
             output("")
         }
-        output(FORMAT_TAB.repeat(depth + 1) + "companion object${companionObjectHeritages}${if (!hasStaticMembers) "" else " {"}")
+        output(FORMAT_TAB.repeat(depth + 1) + "${companionObject?.expectActualModifier?.keyword?.plus(" ").orEmpty()}companion object${companionObjectHeritages}${if (!hasStaticMembers) "" else " {"}")
     }
     if (hasStaticMembers) {
         staticMembers.flatMap { it.translate() }.map({ FORMAT_TAB.repeat(depth + 2) + it }).forEach {
@@ -1023,9 +1043,12 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
 
     val isBlock = hasMembers || staticMembers.isNotEmpty() || companionObject != null
     val parents = translateHeritagModels(parentEntities)
+    val expectActualKeyword = expectActualModifier?.keyword
 
     val tokens = mutableListOf<String>()
-    visibilityModifier.translate()?.let { tokens.add(it) }
+
+    visibilityModifier.keyword?.let(tokens::add)
+    expectActualKeyword?.let(tokens::add)
 
     if (external) {
         tokens.add(KEYWORD_EXTERNAL)
@@ -1054,7 +1077,7 @@ fun InterfaceModel.translate(padding: Int, output: (String) -> Unit) {
             if (hasMembers) {
                 output("")
             }
-            output("${FORMAT_TAB.repeat(padding + 1)}companion object${parentsResolved}${if (staticMembers.isEmpty()) "" else " {"}")
+            output("${FORMAT_TAB.repeat(padding + 1)}${companionObject?.expectActualModifier?.keyword?.plus(" ").orEmpty()}companion object${parentsResolved}${if (staticMembers.isEmpty()) "" else " {"}")
 
             if (staticMembers.isNotEmpty()) {
                 staticMembers.flatMap { it.translate() }.map { "${FORMAT_TAB.repeat(padding + 2)}${it}" }
@@ -1098,7 +1121,8 @@ class StringTranslator : ModelVisitor {
         addOutput("")
 
         val modifiers = mutableListOf<String>()
-        objectNode.visibilityModifier.translate()?.let { modifiers.add(it) }
+        objectNode.visibilityModifier.keyword?.let(modifiers::add)
+        objectNode.expectActualModifier?.keyword?.let(modifiers::add)
         modifiers.add(KEYWORD_EXTERNAL)
 
         val objectModel =

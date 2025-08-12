@@ -58,8 +58,8 @@ dependencies {
     implementation(project(":ts-model-introduction"))
     implementation(project(":ts-translator"))
 
-    runtime 'org.jetbrains.kotlin:kotlin-reflect'
-    compile 'org.jetbrains.kotlin:kotlin-reflect'
+    runtimeOnly 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
     testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
 
@@ -78,7 +78,7 @@ dependencies {
 
     testImplementation "org.jetbrains.kotlinx:kotlinx-serialization-core:${gradle.kotlinSerializationVersion}"
 
-    compile(project(path: ":ts-converter", configuration: 'dukatTsResources'))
+    implementation(project(path: ":ts-converter", configuration: 'dukatTsResources'))
 
     kotlinJsLibs("org.jetbrains.kotlin:kotlin-stdlib-js:${gradle.kotlinVersion}")
 
