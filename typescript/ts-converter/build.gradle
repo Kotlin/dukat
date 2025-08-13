@@ -3,6 +3,7 @@ plugins {
 }
 
 def packagePath = "${project.buildDir}/package"
+def nodeModules = "${packagePath}/node_modules/"
 def typescriptVersion = hasProperty("tsVersion") ? tsVersion : gradle.defaultTsVersion
 def tsDeclarationsPath = ".tsdeclarations"
 
@@ -28,6 +29,7 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
   workingDir packagePath
   errorOutput = new ByteArrayOutputStream()
   ignoreExitValue true
+  outputs.dir(nodeModules)
 
   doLast {
     if (execResult.exitValue > 0) {
@@ -36,12 +38,13 @@ task installNpmDependencies(dependsOn: [prepareNpmPackage, execConfig, ":node-di
   }
 }
 
+
 task copyTypescriptDeclarations(type: Copy) {
   dependsOn = [installNpmDependencies]
-
-  from "${packagePath}/node_modules/typescript/lib"
-  into tsDeclarationsPath
+  inputs.files(installNpmDependencies.outputs.files)
+  from "${nodeModules}/typescript/lib/"
   include "*.d.ts"
+  into tsDeclarationsPath
 }
 
 task compileTs(type: Exec) {
@@ -51,6 +54,7 @@ task compileTs(type: Exec) {
   inputs.file("./tsconfig.json")
   inputs.dir("./src")
   inputs.dir(packagePath)
+  inputs.dir(copyTypescriptDeclarations.destinationDir)
   outputs.dir("./build/ts")
 }
 
