@@ -154,7 +154,7 @@ private fun ParameterValueDeclaration.unroll(): List<ParameterValueDeclaration> 
     }
 }
 
-private fun Declaration.isOpen() = this !is ObjectLiteralDeclaration
+private fun Declaration.isOpen() = this !is ObjectLiteralDeclaration && this !is InterfaceDeclaration
 
 //TODO: this should be done somewhere near escapeIdentificators (at least code should be reused)
 private fun escapeName(name: String): String {

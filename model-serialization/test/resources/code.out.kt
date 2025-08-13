@@ -42,6 +42,7 @@ public external interface Json
 
 public external open class Promise<T> {
     open fun catch(onRejected: ((Throwable) -> S)?): Promise
+    open fun finally(onFinally: Function0): Promise
     open fun then(onFulfilled: ((T) -> S)?): Promise
     open fun then(onFulfilled: ((T) -> S)?, onRejected: ((Throwable) -> S)?): Promise
 }
