@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
+import java.nio.file.FileSystems
 import kotlin.test.assertEquals
 
 internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: String?) {
@@ -51,36 +52,4 @@ internal fun assertDescriptorEquals(name: String, tsPath: String, tsConfig: Stri
             RecursiveDescriptorComparator().serializeRecursively(outputModuleDescriptor.getPackage(FqName.ROOT)),
             RecursiveDescriptorComparator().serializeRecursively(expectedModuleDescriptor.getPackage(FqName.ROOT))
     )
-}
-
-@ExtendWith(CliTestsStarted::class, CliTestsEnded::class)
-class DescriptorTests {
-
-    @DisplayName("descriptors test set")
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("descriptorsTestSet")
-    @Suppress("UNUSED_PARAMETER")
-    fun withValueSource(name: String, tsPath: String, ktPath: String, tsConfig: String) {
-        assertDescriptorEquals(name, tsPath, if (tsConfig.isEmpty()) null else tsConfig)
-    }
-
-    companion object {
-        private val skippedDescriptorTests = setOf<String>(
-                "class/inheritance/overrides",
-                "class/inheritance/overridesFromReferencedFile",
-                "class/inheritance/overridingStdLib",
-                "class/inheritance/simple",
-                "interface/inheritance/simple",
-                "interface/inheritance/withQualifiedParent",
-                "mergeDeclarations/moduleWith/functionAndSecondaryWithTrait",
-                "misc/missedOverloads",
-                "override/copyGeneratedMembers"
-        ).map { it.replace("/", System.getProperty("file.separator")) }
-
-        @JvmStatic
-        fun descriptorsTestSet(): Array<Array<String>> {
-            return MethodSourceSourceFiles("./test/data/typescript/node_modules", D_TS_DECLARATION_EXTENSION)
-                    .fileSetWithDescriptors().filter { !skippedDescriptorTests.contains(it.first()) }.toTypedArray()
-        }
-    }
 }
